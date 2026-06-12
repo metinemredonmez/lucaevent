@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 1200" width="2400" height="1200" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- warm stage lights from top -->
+    <radialGradient id="light1" cx="30%" cy="10%" r="50%">
+      <stop offset="0%" stop-color="#FF6A3D" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#FF6A3D" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="light2" cx="70%" cy="15%" r="45%">
+      <stop offset="0%" stop-color="#FFB366" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#FFB366" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="light3" cx="50%" cy="0%" r="60%">
+      <stop offset="0%" stop-color="#FF3D00" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#FF3D00" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- haze over stage -->
+    <linearGradient id="haze" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1A0F0A" stop-opacity="0"/>
+      <stop offset="60%" stop-color="#0B0B0E" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#0B0B0E" stop-opacity="1"/>
+    </linearGradient>
+
+    <!-- base sky -->
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1C0E08"/>
+      <stop offset="45%" stop-color="#100908"/>
+      <stop offset="100%" stop-color="#0B0B0E"/>
+    </linearGradient>
+
+    <!-- film noise -->
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7"/>
+      <feColorMatrix values="0 0 0 0 0.7 0 0 0 0 0.45 0 0 0 0 0.3 0 0 0 0.06 0"/>
+    </filter>
+
+    <!-- soft bokeh dots -->
+    <radialGradient id="bokeh">
+      <stop offset="0%" stop-color="#FFC89A" stop-opacity="0.6"/>
+      <stop offset="70%" stop-color="#FF8A40" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#FF8A40" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- layers -->
+  <rect width="2400" height="1200" fill="url(#sky)"/>
+  <rect width="2400" height="1200" fill="url(#light1)"/>
+  <rect width="2400" height="1200" fill="url(#light2)"/>
+  <rect width="2400" height="1200" fill="url(#light3)"/>
+
+  <!-- scattered bokeh -->
+  <g opacity="0.75">
+    <circle cx="350" cy="280" r="60" fill="url(#bokeh)"/>
+    <circle cx="1850" cy="230" r="90" fill="url(#bokeh)"/>
+    <circle cx="1200" cy="180" r="45" fill="url(#bokeh)"/>
+    <circle cx="1550" cy="340" r="30" fill="url(#bokeh)"/>
+    <circle cx="720" cy="380" r="38" fill="url(#bokeh)"/>
+    <circle cx="2100" cy="300" r="52" fill="url(#bokeh)"/>
+  </g>
+
+  <!-- crowd silhouettes (impressionistic) -->
+  <g fill="#070708" opacity="0.95">
+    <!-- back row -->
+    <ellipse cx="120"  cy="960" rx="70" ry="130"/>
+    <ellipse cx="260"  cy="950" rx="75" ry="140"/>
+    <ellipse cx="410"  cy="955" rx="68" ry="135"/>
+    <ellipse cx="560"  cy="945" rx="78" ry="145"/>
+    <ellipse cx="720"  cy="960" rx="70" ry="130"/>
+    <ellipse cx="880"  cy="950" rx="80" ry="148"/>
+    <ellipse cx="1040" cy="955" rx="70" ry="135"/>
+    <ellipse cx="1200" cy="948" rx="82" ry="150"/>
+    <ellipse cx="1360" cy="960" rx="72" ry="132"/>
+    <ellipse cx="1520" cy="952" rx="78" ry="142"/>
+    <ellipse cx="1680" cy="958" rx="68" ry="132"/>
+    <ellipse cx="1840" cy="950" rx="80" ry="146"/>
+    <ellipse cx="2000" cy="960" rx="72" ry="134"/>
+    <ellipse cx="2160" cy="952" rx="76" ry="140"/>
+    <ellipse cx="2300" cy="958" rx="74" ry="136"/>
+
+    <!-- heads -->
+    <circle cx="120"  cy="850" r="34"/>
+    <circle cx="260"  cy="840" r="38"/>
+    <circle cx="410"  cy="845" r="35"/>
+    <circle cx="560"  cy="830" r="40"/>
+    <circle cx="720"  cy="850" r="36"/>
+    <circle cx="880"  cy="832" r="42"/>
+    <circle cx="1040" cy="845" r="36"/>
+    <circle cx="1200" cy="828" r="42"/>
+    <circle cx="1360" cy="850" r="36"/>
+    <circle cx="1520" cy="840" r="40"/>
+    <circle cx="1680" cy="848" r="35"/>
+    <circle cx="1840" cy="832" r="42"/>
+    <circle cx="2000" cy="850" r="37"/>
+    <circle cx="2160" cy="840" r="39"/>
+    <circle cx="2300" cy="848" r="38"/>
+  </g>
+
+  <!-- raised hands hint -->
+  <g fill="#0A0A0C" opacity="0.95">
+    <rect x="560"  y="770" width="14" height="70" rx="7"/>
+    <rect x="880"  y="760" width="14" height="80" rx="7"/>
+    <rect x="1200" y="760" width="14" height="72" rx="7"/>
+    <rect x="1520" y="765" width="14" height="78" rx="7"/>
+    <rect x="1840" y="760" width="14" height="76" rx="7"/>
+    <rect x="2160" y="770" width="14" height="70" rx="7"/>
+  </g>
+
+  <!-- warm haze over lower half -->
+  <rect width="2400" height="1200" fill="url(#haze)"/>
+
+  <!-- grain -->
+  <rect width="2400" height="1200" filter="url(#grain)" opacity="0.7"/>
+</svg>

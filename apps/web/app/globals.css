@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* LIGHT MODE — Luca (nötr açık taban + mor accent) */
+    --background: 240 8% 98%;          /* temiz near-white (mor değil) */
+    --foreground: 255 8% 9%;           /* nötr siyah */
+    --card: 0 0% 100%;
+    --card-foreground: 255 8% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 255 8% 9%;
+    --primary: 271 91% 65%;            /* #A855F7 — tek accent */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 255 6% 95%;
+    --secondary-foreground: 255 8% 9%;
+    --muted: 255 5% 95%;
+    --muted-foreground: 250 5% 40%;
+    --accent: 255 6% 93%;
+    --accent-foreground: 255 8% 9%;
+    --destructive: 0 74% 42%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 146 65% 30%;
+    --warn: 25 90% 37%;
+    --border: 255 6% 89%;
+    --input: 255 6% 89%;
+    --ring: 271 91% 65%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* DARK MODE — Luca (nötr kömür taban + tek mor accent, ana mod) */
+    --background: 255 7% 5%;           /* nötr near-black (mor değil) */
+    --foreground: 240 8% 97%;          /* temiz near-white */
+    --card: 255 6% 9%;                 /* nötr kömür */
+    --card-foreground: 240 8% 97%;
+    --popover: 255 6% 9%;
+    --popover-foreground: 240 8% 97%;
+    --primary: 271 91% 65%;            /* #A855F7 — tek accent */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 255 6% 14%;
+    --secondary-foreground: 240 8% 97%;
+    --muted: 255 5% 14%;
+    --muted-foreground: 250 5% 64%;    /* nötr gri */
+    --accent: 255 6% 19%;
+    --accent-foreground: 240 8% 97%;
+    --destructive: 0 74% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 146 65% 45%;
+    --warn: 35 90% 55%;
+    --border: 255 6% 19%;
+    --input: 255 6% 19%;
+    --ring: 271 91% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html, body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+  }
+  ::selection {
+    @apply bg-primary/35 text-foreground;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  /* Hafif kağıt dokusu — premium hissi */
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  }
+  .mask-fade-bottom {
+    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  }
+  /* Neon mor gradient yazı (eski .text-gold-grad ile aynı sınıf adı korundu — kod değişmesin) */
+  .text-gold-grad {
+    background: linear-gradient(135deg, #C026D3 0%, #A855F7 50%, #7C3AED 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  /* Mor neon glow border */
+  .border-gold {
+    border-color: rgba(168, 85, 247, 0.35);
+  }
+  /* Neon mor glow efekti (logo benzeri) */
+  .glow-violet {
+    box-shadow:
+      0 0 20px rgba(168, 85, 247, 0.26),
+      0 0 52px rgba(168, 85, 247, 0.13);
+  }
+  .text-glow-violet {
+    text-shadow:
+      0 0 16px rgba(168, 85, 247, 0.32),
+      0 0 40px rgba(168, 85, 247, 0.16);
+  }
+}

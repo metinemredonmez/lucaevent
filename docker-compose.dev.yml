@@ -1,0 +1,75 @@
+# Luca — local dev stack
+# Frontend ve backend lokalde çalışır (yarn/pnpm dev).
+# Sadece veritabanı ve cache Docker'da.
+name: luca
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: luca-postgres
+    restart: unless-stopped
+    ports:
+      - "55432:5432"   # Mac'te lokal postgres 5432'yi kullanıyor, çakışma için 55432
+    environment:
+      POSTGRES_USER: luca
+      POSTGRES_PASSWORD: luca
+      POSTGRES_DB: luca_dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U luca -d luca_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: luca-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+
+  # Mailpit kaldırıldı — Luca production SMTP'sini (CyberPanel) kullanıyor.
+  # Mail dev'de gerçekten gönderilecek; ister boş bırakırsın, ister test inbox'a yönlendir.
+
+  minio:
+    image: minio/minio:latest
+    container_name: luca-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # Console → http://localhost:9001
+    environment:
+      MINIO_ROOT_USER: luca
+      MINIO_ROOT_PASSWORD: luca-dev-secret
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: luca-minio-init
+    depends_on:
+      minio:
+        condition: service_started
+    entrypoint: >
+      /bin/sh -c "
+        sleep 3;
+        /usr/bin/mc alias set local http://minio:9000 luca luca-dev-secret;
+        /usr/bin/mc mb -p local/luca-dev || true;
+        /usr/bin/mc anonymous set download local/luca-dev;
+        echo '✅ MinIO bucket luca-dev hazır';
+        exit 0;
+      "
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:

@@ -1,0 +1,279 @@
+// Luca Network — Event platform
+// Full schema for MVP (web + admin + mobile shared via API)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- enums ----------
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  EDITOR
+  DOOR
+  VIEWER
+}
+
+enum EventStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  CANCELED
+  ARCHIVED
+}
+
+enum EventKind {
+  PARTY       // club night / single-venue
+  CAMP        // multi-day outdoor / festival
+  CONCERT
+  SHOWCASE
+}
+
+enum TicketStatus {
+  ACTIVE
+  PAUSED
+  SOLD_OUT
+  HIDDEN
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  REFUNDED
+  FAILED
+  CANCELED
+}
+
+enum MediaKind {
+  POSTER
+  GALLERY
+  AFTERMOVIE
+  SET_REC
+  PRESS
+}
+
+// ---------- models ----------
+
+model User {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  name        String?
+  avatarUrl   String?
+  role        Role      @default(VIEWER)
+  passwordHash String?
+  twoFaSecret String?
+  isActive    Boolean   @default(true)
+  lastLoginAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  orders       Order[]
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id         String   @id @default(cuid())
+  userId     String
+  tokenHash  String   @unique
+  userAgent  String?
+  ip         String?
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+}
+
+model Event {
+  id          String      @id @default(cuid())
+  slug        String      @unique
+  title       String
+  tagline     String?
+  description String?
+  kind        EventKind   @default(PARTY)
+  startsAt    DateTime
+  endsAt      DateTime?
+  doorsAt     DateTime?
+  status      EventStatus @default(DRAFT)
+  isSoldOut   Boolean     @default(false)
+  venueId     String?
+  venue       Venue?      @relation(fields: [venueId], references: [id])
+  coverUrl    String?
+  heroMediaId String?
+  heroMedia   Media?      @relation("HeroMedia", fields: [heroMediaId], references: [id])
+
+  // camp / multi-day fields (nullable when PARTY)
+  campingAllowed Boolean  @default(false)
+  campMapUrl     String?
+  travelInfo     String?
+  faq            Json?
+
+  lineup      Lineup[]
+  tickets     TicketTier[]
+  media       Media[]     @relation("EventMedia")
+  orders      Order[]
+
+  seoTitle    String?
+  seoDesc     String?
+  publishedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([status, startsAt])
+  @@index([kind])
+}
+
+model Venue {
+  id       String  @id @default(cuid())
+  slug     String  @unique
+  name     String
+  address  String?
+  city     String?
+  country  String? @default("TR")
+  lat      Float?
+  lng      Float?
+  capacity Int?
+  mapStyle String? // mapbox style URL
+  coverUrl String?
+  events   Event[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Artist {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  bio         String?
+  country     String?
+  avatarUrl   String?
+  soundcloud  String?
+  mixcloud    String?
+  instagram   String?
+  website     String?
+  isResident  Boolean  @default(false)
+  lineup      Lineup[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Lineup {
+  id         String    @id @default(cuid())
+  eventId    String
+  artistId   String
+  stage      String?
+  startsAt   DateTime?
+  endsAt     DateTime?
+  order      Int       @default(0)
+  isHeadline Boolean   @default(false)
+  event      Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  artist     Artist    @relation(fields: [artistId], references: [id])
+  @@unique([eventId, artistId])
+  @@index([eventId, order])
+}
+
+model TicketTier {
+  id           String        @id @default(cuid())
+  eventId      String
+  name         String
+  description  String?
+  priceMinor   Int
+  currency     String        @default("TRY")
+  capacity     Int
+  sold         Int           @default(0)
+  salesOpenAt  DateTime?
+  salesCloseAt DateTime?
+  status       TicketStatus  @default(ACTIVE)
+  position     Int           @default(0)
+  event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  items        OrderItem[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  @@index([eventId])
+}
+
+model Order {
+  id         String      @id @default(cuid())
+  code       String      @unique
+  status     OrderStatus @default(PENDING)
+  userId     String?
+  user       User?       @relation(fields: [userId], references: [id])
+  eventId    String
+  event      Event       @relation(fields: [eventId], references: [id])
+  email      String
+  fullName   String?
+  totalMinor Int
+  currency   String      @default("TRY")
+  provider   String
+  providerId String?
+  items      OrderItem[]
+  tickets    IssuedTicket[]
+  createdAt  DateTime    @default(now())
+  paidAt     DateTime?
+  @@index([eventId, status])
+}
+
+model OrderItem {
+  id        String     @id @default(cuid())
+  orderId   String
+  tierId    String
+  qty       Int
+  unitMinor Int
+  order     Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  tier      TicketTier @relation(fields: [tierId], references: [id])
+}
+
+model IssuedTicket {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  orderId     String
+  tierId      String
+  holderName  String?
+  checkedIn   Boolean   @default(false)
+  checkedInAt DateTime?
+  checkedInBy String?
+  order       Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  @@index([orderId])
+}
+
+model Media {
+  id        String    @id @default(cuid())
+  kind      MediaKind
+  url       String
+  muxId     String?
+  width     Int?
+  height    Int?
+  durationS Int?
+  alt       String?
+  eventId   String?
+  event     Event?    @relation("EventMedia", fields: [eventId], references: [id])
+  heroOf    Event[]   @relation("HeroMedia")
+  createdAt DateTime  @default(now())
+  @@index([eventId, kind])
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  source    String?
+  verified  Boolean  @default(false)
+  tags      String[]
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String
+  entity    String?
+  entityId  String?
+  meta      Json?
+  createdAt DateTime @default(now())
+  @@index([entity, entityId])
+}
