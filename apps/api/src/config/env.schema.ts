@@ -31,6 +31,28 @@ const schema = z.object({
   IYZICO_API_KEY: z.string().optional().default(''),
   IYZICO_SECRET: z.string().optional().default(''),
 
+  // Google Sign-In (ID-token verification). Comma-separated for multiple
+  // audiences (web / ios / android client ids).
+  GOOGLE_CLIENT_ID: z.string().optional().default(''),
+
+  // OneSignal push notifications
+  ONESIGNAL_APP_ID: z.string().optional().default(''),
+  ONESIGNAL_API_KEY: z.string().optional().default(''),
+
+  // Aktif ödeme sağlayıcı (Setting ile admin'den override edilir)
+  PAYMENT_PROVIDER: z.string().optional().default('mock'),
+
+  // S3 / MinIO (görsel upload — presigned PUT)
+  S3_ENDPOINT: z.string().optional().default(''),
+  S3_BUCKET: z.string().optional().default(''),
+  S3_ACCESS_KEY: z.string().optional().default(''),
+  S3_SECRET_KEY: z.string().optional().default(''),
+  S3_PUBLIC_URL: z.string().optional().default(''),
+  S3_REGION: z.string().optional().default('us-east-1'),
+  // Admin-managed Setting secret'larını şifrelemek için anahtar (boşsa
+  // JWT_REFRESH_SECRET'a düşer). Bkz. ADR-013.
+  SETTINGS_ENC_KEY: z.string().optional().default(''),
+
   MUX_TOKEN_ID: z.string().optional().default(''),
   MUX_TOKEN_SECRET: z.string().optional().default(''),
 

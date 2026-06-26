@@ -30,7 +30,8 @@ enum EventStatus {
 
 enum EventKind {
   PARTY       // club night / single-venue
-  CAMP        // multi-day outdoor / festival
+  CAMP        // multi-day outdoor / festival (konaklamalı)
+  TRIP        // day trip / tour (tekne, gastronomi, şehir turu) — tek gün
   CONCERT
   SHOWCASE
 }
@@ -50,12 +51,35 @@ enum OrderStatus {
   CANCELED
 }
 
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELED
+}
+
 enum MediaKind {
   POSTER
   GALLERY
   AFTERMOVIE
   SET_REC
   PRESS
+}
+
+enum RecurrenceFreq {
+  DAILY
+  WEEKLY
+}
+
+enum WaitlistStatus {
+  WAITING
+  NOTIFIED
+  CONVERTED
+  CANCELED
+}
+
+enum CouponType {
+  PERCENT
+  FIXED
 }
 
 // ---------- models ----------
@@ -67,14 +91,35 @@ model User {
   avatarUrl   String?
   role        Role      @default(VIEWER)
   passwordHash String?
+  googleId    String?   @unique  // Google Sign-In linkage (provider sub)
   twoFaSecret String?
   isActive    Boolean   @default(true)
+  emailVerified   Boolean   @default(false)
+  emailVerifiedAt DateTime?
   lastLoginAt DateTime?
+
+  // onboarding / profile
+  phone       String?
+  city        String?
+  birthDate   DateTime?
+  interests   String[]  // ["yoga","camp","workshop"]
+
+  // consent / KVKK (legal)
+  kvkkConsentAt   DateTime?
+  termsAcceptedAt DateTime?
+  marketingOptIn  Boolean   @default(false)
+  consentVersion  String?
+
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  orders       Order[]
+  orders        Order[]
+  reservations  Reservation[]
   refreshTokens RefreshToken[]
+  authTokens    AuthToken[]
+  favorites     Favorite[]
+  reviews       Review[]
+  waitlist      WaitlistEntry[]
 }
 
 model RefreshToken {
@@ -88,6 +133,83 @@ model RefreshToken {
   createdAt  DateTime @default(now())
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@index([userId])
+}
+
+enum AuthTokenType {
+  EMAIL_VERIFY
+  PASSWORD_RESET
+}
+
+// One-time tokens for email verification & password reset (only the hash stored).
+model AuthToken {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      AuthTokenType
+  tokenHash String        @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime      @default(now())
+  @@index([userId, type])
+}
+
+model Favorite {
+  userId    String
+  eventId   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@id([userId, eventId])
+  @@index([eventId])
+}
+
+// When a tier is sold out, users join the waitlist; freed stock (cancel/refund/
+// abandoned) notifies the next WAITING entries in FIFO order.
+model WaitlistEntry {
+  id         String         @id @default(cuid())
+  eventId    String
+  event      Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  tierId     String
+  tier       TicketTier     @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  userId     String?
+  user       User?          @relation(fields: [userId], references: [id])
+  email      String
+  fullName   String?
+  phone      String?
+  status     WaitlistStatus @default(WAITING)
+  notifiedAt DateTime?
+  createdAt  DateTime       @default(now())
+  @@index([tierId, status, createdAt])
+  @@index([userId])
+}
+
+// Post-attendance rating (1..5) + comment. One per user per event.
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  eventId   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([userId, eventId])
+  @@index([eventId])
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  icon      String?
+  color     String?
+  position  Int      @default(0)
+  events    Event[]
+  series    EventSeries[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([position])
 }
 
 model Event {
@@ -104,9 +226,19 @@ model Event {
   isSoldOut   Boolean     @default(false)
   venueId     String?
   venue       Venue?      @relation(fields: [venueId], references: [id])
+  categoryId  String?
+  category    Category?   @relation(fields: [categoryId], references: [id])
+  seriesId    String?
+  series      EventSeries? @relation(fields: [seriesId], references: [id])
   coverUrl    String?
   heroMediaId String?
   heroMedia   Media?      @relation("HeroMedia", fields: [heroMediaId], references: [id])
+
+  // rich content (detail screen)
+  agenda      Json?       // [{ time:"10:00", title:"Check-in" }, ...]
+  included    Json?       // ["Yoga matı","İçecek","Kahvaltı"]
+  bringList   Json?       // ["Rahat kıyafet","Havlu"]
+  ageMin      Int?
 
   // camp / multi-day fields (nullable when PARTY)
   campingAllowed Boolean  @default(false)
@@ -114,19 +246,60 @@ model Event {
   travelInfo     String?
   faq            Json?
 
-  lineup      Lineup[]
-  tickets     TicketTier[]
-  media       Media[]     @relation("EventMedia")
-  orders      Order[]
+  lineup       Lineup[]
+  tickets      TicketTier[]
+  media        Media[]      @relation("EventMedia")
+  orders       Order[]
+  reservations Reservation[]
+  favorites    Favorite[]
+  reviews      Review[]
+  waitlist     WaitlistEntry[]
 
   seoTitle    String?
   seoDesc     String?
   publishedAt DateTime?
+  reminderSentAt DateTime?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
   @@index([status, startsAt])
   @@index([kind])
+  @@index([categoryId])
+  @@index([seriesId])
+}
+
+// Recurring event template. Generates concrete Event occurrences (each with its
+// own tickets/capacity/check-in) per the recurrence rule. For weekly yoga/pilates.
+model EventSeries {
+  id           String         @id @default(cuid())
+  slug         String         @unique
+  title        String
+  tagline      String?
+  description  String?
+  kind         EventKind      @default(PARTY)
+  categoryId   String?
+  category     Category?      @relation(fields: [categoryId], references: [id])
+  venueId      String?
+  venue        Venue?         @relation(fields: [venueId], references: [id])
+  agenda       Json?
+  included     Json?
+  bringList    Json?
+  ageMin       Int?
+
+  // recurrence
+  freq         RecurrenceFreq @default(WEEKLY)
+  interval     Int            @default(1)   // every N freq units
+  weekdays     Int[]                        // 0=Sun..6=Sat (WEEKLY)
+  startDate    DateTime
+  endDate      DateTime?
+  startTime    String                       // "18:30" (venue local)
+  durationMin  Int            @default(60)
+  tierTemplate Json                         // [{ name, priceMinor, capacity }]
+
+  isActive     Boolean        @default(true)
+  events       Event[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 }
 
 model Venue {
@@ -141,7 +314,9 @@ model Venue {
   capacity Int?
   mapStyle String? // mapbox style URL
   coverUrl String?
-  events   Event[]
+  events       Event[]
+  reservations Reservation[]
+  series       EventSeries[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -193,30 +368,39 @@ model TicketTier {
   position     Int           @default(0)
   event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
   items        OrderItem[]
+  issued       IssuedTicket[]
+  waitlist     WaitlistEntry[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   @@index([eventId])
 }
 
 model Order {
-  id         String      @id @default(cuid())
-  code       String      @unique
-  status     OrderStatus @default(PENDING)
-  userId     String?
-  user       User?       @relation(fields: [userId], references: [id])
-  eventId    String
-  event      Event       @relation(fields: [eventId], references: [id])
-  email      String
-  fullName   String?
-  totalMinor Int
-  currency   String      @default("TRY")
-  provider   String
-  providerId String?
-  items      OrderItem[]
-  tickets    IssuedTicket[]
-  createdAt  DateTime    @default(now())
-  paidAt     DateTime?
+  id             String      @id @default(cuid())
+  code           String      @unique
+  idempotencyKey String?     @unique
+  status         OrderStatus @default(PENDING)
+  userId         String?
+  user           User?       @relation(fields: [userId], references: [id])
+  eventId        String
+  event          Event       @relation(fields: [eventId], references: [id])
+  email          String
+  fullName       String?
+  phone          String?
+  totalMinor     Int
+  discountMinor  Int         @default(0)
+  couponCode     String?
+  currency       String      @default("TRY")
+  provider       String
+  providerId     String?
+  items          OrderItem[]
+  tickets        IssuedTicket[]
+  createdAt      DateTime    @default(now())
+  paidAt         DateTime?
+  canceledAt     DateTime?
+  refundedAt     DateTime?
   @@index([eventId, status])
+  @@index([userId])
 }
 
 model OrderItem {
@@ -230,16 +414,40 @@ model OrderItem {
 }
 
 model IssuedTicket {
-  id          String    @id @default(cuid())
-  code        String    @unique
+  id          String     @id @default(cuid())
+  code        String     @unique
   orderId     String
   tierId      String
   holderName  String?
-  checkedIn   Boolean   @default(false)
+  checkedIn   Boolean    @default(false)
   checkedInAt DateTime?
   checkedInBy String?
-  order       Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order       Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  tier        TicketTier @relation(fields: [tierId], references: [id])
   @@index([orderId])
+  @@index([tierId])
+}
+
+model Reservation {
+  id        String            @id @default(cuid())
+  code      String            @unique
+  eventId   String?
+  event     Event?            @relation(fields: [eventId], references: [id])
+  venueId   String?
+  venue     Venue?            @relation(fields: [venueId], references: [id])
+  area      String            // "VIP" | "Lounge" | "Dance Floor" | "Rooftop" ...
+  date      DateTime
+  partySize Int
+  fullName  String
+  phone     String
+  email     String
+  note      String?
+  status    ReservationStatus @default(PENDING)
+  userId    String?
+  user      User?             @relation(fields: [userId], references: [id])
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  @@index([status, date])
 }
 
 model Media {
@@ -276,4 +484,34 @@ model AuditLog {
   meta      Json?
   createdAt DateTime @default(now())
   @@index([entity, entityId])
+}
+
+// Admin-managed runtime config (integration keys, feature flags). Secret values
+// are stored encrypted. Read via SettingsService (DB -> env fallback). See ADR-013.
+// Discount code applied at booking. usedCount incremented atomically under maxUses.
+model Coupon {
+  id               String     @id @default(cuid())
+  code             String     @unique
+  type             CouponType
+  value            Int        // PERCENT: 0-100 · FIXED: minor units (kuruş)
+  maxUses          Int?
+  usedCount        Int        @default(0)
+  minSubtotalMinor Int?
+  eventId          String?    // null = tüm etkinlikler
+  startsAt         DateTime?
+  endsAt           DateTime?
+  isActive         Boolean    @default(true)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  @@index([code])
+}
+
+model Setting {
+  key       String   @id          // e.g. "auth.google.clientId", "push.onesignal.apiKey"
+  value     String?               // encrypted if isSecret
+  category  String   @default("general")
+  isSecret  Boolean  @default(false)
+  updatedBy String?
+  updatedAt DateTime @updatedAt
+  @@index([category])
 }

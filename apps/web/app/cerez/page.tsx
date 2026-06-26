@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { PageShell, Section } from "@/components/legal/page-shell";
 
 export const metadata: Metadata = {
-  title: "Çerez Politikası · Novara Network",
+  title: "Çerez Politikası · Luca",
   description:
-    "novaranetwork.com web sitesinde kullanılan çerezler ve tercihlerinizi nasıl yönetebileceğinize dair bilgiler.",
+    "lucaclub.com.tr'de kullanılan çerezler ve tercihlerinizi nasıl yönetebileceğinize dair bilgiler.",
 };
 
 export default function CerezPage() {
@@ -12,14 +12,15 @@ export default function CerezPage() {
     <PageShell
       eyebrow="Çerez"
       title="Çerez Politikası"
-      lead="Siteyi daha hızlı, daha güvenli ve daha kişisel hale getirmek için az sayıda çerez kullanıyoruz. Bu sayfa hangi çerezleri ne için kullandığımızı ve nasıl yöneteceğinizi anlatır."
-      updatedAt="22 Nisan 2026"
+      lead="Siteyi daha hızlı, güvenli ve kişisel hale getirmek için az sayıda çerez ve benzeri teknoloji kullanıyoruz. Bu sayfa hangi çerezleri ne için kullandığımızı ve nasıl yöneteceğinizi anlatır."
+      updatedAt="25 Haziran 2026"
     >
       <Section n="01" title="Çerez nedir?">
         <p>
-          Çerez (cookie), tarayıcınız tarafından cihazınızda depolanan küçük bir metin
-          dosyasıdır. Siteler sizi tanımak, tercihlerinizi hatırlamak ve site kullanımını
-          iyileştirmek için çerez kullanır.
+          Çerez (cookie), tarayıcınız tarafından cihazınızda saklanan küçük bir metin dosyasıdır.
+          Siteler sizi tanımak, oturumunuzu sürdürmek ve kullanımı iyileştirmek için çerez ve
+          yerel depolama (localStorage) gibi teknolojiler kullanır. Luca, giriş oturumunuzu
+          cihazınızdaki güvenli depolamada tutar.
         </p>
       </Section>
 
@@ -28,74 +29,43 @@ export default function CerezPage() {
           <div>
             <div className="text-foreground font-medium">Zorunlu çerezler</div>
             <p>
-              Sitenin çalışması için gereklidir. Oturum, tema tercihi (koyu/açık), dil ve
-              güvenlik amaçlı kullanılır. Bu çerezler devre dışı bırakılamaz.
+              Oturum açma, hesap güvenliği, sepet/bilet işlemleri ve site güvenliği için
+              gereklidir. Bunlar olmadan temel işlevler çalışmaz; kapatılamaz.
             </p>
           </div>
           <div>
-            <div className="text-foreground font-medium">Performans çerezleri</div>
-            <p>
-              Hangi sayfaların kaç kez açıldığını, hata oranlarını ve yükleme sürelerini
-              toplar — anonim olarak. Kimliğinize bağlanmaz. Bu çerezleri istediğiniz zaman
-              reddedebilirsiniz.
-            </p>
+            <div className="text-foreground font-medium">Tercih çerezleri</div>
+            <p>Dil, tema ve görüntüleme tercihlerinizi hatırlar.</p>
           </div>
           <div>
-            <div className="text-foreground font-medium">İşlevsellik çerezleri</div>
+            <div className="text-foreground font-medium">Analitik çerezler (varsa)</div>
             <p>
-              Katılım listeniz, kaydedilmiş aktiviteler ve tercihler gibi site deneyimini
-              kişiselleştirir.
+              Sayfa kullanımı hakkında toplu/anonim istatistik üretir; hizmeti iyileştirmemize
+              yardımcı olur. Bunlar yalnızca açık rızanızla çalışır.
             </p>
           </div>
         </div>
       </Section>
 
-      <Section n="03" title="Üçüncü taraf çerezler">
+      <Section n="03" title="Üçüncü taraf hizmetleri">
         <p>
-          Sitenin bazı bölümlerinde üçüncü taraf gömülü içerikler kullanırız (Instagram/YouTube
-          embed&apos;leri, harita, ödeme form&apos;u). Bu üçüncü taraflar kendi çerezlerini
-          bırakabilir. Bu çerezler üzerinde kontrolümüz yoktur; ilgili şirketlerin gizlilik
+          Ödeme (Iyzico/PayTR), bildirim (OneSignal) ve Google ile giriş gibi entegrasyonlar
+          kendi çerez/teknolojilerini kullanabilir. Bu hizmetler kendi gizlilik ve çerez
           politikalarına tabidir.
         </p>
       </Section>
 
-      <Section n="04" title="Çerez tercihlerinizi yönetme">
-        <p>Çerezleri üç yolla yönetebilirsiniz:</p>
-        <ul className="mt-3 space-y-2 list-disc pl-5">
-          <li>
-            Siteye ilk girişinizde görünen <strong className="text-foreground">çerez
-            banneri</strong> üzerinden kategori bazında seçim yapabilirsiniz.
-          </li>
-          <li>
-            <strong className="text-foreground">Tarayıcı ayarlarından</strong> tüm çerezleri
-            engelleyebilir veya silebilirsiniz. (Zorunlu çerezler engellenirse site düzgün
-            çalışmayabilir.)
-          </li>
-          <li>
-            İstediğiniz zaman bu sayfanın sonundaki &ldquo;Tercihlerimi sıfırla&rdquo; bağlantısını
-            kullanabilirsiniz.
-          </li>
-        </ul>
-      </Section>
-
-      <Section n="05" title="Saklama süresi">
+      <Section n="04" title="Çerezleri yönetme">
         <p>
-          Oturum çerezleri tarayıcıyı kapattığınızda silinir. Kalıcı çerezlerin süresi 30 gün ile
-          13 ay arasındadır — amacına göre değişir. Süre dolduğunda çerez otomatik silinir.
+          Tarayıcı ayarlarından çerezleri silebilir veya engelleyebilirsiniz; ancak zorunlu
+          çerezleri engellerseniz giriş ve bilet işlemleri çalışmayabilir. Oturumunuzu sonlandırmak
+          için <em>Çıkış</em> yapabilir veya cihazınızdaki site verilerini temizleyebilirsiniz.
         </p>
-      </Section>
-
-      <Section n="06" title="İletişim">
-        <p>
-          Çerez kullanımına dair sorularınızı{" "}
-          <a className="text-primary hover:underline" href="mailto:kvkk@novaranetwork.com">
-            kvkk@novaranetwork.com
-          </a>{" "}
-          adresine iletebilirsiniz. Daha kapsamlı bilgi için{" "}
-          <a className="text-primary hover:underline" href="/kvkk">
-            KVKK Aydınlatma Metni&apos;ne
-          </a>{" "}
-          göz atabilirsiniz.
+        <p className="mt-3">
+          Sorularınız için:{" "}
+          <a className="text-primary hover:underline" href="mailto:kvkk@lucaclub.com.tr">
+            kvkk@lucaclub.com.tr
+          </a>
         </p>
       </Section>
     </PageShell>

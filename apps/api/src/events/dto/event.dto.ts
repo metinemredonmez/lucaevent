@@ -1,16 +1,30 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsArray,
   IsBoolean,
   IsDateString,
   IsEnum,
+  IsIn,
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   MaxLength,
   Min,
+  ValidateNested,
 } from 'class-validator';
 import { EventKind, EventStatus } from '@prisma/client';
+
+export class AgendaItemDto {
+  @ApiProperty()
+  @IsString()
+  time!: string;
+
+  @ApiProperty()
+  @IsString()
+  title!: string;
+}
 
 export class EventCreateDto {
   @ApiProperty()
@@ -77,6 +91,38 @@ export class EventCreateDto {
   @IsString()
   travelInfo?: string;
 
+  @ApiPropertyOptional({ description: 'Category id (one of the 8 verticals)' })
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
+
+  // Declared as a plain shape (assignable to Prisma Json on `...dto` spread);
+  // @Type(() => AgendaItemDto) still drives validation/whitelist via the class.
+  @ApiPropertyOptional({ type: [AgendaItemDto], description: 'Program' })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => AgendaItemDto)
+  agenda?: { time: string; title: string }[];
+
+  @ApiPropertyOptional({ type: [String], description: 'Dahil olanlar' })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  included?: string[];
+
+  @ApiPropertyOptional({ type: [String], description: 'Yanında getir' })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  bringList?: string[];
+
+  @ApiPropertyOptional({ description: 'Minimum yaş' })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  ageMin?: number;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
@@ -101,10 +147,49 @@ export class EventQueryDto {
   @IsEnum(EventKind)
   kind?: EventKind;
 
-  @ApiPropertyOptional({ description: 'upcoming | past' })
+  @ApiPropertyOptional({ description: 'Filter by category id' })
   @IsOptional()
   @IsString()
-  range?: 'upcoming' | 'past';
+  categoryId?: string;
+
+  @ApiPropertyOptional({
+    description: 'upcoming | past | today | tomorrow | weekend',
+    enum: ['upcoming', 'past', 'today', 'tomorrow', 'weekend'],
+  })
+  @IsOptional()
+  @IsIn(['upcoming', 'past', 'today', 'tomorrow', 'weekend'])
+  range?: 'upcoming' | 'past' | 'today' | 'tomorrow' | 'weekend';
+
+  @ApiPropertyOptional({ description: 'Ücretsiz etkinlikler (priceMinor=0 tier)' })
+  @IsOptional()
+  @Type(() => Boolean)
+  @IsBoolean()
+  free?: boolean;
+
+  @ApiPropertyOptional({ description: 'Tam metin arama (başlık/tagline/açıklama)' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  q?: string;
+
+  @ApiPropertyOptional({ description: 'Konum enlem (near için)' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  lat?: number;
+
+  @ApiPropertyOptional({ description: 'Konum boylam (near için)' })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  lng?: number;
+
+  @ApiPropertyOptional({ description: 'Yarıçap km (lat/lng ile)', default: 25 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  radiusKm?: number;
 
   @ApiPropertyOptional({ default: 20 })
   @IsOptional()

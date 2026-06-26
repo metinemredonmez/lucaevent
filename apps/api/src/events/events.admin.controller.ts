@@ -46,6 +46,11 @@ export class EventsAdminController {
     return this.events.unpublish(id);
   }
 
+  @Post(':id/cancel')
+  cancel(@Param('id') id: string) {
+    return this.events.cancel(id);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.events.remove(id);

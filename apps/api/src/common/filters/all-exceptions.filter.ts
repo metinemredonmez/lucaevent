@@ -28,16 +28,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message = exception.message;
     }
 
+    // Never leak internal error details (stack/Prisma/driver messages) to the
+    // client on 5xx in production; log the real reason server-side instead.
+    const isProd = process.env.NODE_ENV === 'production';
+    const clientMessage =
+      status >= 500 && isProd ? 'Internal server error' : message;
+
     const payload = {
       statusCode: status,
       error: code ?? HttpStatus[status],
-      message,
+      message: clientMessage,
       path: request.url,
       timestamp: new Date().toISOString(),
     };
 
     if (status >= 500) {
-      this.logger.error(`[${request.method}] ${request.url} — ${JSON.stringify(payload)}`);
+      this.logger.error(
+        `[${request.method}] ${request.url} — ${status} — ${JSON.stringify(message)}`,
+      );
     }
 
     response.status(status).json(payload);

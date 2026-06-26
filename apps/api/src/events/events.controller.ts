@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Header, Param, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { EventsService } from './events.service';
 import { EventQueryDto } from './dto/event.dto';
@@ -13,6 +13,13 @@ export class EventsController {
   @Get()
   list(@Query() q: EventQueryDto) {
     return this.events.listPublic(q);
+  }
+
+  @Public()
+  @Header('Content-Type', 'text/calendar; charset=utf-8')
+  @Get(':slug/calendar.ics')
+  ics(@Param('slug') slug: string) {
+    return this.events.icsForSlug(slug);
   }
 
   @Public()
