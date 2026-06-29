@@ -85,6 +85,27 @@ export async function googleLogin(idToken: string) {
   return data;
 }
 
+export async function getPushConfig(): Promise<{ enabled: boolean; appId: string }> {
+  try {
+    const r = await fetch(BASE + "/push/config");
+    return await r.json();
+  } catch {
+    return { enabled: false, appId: "" };
+  }
+}
+
+/** JWT payload'undan user id (sub) — OneSignal.login(external_id) için. */
+export function getUserId(): string | null {
+  const t = getSession();
+  if (!t) return null;
+  try {
+    const payload = JSON.parse(atob(t.split(".")[1] ?? ""));
+    return payload.sub ?? payload.userId ?? null;
+  } catch {
+    return null;
+  }
+}
+
 // 0..4 — length + lower + upper + digit + symbol
 export function passwordScore(pw: string): number {
   let s = 0;

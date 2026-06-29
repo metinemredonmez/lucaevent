@@ -37,6 +37,16 @@ export class NotificationsService {
     return Boolean(appId && apiKey);
   }
 
+  /** Public — frontend web-push SDK'sını başlatmak için (appId gizli değil; apiKey verilmez). */
+  async publicConfig(): Promise<{ enabled: boolean; appId: string }> {
+    try {
+      const appId = await this.settings.get('push.onesignal.appId');
+      return { enabled: Boolean(appId), appId: appId || '' };
+    } catch {
+      return { enabled: false, appId: '' };
+    }
+  }
+
   broadcast(title: string, message: string, opts: PushOptions = {}) {
     return this.send({
       included_segments: [opts.segment ?? 'Subscribed Users'],
