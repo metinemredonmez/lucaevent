@@ -313,12 +313,17 @@ async function main() {
     const start = hours(days(e.inDays), 10);
     const created = await prisma.event.upsert({
       where: { slug: e.slug },
-      update: { categoryId: cat[e.categorySlug].id, status: e.status ?? EventStatus.PUBLISHED },
+      update: {
+        categoryId: cat[e.categorySlug].id,
+        status: e.status ?? EventStatus.PUBLISHED,
+        coverUrl: `/img/events/${e.slug}.jpg`,
+      },
       create: {
         slug: e.slug,
         title: e.title,
         tagline: e.tagline,
         description: e.description,
+        coverUrl: `/img/events/${e.slug}.jpg`,
         kind: e.kind,
         categoryId: cat[e.categorySlug].id,
         venueId: e.venueId,
