@@ -6,7 +6,7 @@ Bu tarz event + lifestyle + booking platformunda olması gerekenlerin tam listes
 - ✅ Email/şifre · ✅ Google · ✅ rol sistemi
 - ⬜ Apple Sign-In (mobilde App Store zorunlu) · ⬜ Telefon/OTP
 - ✅ Email doğrulama · ✅ Şifre sıfırlama (token + mail; mail transport: nodemailer varsa SMTP, yoksa log)
-- 🟡 2FA (alan var, akış yok) · 🟡 Onboarding/ilgi alanı (alan var, ekran yok)
+- 🟡 2FA (alan var, akış yok) · ✅ Onboarding/ilgi alanı (çok adımlı kayıt: profil + 8 dikeyden ilgi seçimi; +email doğrula/şifre-sıfırla sayfaları)
 - ✅ KVKK açık rıza (register'da onay zorunlu + saklanır: kvkk/terms timestamp, marketing, versiyon) · ✅ hesap silme (anonimleştirme) · ✅ public register/login/şifre-sıfırlama UI (şifre gücü, göster/gizle)
 
 ## 2. Keşfet & Arama
@@ -42,7 +42,7 @@ Bu tarz event + lifestyle + booking platformunda olması gerekenlerin tam listes
 
 ## 8. Admin & Operasyon
 - ✅ Etkinlik/bilet/kullanıcı CRUD · ✅ dashboard · ✅ CSV export · ✅ rol yönetimi · ✅ audit log (model)
-- 🟡 Admin paneli UI (Faz 2 — `apps/web/app/admin`: login+layout+dashboard+etkinlikler+kategoriler+kuponlar+ayarlar+check-in ✅; etkinlik oluştur/düzenle formu + katılımcı/rezervasyon/waitlist ekranları ⬜) · ✅ **Ayarlar/Entegrasyonlar UI** (backend ✅ `/admin/settings` + SettingsService + şifreli secret; admin UI ⬜ — ADR-013) · ⬜ Landing CMS · ⬜ E-posta kampanya
+- 🟡 Admin paneli UI (Faz 2 — `apps/web/app/admin`: login+layout+dashboard+etkinlikler(liste)+kategoriler+kuponlar+ayarlar+check-in ✅; **etkinlik oluştur/düzenle formu ⬜ (EN KRİTİK eksik — admin UI'dan event ekleyemiyor)** + katılımcı/rezervasyon/waitlist ekranları ⬜) · ✅ **Ayarlar/Entegrasyonlar UI** (backend ✅ `/admin/settings` + SettingsService + şifreli secret; admin UI ✅ `settings/page.tsx` entegrasyon alanları — ADR-013) · ⬜ Landing CMS · ⬜ E-posta kampanya
 
 ## 9. Altyapı & Kalite
 - ✅ Auth/rate-limit/validation · ✅ oversell/idempotency güvenli

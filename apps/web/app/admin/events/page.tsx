@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { api } from "@/lib/api";
 import { formatDateTR } from "@/lib/utils";
 
@@ -47,13 +48,23 @@ export default function EventsAdmin() {
 
   return (
     <div>
-      <h1
-        className="text-3xl text-[#171717] mb-1"
-        style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}
-      >
-        Etkinlikler
-      </h1>
-      <p className="text-sm text-[#6F6F6F] mb-6">{rows.length} etkinlik</p>
+      <div className="mb-6 flex items-end justify-between gap-4">
+        <div>
+          <h1
+            className="text-3xl text-[#171717] mb-1"
+            style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}
+          >
+            Etkinlikler
+          </h1>
+          <p className="text-sm text-[#6F6F6F]">{rows.length} etkinlik</p>
+        </div>
+        <Link
+          href="/admin/events/new"
+          className="rounded-md bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90"
+        >
+          + Yeni etkinlik
+        </Link>
+      </div>
       {err && <p className="text-[#A23E48] text-sm mb-3">{err}</p>}
 
       <div className="overflow-hidden rounded-xl border border-[#E3DED5] bg-white">
@@ -88,6 +99,12 @@ export default function EventsAdmin() {
                   </span>
                 </td>
                 <td className="px-4 py-3 text-right space-x-2 whitespace-nowrap">
+                  <Link
+                    href={`/admin/events/${e.id}/edit`}
+                    className="text-xs rounded-md border border-[#E3DED5] text-[#171717] px-2 py-1 hover:bg-[#F7F5F0]"
+                  >
+                    Düzenle
+                  </Link>
                   {e.status !== "PUBLISHED" && e.status !== "CANCELED" && (
                     <button
                       disabled={busy === e.id}
