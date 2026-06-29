@@ -68,6 +68,9 @@ export function Nav() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
+          <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
+            <a href="/basvuru">Bize Ulaş</a>
+          </Button>
           <Button asChild size="sm" className="hidden sm:inline-flex">
             <a href="/giris">Giriş</a>
           </Button>
