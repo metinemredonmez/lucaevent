@@ -14,8 +14,12 @@ export function PushInit() {
     if (started) return;
     started = true;
 
-    getPushConfig().then((cfg) => {
-      if (!cfg.enabled || !cfg.appId) return; // App ID girilene kadar sessiz
+    const envAppId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID;
+    const cfg$ = envAppId
+      ? Promise.resolve({ enabled: true, appId: envAppId })
+      : getPushConfig();
+    cfg$.then((cfg) => {
+      if (!cfg.enabled || !cfg.appId) return; // App ID yoksa sessiz
 
       const w = window as any;
       w.OneSignalDeferred = w.OneSignalDeferred || [];

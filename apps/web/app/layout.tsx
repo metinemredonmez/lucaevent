@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Newsreader, Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
-import { BackgroundMusic } from "@/components/background-music";
+import { RadioPlayer } from "@/components/radio-player";
 import { PushInit } from "@/components/push-init";
 import "./globals.css";
 
@@ -88,7 +88,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           {children}
           <PushInit />
-          <BackgroundMusic />
+          <RadioPlayer />
           <Toaster
             position="bottom-center"
             toastOptions={{
