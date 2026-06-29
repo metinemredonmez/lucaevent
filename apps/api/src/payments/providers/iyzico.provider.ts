@@ -13,7 +13,11 @@ import { SettingsService } from '../../settings/settings.service';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const Iyzipay = require('iyzipay');
 
-export type IyzicoRetrieveResult = ParsedWebhook & { providerId?: string };
+export type IyzicoRetrieveResult = {
+  orderCode: string;
+  status: 'PAID' | 'FAILED' | 'PENDING';
+  providerId?: string;
+};
 
 /**
  * Iyzico Checkout Form akışı:
@@ -62,11 +66,12 @@ export class IyzicoProvider implements PaymentProvider {
     );
   }
 
-  async createCheckout(order: Order): Promise<CheckoutResult> {
+  async createCheckout(order: Order, ctx?: { ip?: string }): Promise<CheckoutResult> {
     const iyzipay = await this.client();
     const apiBase = this.config.get<string>('APP_URL') || 'http://localhost:3001';
     const callbackUrl = `${apiBase}/api/v1/payments/iyzico/callback`;
     const price = this.price(order.totalMinor);
+    const ip = ctx?.ip || '85.34.78.112';
     const [firstName, ...rest] = (order.fullName || 'Luca Üye').trim().split(/\s+/);
     const lastName = rest.join(' ') || firstName;
 
@@ -88,7 +93,7 @@ export class IyzicoProvider implements PaymentProvider {
         email: order.email,
         identityNumber: '11111111111',
         registrationAddress: 'İstanbul',
-        ip: '85.34.78.112',
+        ip,
         city: 'İstanbul',
         country: 'Turkey',
       },
@@ -101,27 +106,37 @@ export class IyzicoProvider implements PaymentProvider {
 
     const result = await this.call((cb) => iyzipay.checkoutFormInitialize.create(request, cb));
     if (result.status !== 'success' || !result.paymentPageUrl) {
-      this.logger.error(`Iyzico initialize failed: ${result.errorCode} ${result.errorMessage}`);
-      throw new Error(result.errorMessage || 'Iyzico ödeme başlatılamadı.');
+      // errorMessage müşteriye/loglara sızmasın — yalnız errorCode logla, generic fırlat.
+      this.logger.error(`Iyzico initialize failed (code=${result.errorCode})`);
+      throw new Error('Iyzico ödeme başlatılamadı.');
     }
     return { checkoutUrl: result.paymentPageUrl, providerId: result.token };
   }
 
-  /** Callback token'ından ödeme sonucunu çeker. */
+  /** Callback token'ından ödeme sonucunu çeker (PAID | FAILED | belirsiz=PENDING). */
   async retrieveByToken(token: string): Promise<IyzicoRetrieveResult> {
     const iyzipay = await this.client();
     const result = await this.call((cb) =>
       iyzipay.checkoutForm.retrieve({ locale: 'tr', token }, cb),
     );
-    const paid = result.status === 'success' && result.paymentStatus === 'SUCCESS';
     // İade için kullanılacak gerçek id: itemTransaction.paymentTransactionId.
     const providerId =
       result.itemTransactions?.[0]?.paymentTransactionId || result.paymentId || undefined;
-    return {
-      orderCode: result.basketId,
-      status: paid ? 'PAID' : 'FAILED',
-      providerId,
-    };
+
+    let status: 'PAID' | 'FAILED' | 'PENDING';
+    if (result.status === 'success' && result.paymentStatus === 'SUCCESS') {
+      status = 'PAID';
+    } else if (result.paymentStatus === 'FAILURE' || result.status === 'failure') {
+      status = 'FAILED';
+    } else {
+      // Belirsiz/eksik durum (3DS devam ediyor, paymentStatus yok vb.):
+      // siparişi FAILED yapıp stok iade ETME — beklemede bırak.
+      this.logger.warn(
+        `Iyzico belirsiz sonuç: status=${result.status} paymentStatus=${result.paymentStatus}`,
+      );
+      status = 'PENDING';
+    }
+    return { orderCode: result.basketId, status, providerId };
   }
 
   // Iyzico klasik (signature'lı body) webhook kullanmaz — generic /payments/webhook
@@ -150,8 +165,8 @@ export class IyzicoProvider implements PaymentProvider {
       ),
     );
     if (result.status !== 'success') {
-      this.logger.error(`Iyzico refund failed: ${result.errorMessage}`);
-      throw new Error(result.errorMessage || 'Iyzico iade başarısız.');
+      this.logger.error(`Iyzico refund failed (code=${result.errorCode})`);
+      throw new Error('Iyzico iade başarısız.');
     }
   }
 }

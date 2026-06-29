@@ -45,17 +45,14 @@ export class PaymentsController {
     const webUrl = this.config.get<string>('WEB_URL') || 'http://localhost:3010';
     const token = body?.token || '';
     let durum = 'hata';
-    let kod = '';
     try {
       const result = await this.payments.handleIyzicoCallback(token);
-      kod = result.orderCode || '';
       durum = result.status === 'PAID' ? 'basarili' : 'basarisiz';
     } catch {
       durum = 'hata';
     }
-    const params = new URLSearchParams({ durum });
-    if (kod) params.set('kod', kod);
-    res.redirect(303, `${webUrl}/odeme/sonuc?${params.toString()}`);
+    // Sipariş kodu redirect URL'ine konmaz (tarayıcı geçmişi/log/referer sızıntısı).
+    res.redirect(303, `${webUrl}/odeme/sonuc?durum=${durum}`);
   }
 
   // DEV helper to simulate a PAID provider webhook.

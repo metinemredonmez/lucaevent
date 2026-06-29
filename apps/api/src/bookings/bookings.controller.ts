@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Ip, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { BookingsService } from './bookings.service';
@@ -17,8 +17,8 @@ export class BookingsController {
 
   @Public()
   @Post('bookings')
-  create(@Body() dto: CreateBookingDto) {
-    return this.bookings.create(dto);
+  create(@Body() dto: CreateBookingDto, @Ip() ip: string) {
+    return this.bookings.create(dto, ip);
   }
 
   @ApiBearerAuth()

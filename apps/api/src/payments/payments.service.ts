@@ -21,6 +21,7 @@ import {
   PaymentProvider,
   ParsedWebhook,
   CheckoutResult,
+  CheckoutContext,
 } from './providers/payment.provider';
 import { SettingsService } from '../settings/settings.service';
 
@@ -64,9 +65,9 @@ export class PaymentsService {
   }
 
   /** Aktif sağlayıcıyla ödeme başlatır; provider + providerId'yi siparişe yazar. */
-  async createCheckout(order: Order): Promise<CheckoutResult> {
+  async createCheckout(order: Order, ctx?: CheckoutContext): Promise<CheckoutResult> {
     const provider = await this.getProvider();
-    const result = await provider.createCheckout(order);
+    const result = await provider.createCheckout(order, ctx);
     await this.prisma.order.update({
       where: { id: order.id },
       data: { provider: provider.name, providerId: result.providerId },
@@ -136,7 +137,28 @@ export class PaymentsService {
   ): Promise<{ ok: boolean; orderCode?: string; status: 'PAID' | 'FAILED' }> {
     const parsed = await this.iyzico.retrieveByToken(token);
     if (!parsed.orderCode) return { ok: false, status: 'FAILED' };
-    await this.applyResult(parsed);
+
+    const order = await this.prisma.order.findUnique({
+      where: { code: parsed.orderCode },
+      select: { status: true, providerId: true },
+    });
+    if (!order) return { ok: false, status: 'FAILED' };
+    // Idempotent: zaten ödenmişse başarı dön (PAID'de providerId değiştiği için
+    // token eşleşmesi aranmaz — yeniden oynatılan callback no-op).
+    if (order.status === 'PAID') {
+      return { ok: true, orderCode: parsed.orderCode, status: 'PAID' };
+    }
+    // Defense-in-depth: token bu siparişin checkout'unda saklanan token olmalı.
+    // Sızan/yeniden oynatılan bir token başka bir PENDING siparişi PAID yapamaz.
+    if (order.providerId !== token) {
+      return { ok: false, status: 'FAILED' };
+    }
+    // Belirsiz sonuç (3DS devam ediyor / paymentStatus yok): siparişi ne PAID ne
+    // FAILED yap — PENDING bırak (abandoned-sweep cron temizler).
+    if (parsed.status === 'PENDING') {
+      return { ok: false, status: 'FAILED' };
+    }
+    await this.applyResult(parsed as ParsedWebhook & { providerId?: string });
     return { ok: true, orderCode: parsed.orderCode, status: parsed.status };
   }
 
@@ -240,38 +262,54 @@ export class PaymentsService {
     if (order.status !== 'PAID') {
       throw new ConflictException('ORDER_NOT_PAID');
     }
+    // Gerçek bir ödeme işlem kimliği yoksa sağlayıcıya iade gönderemeyiz.
+    if (!order.providerId) {
+      throw new ConflictException('REFUND_NOT_AVAILABLE');
+    }
 
     const provider = await this.getProvider(order.provider);
-    await provider.refund(order.providerId ?? '', order.totalMinor);
-
     const restoreStock = order.event.startsAt > new Date();
 
-    const updated = await this.prisma.$transaction(async (tx) => {
-      // atomic PAID->REFUNDED gate guards against concurrent double-refund
-      // (which would otherwise restore stock twice).
-      const gate = await tx.order.updateMany({
-        where: { id: order.id, status: 'PAID' },
-        data: { status: 'REFUNDED', refundedAt: new Date() },
+    // 1) Önce atomik olarak PAID->REFUNDED kapısını al — yalnız tek eşzamanlı
+    //    iade ilerler; böylece sağlayıcıya ÇİFT iade ve çift stok iadesi olmaz.
+    const gate = await this.prisma.order.updateMany({
+      where: { id: order.id, status: 'PAID' },
+      data: { status: 'REFUNDED', refundedAt: new Date() },
+    });
+    if (gate.count === 0) {
+      throw new ConflictException('ORDER_NOT_PAID');
+    }
+
+    // 2) Sağlayıcı çağrısını DB transaction'ı DIŞINDA yap (dış ağ çağrısı bir
+    //    DB transaction'ını açık tutmamalı). Başarısız olursa siparişi PAID'e
+    //    geri al (telafi) ki admin güvenle yeniden deneyebilsin.
+    try {
+      await provider.refund(order.providerId, order.totalMinor);
+    } catch (e) {
+      await this.prisma.order.update({
+        where: { id: order.id },
+        data: { status: 'PAID', refundedAt: null },
       });
-      if (gate.count === 0) {
-        throw new ConflictException('ORDER_NOT_PAID');
-      }
-      if (restoreStock) {
-        for (const item of order.items) {
-          await tx.ticketTier.update({
+      throw e;
+    }
+
+    // 3) Stok iadesi + bekleme listesi (yalnız kapıyı kazanan buraya ulaşır).
+    if (restoreStock) {
+      await this.prisma.$transaction(
+        order.items.map((item) =>
+          this.prisma.ticketTier.update({
             where: { id: item.tierId },
             data: { sold: { decrement: item.qty } },
-          });
-        }
-      }
-      return tx.order.findUniqueOrThrow({
-        where: { id: order.id },
-        include: { items: true },
-      });
-    });
+          }),
+        ),
+      );
+      this.notifyWaitlist(order.items);
+    }
 
-    if (restoreStock) this.notifyWaitlist(order.items);
-    return updated;
+    return this.prisma.order.findUniqueOrThrow({
+      where: { id: order.id },
+      include: { items: true },
+    });
   }
 
   /** Freed stock → notify waitlist (fire-and-forget, post-commit). */

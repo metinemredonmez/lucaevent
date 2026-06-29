@@ -10,9 +10,14 @@ export interface ParsedWebhook {
   status: 'PAID' | 'FAILED';
 }
 
+export interface CheckoutContext {
+  /** Gerçek istemci IP'si (Iyzico fraud/risk skoru için). */
+  ip?: string;
+}
+
 export interface PaymentProvider {
   readonly name: string;
-  createCheckout(order: Order): Promise<CheckoutResult>;
+  createCheckout(order: Order, ctx?: CheckoutContext): Promise<CheckoutResult>;
   verifyWebhook(payload: any, headers: Record<string, any>): boolean;
   parseWebhook(payload: any): ParsedWebhook;
   refund(providerId: string, amountMinor: number): Promise<void>;

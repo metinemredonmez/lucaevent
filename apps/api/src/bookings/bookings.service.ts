@@ -24,7 +24,7 @@ export class BookingsService {
     return 'LUCA-' + randomBytes(4).toString('hex').toUpperCase();
   }
 
-  async create(dto: CreateBookingDto) {
+  async create(dto: CreateBookingDto, ip?: string) {
     const order = await this.prisma.$transaction(async (tx) => {
       // a. idempotent replay
       if (dto.idempotencyKey) {
@@ -120,7 +120,7 @@ export class BookingsService {
     });
 
     // f. aktif sağlayıcıyla (mock | iyzico) ödeme başlat, checkout URL'ini dön
-    const checkout = await this.payments.createCheckout(order);
+    const checkout = await this.payments.createCheckout(order, { ip });
     return {
       orderCode: order.code,
       status: order.status,
