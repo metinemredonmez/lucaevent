@@ -26,10 +26,10 @@ type WaitEntry = {
 };
 
 const WAIT_COLOR: Record<string, string> = {
-  WAITING: "bg-[#B7791F]/15 text-[#92600A]",
-  NOTIFIED: "bg-[#3E5A78]/15 text-[#3E5A78]",
-  CONVERTED: "bg-[#657257]/15 text-[#3A5A3A]",
-  EXPIRED: "bg-[#6F6F6F]/15 text-[#6F6F6F]",
+  WAITING: "bg-[#B7791F]/15 text-amber-400",
+  NOTIFIED: "bg-[#3E5A78]/15 text-sky-400",
+  CONVERTED: "bg-[#657257]/15 text-emerald-400",
+  EXPIRED: "bg-[#6F6F6F]/15 text-muted-foreground",
 };
 
 export default function EventAttendees() {
@@ -63,35 +63,35 @@ export default function EventAttendees() {
 
   return (
     <div>
-      <Link href="/admin/events" className="text-sm text-[#6F6F6F] hover:text-[#171717]">
+      <Link href="/admin/events" className="text-sm text-muted-foreground hover:text-foreground">
         ← Etkinlikler
       </Link>
       <div className="mb-6 mt-2 flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl text-[#171717]" style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}>
+          <h1 className="text-3xl text-foreground" style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}>
             Katılımcılar
           </h1>
-          <p className="text-sm text-[#6F6F6F]">{title || "…"}</p>
+          <p className="text-sm text-muted-foreground">{title || "…"}</p>
         </div>
         <button
           onClick={exportCsv}
           disabled={dl || att.length === 0}
-          className="inline-flex items-center gap-2 rounded-md border border-[#E3DED5] bg-white px-3 py-2 text-sm text-[#171717] hover:bg-[#F7F5F0] disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground hover:bg-muted disabled:opacity-50"
         >
           <Download className="h-4 w-4" /> {dl ? "İndiriliyor…" : "CSV indir"}
         </button>
       </div>
 
-      {err && <p className="mb-3 text-sm text-[#A23E48]">{err}</p>}
+      {err && <p className="mb-3 text-sm text-rose-400">{err}</p>}
 
       {/* Katılımcılar */}
-      <div className="mb-3 flex items-center gap-3 text-sm text-[#6F6F6F]">
-        <span className="font-medium text-[#171717]">{att.length}</span> bilet ·
-        <span className="font-medium text-[#3A5A3A]">{checkedCount}</span> giriş yaptı
+      <div className="mb-3 flex items-center gap-3 text-sm text-muted-foreground">
+        <span className="font-medium text-foreground">{att.length}</span> bilet ·
+        <span className="font-medium text-emerald-400">{checkedCount}</span> giriş yaptı
       </div>
-      <div className="mb-8 overflow-hidden rounded-xl border border-[#E3DED5] bg-white">
+      <div className="mb-8 overflow-hidden rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
-          <thead className="bg-[#F7F5F0] text-left text-xs text-[#6F6F6F]">
+          <thead className="bg-muted text-left text-xs text-muted-foreground">
             <tr>
               <th className="px-4 py-3 font-medium">Ad</th>
               <th className="px-4 py-3 font-medium">E-posta</th>
@@ -101,24 +101,24 @@ export default function EventAttendees() {
           </thead>
           <tbody>
             {att.map((a, i) => (
-              <tr key={i} className="border-t border-[#E3DED5]">
-                <td className="px-4 py-3 font-medium text-[#171717]">{a.holderName || "—"}</td>
-                <td className="px-4 py-3 text-[#6F6F6F]">{a.email}</td>
-                <td className="px-4 py-3 text-[#6F6F6F]">{a.tier}</td>
+              <tr key={i} className="border-t border-border">
+                <td className="px-4 py-3 font-medium text-foreground">{a.holderName || "—"}</td>
+                <td className="px-4 py-3 text-muted-foreground">{a.email}</td>
+                <td className="px-4 py-3 text-muted-foreground">{a.tier}</td>
                 <td className="px-4 py-3">
                   {a.checkedIn ? (
-                    <span className="inline-flex items-center gap-1 text-xs text-[#3A5A3A]">
+                    <span className="inline-flex items-center gap-1 text-xs text-emerald-400">
                       <Check className="h-3.5 w-3.5" /> {a.checkedInAt ? formatDateTR(a.checkedInAt) : "Evet"}
                     </span>
                   ) : (
-                    <span className="text-xs text-[#6F6F6F]">—</span>
+                    <span className="text-xs text-muted-foreground">—</span>
                   )}
                 </td>
               </tr>
             ))}
             {att.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-[#6F6F6F]">Henüz katılımcı yok.</td>
+                <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">Henüz katılımcı yok.</td>
               </tr>
             )}
           </tbody>
@@ -126,10 +126,10 @@ export default function EventAttendees() {
       </div>
 
       {/* Bekleme listesi */}
-      <h2 className="mb-3 text-lg font-medium text-[#171717]">Bekleme listesi ({wait.length})</h2>
-      <div className="overflow-hidden rounded-xl border border-[#E3DED5] bg-white">
+      <h2 className="mb-3 text-lg font-medium text-foreground">Bekleme listesi ({wait.length})</h2>
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
-          <thead className="bg-[#F7F5F0] text-left text-xs text-[#6F6F6F]">
+          <thead className="bg-muted text-left text-xs text-muted-foreground">
             <tr>
               <th className="px-4 py-3 font-medium">#</th>
               <th className="px-4 py-3 font-medium">Kişi</th>
@@ -140,24 +140,24 @@ export default function EventAttendees() {
           </thead>
           <tbody>
             {wait.map((w, i) => (
-              <tr key={w.id} className="border-t border-[#E3DED5]">
-                <td className="px-4 py-3 tabular-nums text-[#6F6F6F]">{i + 1}</td>
+              <tr key={w.id} className="border-t border-border">
+                <td className="px-4 py-3 tabular-nums text-muted-foreground">{i + 1}</td>
                 <td className="px-4 py-3">
-                  <div className="font-medium text-[#171717]">{w.fullName || "—"}</div>
-                  <div className="text-xs text-[#6F6F6F]">{w.email}{w.phone ? ` · ${w.phone}` : ""}</div>
+                  <div className="font-medium text-foreground">{w.fullName || "—"}</div>
+                  <div className="text-xs text-muted-foreground">{w.email}{w.phone ? ` · ${w.phone}` : ""}</div>
                 </td>
-                <td className="px-4 py-3 text-[#6F6F6F]">{w.tier?.name ?? "—"}</td>
+                <td className="px-4 py-3 text-muted-foreground">{w.tier?.name ?? "—"}</td>
                 <td className="px-4 py-3">
                   <span className={`inline-block rounded-full px-2 py-0.5 text-xs ${WAIT_COLOR[w.status] ?? ""}`}>
                     {w.status}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-[#6F6F6F]">{formatDateTR(w.createdAt)}</td>
+                <td className="px-4 py-3 text-muted-foreground">{formatDateTR(w.createdAt)}</td>
               </tr>
             ))}
             {wait.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-[#6F6F6F]">Bekleme listesi boş.</td>
+                <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">Bekleme listesi boş.</td>
               </tr>
             )}
           </tbody>

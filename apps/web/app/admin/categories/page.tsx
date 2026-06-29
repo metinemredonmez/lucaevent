@@ -47,31 +47,31 @@ export default function CategoriesAdmin() {
   return (
     <div>
       <h1
-        className="text-3xl text-[#171717] mb-1"
+        className="text-3xl text-foreground mb-1"
         style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}
       >
         Kategoriler
       </h1>
-      <p className="text-sm text-[#6F6F6F] mb-6">{rows.length} dikey</p>
-      {err && <p className="text-[#A23E48] text-sm mb-3">{err}</p>}
+      <p className="text-sm text-muted-foreground mb-6">{rows.length} dikey</p>
+      {err && <p className="text-rose-400 text-sm mb-3">{err}</p>}
 
       <form onSubmit={add} className="mb-6 flex gap-2 items-end">
         <div className="flex-1">
-          <label className="text-xs text-[#6F6F6F]">Ad</label>
+          <label className="text-xs text-muted-foreground">Ad</label>
           <Input value={name} onChange={(e) => setName(e.target.value)} required />
         </div>
         <div className="flex-1">
-          <label className="text-xs text-[#6F6F6F]">Slug</label>
+          <label className="text-xs text-muted-foreground">Slug</label>
           <Input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="wellness" required />
         </div>
-        <Button type="submit" className="bg-[#C86B42] hover:bg-[#b35c36] text-white">
+        <Button type="submit" className="bg-primary hover:bg-primary/90 text-white">
           Ekle
         </Button>
       </form>
 
-      <div className="overflow-hidden rounded-xl border border-[#E3DED5] bg-white">
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
-          <thead className="bg-[#F7F5F0] text-left text-xs text-[#6F6F6F]">
+          <thead className="bg-muted text-left text-xs text-muted-foreground">
             <tr>
               <th className="px-4 py-3 font-medium">Ad</th>
               <th className="px-4 py-3 font-medium">Slug</th>
@@ -80,13 +80,13 @@ export default function CategoriesAdmin() {
           </thead>
           <tbody>
             {rows.map((c) => (
-              <tr key={c.id} className="border-t border-[#E3DED5]">
-                <td className="px-4 py-3 font-medium text-[#171717]">{c.name}</td>
-                <td className="px-4 py-3 text-[#6F6F6F]">{c.slug}</td>
+              <tr key={c.id} className="border-t border-border">
+                <td className="px-4 py-3 font-medium text-foreground">{c.name}</td>
+                <td className="px-4 py-3 text-muted-foreground">{c.slug}</td>
                 <td className="px-4 py-3 text-right">
                   <button
                     onClick={() => del(c.id)}
-                    className="text-xs text-[#A23E48] hover:underline"
+                    className="text-xs text-rose-400 hover:underline"
                   >
                     Sil
                   </button>

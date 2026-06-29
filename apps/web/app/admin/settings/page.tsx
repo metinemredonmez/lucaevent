@@ -24,9 +24,9 @@ const CAT_LABEL: Record<string, string> = {
 };
 
 const SOURCE_BADGE: Record<string, string> = {
-  db: "bg-[#657257]/15 text-[#3A5A3A]",
-  env: "bg-[#3E5A78]/15 text-[#3E5A78]",
-  unset: "bg-[#A23E48]/15 text-[#A23E48]",
+  db: "bg-[#657257]/15 text-emerald-400",
+  env: "bg-[#3E5A78]/15 text-sky-400",
+  unset: "bg-[#A23E48]/15 text-rose-400",
 };
 
 export default function SettingsAdmin() {
@@ -68,21 +68,21 @@ export default function SettingsAdmin() {
   return (
     <div>
       <h1
-        className="text-3xl text-[#171717] mb-1"
+        className="text-3xl text-foreground mb-1"
         style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}
       >
         Ayarlar & Entegrasyonlar
       </h1>
-      <p className="text-sm text-[#6F6F6F] mb-6">
+      <p className="text-sm text-muted-foreground mb-6">
         Anahtarlar burada yönetilir — .env'e dokunmana gerek yok. Secret'lar şifreli saklanır.
       </p>
-      {err && <p className="text-[#A23E48] text-sm mb-3">{err}</p>}
-      {msg && <p className="text-[#3A5A3A] text-sm mb-3">{msg}</p>}
+      {err && <p className="text-rose-400 text-sm mb-3">{err}</p>}
+      {msg && <p className="text-emerald-400 text-sm mb-3">{msg}</p>}
 
       <div className="space-y-6">
         {cats.map((cat) => (
-          <div key={cat} className="rounded-xl border border-[#E3DED5] bg-white p-5">
-            <h2 className="text-sm font-semibold text-[#171717] mb-4">
+          <div key={cat} className="rounded-xl border border-border bg-card p-5">
+            <h2 className="text-sm font-semibold text-foreground mb-4">
               {CAT_LABEL[cat] ?? cat}
             </h2>
             <div className="space-y-4">
@@ -91,7 +91,7 @@ export default function SettingsAdmin() {
                 .map((i) => (
                   <div key={i.key} className="grid grid-cols-[1fr_2fr] items-center gap-4">
                     <div>
-                      <div className="text-sm text-[#171717]">{i.label}</div>
+                      <div className="text-sm text-foreground">{i.label}</div>
                       <span
                         className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] ${SOURCE_BADGE[i.source]}`}
                       >
@@ -117,7 +117,7 @@ export default function SettingsAdmin() {
         <Button
           onClick={save}
           disabled={saving}
-          className="bg-[#C86B42] hover:bg-[#b35c36] text-white"
+          className="bg-primary hover:bg-primary/90 text-white"
         >
           {saving ? "Kaydediliyor…" : "Kaydet"}
         </Button>

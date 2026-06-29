@@ -18,8 +18,8 @@ type Cat = { id: string; name: string; slug: string };
 type Mode = "create" | "edit";
 
 const FIELD =
-  "w-full rounded-md border border-[#E3DED5] bg-white px-3 py-2 text-sm text-[#171717] placeholder:text-[#B7B0A4] focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/40 focus:border-[#8B5CF6]/50";
-const LABEL = "block text-xs font-medium text-[#6F6F6F] mb-1";
+  "w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/40 focus:border-[#8B5CF6]/50";
+const LABEL = "block text-xs font-medium text-muted-foreground mb-1";
 
 function slugify(s: string): string {
   return s
@@ -126,7 +126,7 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
   return (
     <form onSubmit={submit} className="max-w-2xl space-y-5">
       {/* Temel */}
-      <div className="rounded-xl border border-[#E3DED5] bg-white p-5 space-y-4">
+      <div className="rounded-xl border border-border bg-card p-5 space-y-4">
         <div>
           <label className={LABEL}>Başlık *</label>
           <input className={FIELD} value={f.title} onChange={(e) => onTitle(e.target.value)} placeholder="Sunset Yoga & Ses Banyosu" />
@@ -169,7 +169,7 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
                 </button>
               );
             })}
-            {cats.length === 0 && <span className="text-xs text-[#B7B0A4]">kategoriler yükleniyor…</span>}
+            {cats.length === 0 && <span className="text-xs text-muted-foreground/60">kategoriler yükleniyor…</span>}
           </div>
         </div>
         <div>
@@ -187,7 +187,7 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
       </div>
 
       {/* Tarih & saat */}
-      <div className="rounded-xl border border-[#E3DED5] bg-white p-5">
+      <div className="rounded-xl border border-border bg-card p-5">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className={LABEL}>Başlangıç *</label>
@@ -201,13 +201,13 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
       </div>
 
       {/* Gelişmiş */}
-      <div className="rounded-xl border border-[#E3DED5] bg-white">
-        <button type="button" onClick={() => setAdv((a) => !a)} className="flex w-full items-center justify-between px-5 py-4 text-sm font-medium text-[#171717]">
+      <div className="rounded-xl border border-border bg-card">
+        <button type="button" onClick={() => setAdv((a) => !a)} className="flex w-full items-center justify-between px-5 py-4 text-sm font-medium text-foreground">
           Gelişmiş alanlar
-          <span className="text-[#6F6F6F]">{adv ? "−" : "+"}</span>
+          <span className="text-muted-foreground">{adv ? "−" : "+"}</span>
         </button>
         {adv && (
-          <div className="space-y-4 border-t border-[#E3DED5] p-5">
+          <div className="space-y-4 border-t border-border p-5">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className={LABEL}>Kapı açılış</label>
@@ -230,7 +230,7 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
               <label className={LABEL}>Ulaşım / seyahat bilgisi</label>
               <textarea className={FIELD} rows={2} value={f.travelInfo} onChange={(e) => set("travelInfo", e.target.value)} />
             </div>
-            <label className="flex items-center gap-2 text-sm text-[#171717]">
+            <label className="flex items-center gap-2 text-sm text-foreground">
               <input type="checkbox" className="h-4 w-4 accent-[#8B5CF6]" checked={f.campingAllowed} onChange={(e) => set("campingAllowed", e.target.checked)} />
               Konaklama / kamp var
             </label>
@@ -240,7 +240,7 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
 
       {/* Durum (edit) */}
       {mode === "edit" && (
-        <div className="rounded-xl border border-[#E3DED5] bg-white p-5">
+        <div className="rounded-xl border border-border bg-card p-5">
           <label className={LABEL}>Durum</label>
           <select className={FIELD + " sm:w-56"} value={f.status} onChange={(e) => set("status", e.target.value)}>
             {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
@@ -248,7 +248,7 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
         </div>
       )}
 
-      {err && <p className="text-sm text-[#A23E48]">{err}</p>}
+      {err && <p className="text-sm text-rose-400">{err}</p>}
 
       <div className="flex items-center gap-3">
         <button
@@ -258,11 +258,11 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
         >
           {saving ? "Kaydediliyor…" : mode === "create" ? "Etkinliği oluştur" : "Değişiklikleri kaydet"}
         </button>
-        <Link href="/admin/events" className="text-sm text-[#6F6F6F] hover:text-[#171717]">
+        <Link href="/admin/events" className="text-sm text-muted-foreground hover:text-foreground">
           Vazgeç
         </Link>
         {mode === "create" && (
-          <span className="ml-auto text-xs text-[#6F6F6F]">Oluşturunca taslak (DRAFT) olur — listede “Yayınla” ile yayınla.</span>
+          <span className="ml-auto text-xs text-muted-foreground">Oluşturunca taslak (DRAFT) olur — listede “Yayınla” ile yayınla.</span>
         )}
       </div>
     </form>

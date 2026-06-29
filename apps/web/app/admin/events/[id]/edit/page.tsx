@@ -19,18 +19,18 @@ export default function EditEvent() {
 
   return (
     <div>
-      <Link href="/admin/events" className="text-sm text-[#6F6F6F] hover:text-[#171717]">
+      <Link href="/admin/events" className="text-sm text-muted-foreground hover:text-foreground">
         ← Etkinlikler
       </Link>
       <h1
-        className="mb-1 mt-2 text-3xl text-[#171717]"
+        className="mb-1 mt-2 text-3xl text-foreground"
         style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}
       >
         Etkinliği düzenle
       </h1>
-      <p className="mb-6 text-sm text-[#6F6F6F]">{ev ? ev.title : "Yükleniyor…"}</p>
+      <p className="mb-6 text-sm text-muted-foreground">{ev ? ev.title : "Yükleniyor…"}</p>
 
-      {err && <p className="text-sm text-[#A23E48]">{err}</p>}
+      {err && <p className="text-sm text-rose-400">{err}</p>}
       {ev && <EventForm mode="edit" id={id} initial={ev} />}
     </div>
   );

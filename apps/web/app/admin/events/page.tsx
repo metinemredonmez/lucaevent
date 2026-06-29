@@ -17,11 +17,11 @@ type Ev = {
 };
 
 const STATUS_COLOR: Record<string, string> = {
-  PUBLISHED: "bg-[#657257]/15 text-[#3A5A3A]",
-  DRAFT: "bg-[#6F6F6F]/15 text-[#6F6F6F]",
-  CANCELED: "bg-[#A23E48]/15 text-[#A23E48]",
-  ARCHIVED: "bg-[#6F6F6F]/10 text-[#6F6F6F]",
-  SCHEDULED: "bg-[#3E5A78]/15 text-[#3E5A78]",
+  PUBLISHED: "bg-[#657257]/15 text-emerald-400",
+  DRAFT: "bg-[#6F6F6F]/15 text-muted-foreground",
+  CANCELED: "bg-[#A23E48]/15 text-rose-400",
+  ARCHIVED: "bg-[#6F6F6F]/10 text-muted-foreground",
+  SCHEDULED: "bg-[#3E5A78]/15 text-sky-400",
 };
 
 export default function EventsAdmin() {
@@ -51,12 +51,12 @@ export default function EventsAdmin() {
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h1
-            className="text-3xl text-[#171717] mb-1"
+            className="text-3xl text-foreground mb-1"
             style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}
           >
             Etkinlikler
           </h1>
-          <p className="text-sm text-[#6F6F6F]">{rows.length} etkinlik</p>
+          <p className="text-sm text-muted-foreground">{rows.length} etkinlik</p>
         </div>
         <Link
           href="/admin/events/new"
@@ -65,11 +65,11 @@ export default function EventsAdmin() {
           + Yeni etkinlik
         </Link>
       </div>
-      {err && <p className="text-[#A23E48] text-sm mb-3">{err}</p>}
+      {err && <p className="text-rose-400 text-sm mb-3">{err}</p>}
 
-      <div className="overflow-hidden rounded-xl border border-[#E3DED5] bg-white">
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
-          <thead className="bg-[#F7F5F0] text-left text-xs text-[#6F6F6F]">
+          <thead className="bg-muted text-left text-xs text-muted-foreground">
             <tr>
               <th className="px-4 py-3 font-medium">Başlık</th>
               <th className="px-4 py-3 font-medium">Kategori</th>
@@ -80,15 +80,15 @@ export default function EventsAdmin() {
           </thead>
           <tbody>
             {rows.map((e) => (
-              <tr key={e.id} className="border-t border-[#E3DED5]">
+              <tr key={e.id} className="border-t border-border">
                 <td className="px-4 py-3">
-                  <div className="font-medium text-[#171717]">{e.title}</div>
-                  <div className="text-xs text-[#6F6F6F]">
+                  <div className="font-medium text-foreground">{e.title}</div>
+                  <div className="text-xs text-muted-foreground">
                     {e.kind} · {e.venue?.name ?? "—"}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-[#6F6F6F]">{e.category?.name ?? "—"}</td>
-                <td className="px-4 py-3 text-[#6F6F6F]">{formatDateTR(e.startsAt)}</td>
+                <td className="px-4 py-3 text-muted-foreground">{e.category?.name ?? "—"}</td>
+                <td className="px-4 py-3 text-muted-foreground">{formatDateTR(e.startsAt)}</td>
                 <td className="px-4 py-3">
                   <span
                     className={`inline-block rounded-full px-2 py-0.5 text-xs ${
@@ -101,13 +101,13 @@ export default function EventsAdmin() {
                 <td className="px-4 py-3 text-right space-x-2 whitespace-nowrap">
                   <Link
                     href={`/admin/events/${e.id}/attendees`}
-                    className="text-xs rounded-md border border-[#E3DED5] text-[#6F6F6F] px-2 py-1 hover:bg-[#F7F5F0]"
+                    className="text-xs rounded-md border border-border text-muted-foreground px-2 py-1 hover:bg-muted"
                   >
                     Katılımcılar
                   </Link>
                   <Link
                     href={`/admin/events/${e.id}/edit`}
-                    className="text-xs rounded-md border border-[#E3DED5] text-[#171717] px-2 py-1 hover:bg-[#F7F5F0]"
+                    className="text-xs rounded-md border border-border text-foreground px-2 py-1 hover:bg-muted"
                   >
                     Düzenle
                   </Link>
@@ -115,7 +115,7 @@ export default function EventsAdmin() {
                     <button
                       disabled={busy === e.id}
                       onClick={() => action(e.id, "publish")}
-                      className="text-xs rounded-md border border-[#657257] text-[#3A5A3A] px-2 py-1 hover:bg-[#657257]/10"
+                      className="text-xs rounded-md border border-[#657257] text-emerald-400 px-2 py-1 hover:bg-[#657257]/10"
                     >
                       Yayınla
                     </button>
@@ -124,7 +124,7 @@ export default function EventsAdmin() {
                     <button
                       disabled={busy === e.id}
                       onClick={() => action(e.id, "unpublish")}
-                      className="text-xs rounded-md border border-[#E3DED5] text-[#6F6F6F] px-2 py-1 hover:bg-[#F7F5F0]"
+                      className="text-xs rounded-md border border-border text-muted-foreground px-2 py-1 hover:bg-muted"
                     >
                       Geri çek
                     </button>
@@ -136,7 +136,7 @@ export default function EventsAdmin() {
                         if (confirm(`"${e.title}" iptal edilsin mi? Ödenmiş biletler iade edilir.`))
                           action(e.id, "cancel");
                       }}
-                      className="text-xs rounded-md border border-[#A23E48] text-[#A23E48] px-2 py-1 hover:bg-[#A23E48]/10"
+                      className="text-xs rounded-md border border-[#A23E48] text-rose-400 px-2 py-1 hover:bg-[#A23E48]/10"
                     >
                       İptal
                     </button>
@@ -146,7 +146,7 @@ export default function EventsAdmin() {
             ))}
             {rows.length === 0 && !err && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-[#6F6F6F]">
+                <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
                   Yükleniyor…
                 </td>
               </tr>
