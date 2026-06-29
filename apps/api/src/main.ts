@@ -13,7 +13,14 @@ async function bootstrap() {
   app.useLogger(app.get(Logger));
 
   const port = Number(process.env.PORT ?? 3001);
-  const corsOrigins = (process.env.CORS_ORIGINS ?? '').split(',').filter(Boolean);
+  // CORS_ORIGINS (virgüllü) + WEB_URL (frontend kendi origin'i) otomatik izinli.
+  // Böylece prod'da elle CORS ayarı gerekmez; WEB_URL zaten frontend adresine ayarlı.
+  const corsOrigins = [
+    ...(process.env.CORS_ORIGINS ?? '').split(','),
+    process.env.WEB_URL ?? '',
+  ]
+    .map((s) => s.trim())
+    .filter(Boolean);
 
   app.use(helmet({ contentSecurityPolicy: false }));
   app.enableCors({ origin: corsOrigins.length ? corsOrigins : true, credentials: true });
