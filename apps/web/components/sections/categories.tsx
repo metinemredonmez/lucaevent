@@ -175,13 +175,7 @@ function AllCard({ isActive, onClick }: { isActive: boolean; onClick: () => void
                   </span>
                 </div>
               ) : (
-                <Image
-                  src={CATEGORIES[tile.catIndex].cover}
-                  alt=""
-                  fill
-                  sizes="80px"
-                  className="object-cover"
-                />
+                <MosaicPhoto category={CATEGORIES[tile.catIndex]} />
               )}
             </motion.div>
           );
@@ -217,6 +211,26 @@ function AllCard({ isActive, onClick }: { isActive: boolean; onClick: () => void
         </div>
       </div>
     </motion.button>
+  );
+}
+
+/** Mozaik karosu — görsel yoksa kategori aksanlı gradyana düşer (kırık ikon yok). */
+function MosaicPhoto({ category }: { category: Category }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <>
+      <PosterFallback category={category} />
+      {!failed && (
+        <Image
+          src={category.cover}
+          alt=""
+          fill
+          sizes="80px"
+          className="object-cover"
+          onError={() => setFailed(true)}
+        />
+      )}
+    </>
   );
 }
 
