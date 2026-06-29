@@ -1,10 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { CATEGORIES, type CategorySlug, type Category } from "@/lib/data";
+import { CATEGORIES, UPCOMING_ACTIVITIES, type CategorySlug, type Category } from "@/lib/data";
 import { PosterFallback } from "@/components/poster-fallback";
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
 
@@ -44,9 +46,100 @@ export function Categories({ active = "all", onSelect }: Props) {
               onClick={() => onSelect?.(cat.slug)}
             />
           ))}
+
+          <ApplyCard />
         </div>
+
+        {/* kategori seçilince o kategorinin etkinlikleri inline, animasyonlu açılır */}
+        <CategoryEvents active={active} />
       </div>
     </section>
+  );
+}
+
+function ApplyCard() {
+  return (
+    <Link
+      href="/basvuru"
+      className="group relative flex aspect-[5/4] flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-primary/40 bg-primary/[0.06] p-5 text-center transition-colors hover:bg-primary/10"
+    >
+      <Plus className="h-7 w-7 text-primary transition-transform group-hover:scale-110" />
+      <span className="font-serif text-xl font-semibold leading-none text-foreground">Bize Ulaş</span>
+      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">öner · katıl</span>
+    </Link>
+  );
+}
+
+function fmtDate(iso: string) {
+  const d = new Date(iso);
+  return (
+    d.toLocaleDateString("tr-TR", { day: "2-digit", month: "short" }) +
+    " · " +
+    d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })
+  );
+}
+
+function CategoryEvents({ active }: { active: CategorySlug | "all" }) {
+  const cat = CATEGORIES.find((c) => c.slug === active);
+  const events =
+    active === "all" ? [] : UPCOMING_ACTIVITIES.filter((a) => a.category === active);
+
+  return (
+    <AnimatePresence initial={false}>
+      {active !== "all" && cat && (
+        <motion.div
+          key={active}
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="overflow-hidden"
+        >
+          <div className="pt-8">
+            <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="h-2 w-2 rounded-full" style={{ background: cat.accent }} />
+              <span className="font-medium text-foreground">{cat.name}</span>
+              <span>· {events.length} etkinlik</span>
+            </div>
+
+            {events.length ? (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {events.map((e, i) => (
+                  <motion.a
+                    key={e.id}
+                    href="#aktiviteler"
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.06 + i * 0.05, duration: 0.4 }}
+                    className="group overflow-hidden rounded-xl border border-border bg-card transition-colors hover:border-primary/40"
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden">
+                      <div className="absolute inset-0">
+                        <PosterFallback category={cat} />
+                      </div>
+                      <Image
+                        src={e.cover}
+                        alt={e.title}
+                        fill
+                        sizes="(min-width:1024px) 33vw, 100vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <div className="text-xs text-muted-foreground">{fmtDate(e.date)}</div>
+                      <div className="mt-1 font-medium leading-snug tracking-tight">{e.title}</div>
+                      <div className="mt-1 text-xs text-muted-foreground">{e.location}</div>
+                    </div>
+                  </motion.a>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">Bu kategoride yaklaşan etkinlik yok.</p>
+            )}
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 

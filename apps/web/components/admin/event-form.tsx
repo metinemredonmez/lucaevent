@@ -148,18 +148,33 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label className={LABEL}>Kategori</label>
-            <select className={FIELD} value={f.categoryId} onChange={(e) => set("categoryId", e.target.value)}>
-              <option value="">— seç —</option>
-              {cats.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
+        <div>
+          <label className={LABEL}>Kategori</label>
+          <div className="flex flex-wrap gap-2">
+            {cats.map((c) => {
+              const on = f.categoryId === c.id;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => set("categoryId", on ? "" : c.id)}
+                  className="rounded-full border px-3 py-1.5 text-xs transition-all hover:border-[#8B5CF6]/60 active:scale-95"
+                  style={{
+                    borderColor: on ? "#8B5CF6" : "#E3DED5",
+                    background: on ? "rgba(139,92,246,0.12)" : "#fff",
+                    color: on ? "#6D28D9" : "#6F6F6F",
+                  }}
+                >
+                  {c.name}
+                </button>
+              );
+            })}
+            {cats.length === 0 && <span className="text-xs text-[#B7B0A4]">kategoriler yükleniyor…</span>}
           </div>
-          <div>
-            <label className={LABEL}>Kapak görseli (URL/yol)</label>
-            <input className={FIELD} value={f.coverUrl} onChange={(e) => set("coverUrl", e.target.value)} placeholder="/img/events/slug.jpg" />
-          </div>
+        </div>
+        <div>
+          <label className={LABEL}>Kapak görseli (URL/yol)</label>
+          <input className={FIELD} value={f.coverUrl} onChange={(e) => set("coverUrl", e.target.value)} placeholder="/img/events/slug.jpg" />
         </div>
         <div>
           <label className={LABEL}>Kısa açıklama (tagline)</label>
