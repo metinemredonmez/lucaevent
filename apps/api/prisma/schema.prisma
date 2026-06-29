@@ -515,3 +515,30 @@ model Setting {
   updatedAt DateTime @updatedAt
   @@index([category])
 }
+
+enum SubmissionType {
+  CONTACT          // iletişim / öneri
+  EVENT_PROPOSAL   // etkinlik öner / organizatör başvurusu
+  MEMBERSHIP       // üyelik / topluluk başvurusu
+}
+
+enum SubmissionStatus {
+  NEW
+  REVIEWED
+  ARCHIVED
+}
+
+// Public formlardan gelen başvurular — admin panelinde listelenir.
+model Submission {
+  id        String           @id @default(cuid())
+  type      SubmissionType
+  name      String
+  email     String?
+  phone     String?
+  subject   String?
+  message   String?
+  payload   Json?            // tipe özel ekstra alanlar (etkinlik tarihi, ilgi alanı vb.)
+  status    SubmissionStatus @default(NEW)
+  createdAt DateTime         @default(now())
+  @@index([type, status, createdAt])
+}

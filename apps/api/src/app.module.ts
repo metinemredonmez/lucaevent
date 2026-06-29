@@ -31,6 +31,7 @@ import { WaitlistModule } from './waitlist/waitlist.module';
 import { CouponsModule } from './coupons/coupons.module';
 import { SubscribersModule } from './subscribers/subscribers.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { SubmissionsModule } from './submissions/submissions.module';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { UploadsModule } from './uploads/uploads.module';
     CouponsModule,
     SubscribersModule,
     UploadsModule,
+    SubmissionsModule,
   ],
   controllers: [HealthController],
   providers: [
