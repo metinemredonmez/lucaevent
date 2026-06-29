@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { login } from "@/lib/api";
@@ -84,6 +85,11 @@ export default function AdminLogin() {
           {loading ? "Giriş yapılıyor…" : "Giriş yap"}
         </Button>
       </form>
+      <p className="mt-4 text-center text-sm">
+        <Link href="/sifremi-unuttum" className="text-[#A78BFA] hover:underline">
+          Şifremi unuttum
+        </Link>
+      </p>
     </AuthShell>
   );
 }
