@@ -53,15 +53,29 @@ export default function AdminLogin() {
 
       <form onSubmit={onSubmit} className="space-y-4">
         <div>
-          <label className="text-xs text-[#A39DC9]">E-posta</label>
-          <Input className={INP} type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <label htmlFor="admin-email" className="text-xs text-[#A39DC9]">E-posta</label>
+          <Input
+            id="admin-email"
+            name="email"
+            className={INP}
+            type="email"
+            autoComplete="username"
+            inputMode="email"
+            placeholder="ornek@lucaclub.com.tr"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
         </div>
         <div>
-          <label className="text-xs text-[#A39DC9]">Şifre</label>
+          <label htmlFor="admin-password" className="text-xs text-[#A39DC9]">Şifre</label>
           <div className="relative">
             <Input
+              id="admin-password"
+              name="password"
               className={INP}
               type={show ? "text" : "password"}
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
