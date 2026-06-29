@@ -59,6 +59,8 @@ export const SETTINGS_REGISTRY: SettingDef[] = [
     category: 'push',
     isSecret: false,
     label: 'OneSignal App ID',
+    // Public değer (frontend SDK'sında zaten görünür) — admin'den değiştirilebilir.
+    default: 'd5fad9f5-c827-4650-8590-8e10e5a2b51a',
   },
   {
     key: 'push.onesignal.apiKey',
