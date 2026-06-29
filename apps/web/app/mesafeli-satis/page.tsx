@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageShell, Section } from "@/components/legal/page-shell";
+import { COMPANY_SELLER_LINE } from "@/lib/company";
 
 export const metadata: Metadata = {
   title: "Mesafeli Satış Sözleşmesi & Ön Bilgilendirme · Luca",
@@ -25,8 +26,7 @@ export default function MesafeliSatisPage() {
 
       <Section n="01" title="Taraflar">
         <p>
-          <strong className="text-foreground">Satıcı:</strong> [Luca Club — Tam Şirket Ünvanı],
-          [Adres], MERSIS: [—], Vergi Dairesi/No: [—], E-posta: destek@lucaclub.com.tr.
+          <strong className="text-foreground">Satıcı:</strong> {COMPANY_SELLER_LINE}.
         </p>
         <p className="mt-2">
           <strong className="text-foreground">Alıcı (Tüketici):</strong> Sipariş sırasında

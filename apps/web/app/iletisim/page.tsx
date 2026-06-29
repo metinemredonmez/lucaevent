@@ -3,57 +3,58 @@ import Link from "next/link";
 import { ArrowLeft, Instagram, Youtube, Mail, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { COMPANY } from "@/lib/company";
 
 export const metadata: Metadata = {
-  title: "İletişim · Novara Network",
+  title: "İletişim",
   description:
-    "Novara Network ile iletişime geçin — etkinlik önerileri, iş birlikleri, medya ve destek.",
+    "Luca ile iletişime geç — etkinlik önerileri, iş birlikleri, medya ve destek.",
 };
 
 const CHANNELS = [
   {
     icon: Mail,
     label: "E-posta",
-    value: "merhaba@novaranetwork.com",
-    href: "mailto:merhaba@novaranetwork.com",
-    hint: "Genel sorular ve iş birlikleri",
+    value: COMPANY.email,
+    href: `mailto:${COMPANY.email}`,
+    hint: "Genel sorular ve destek",
   },
   {
     icon: Instagram,
     label: "Instagram",
-    value: "@novaranetwork",
-    href: "https://www.instagram.com/novaranetwork/",
+    value: COMPANY.instagram,
+    href: COMPANY.instagramUrl,
     hint: "Günlük akış, duyurular, DM ile sohbet",
   },
   {
     icon: Youtube,
     label: "YouTube",
-    value: "@novaranetworktr",
-    href: "https://www.youtube.com/@novaranetworktr",
-    hint: "Etkinlik özetleri, röportajlar",
+    value: "Luca",
+    href: COMPANY.youtubeUrl,
+    hint: "Etkinlik özetleri, müzik",
   },
 ];
 
 const FAQS = [
   {
-    q: "Novara'ya nasıl katılırım?",
-    a: "Ana sayfadaki \"Aileye katıl\" butonundan formu doldurman yeterli. Seni WhatsApp grubumuza davet ediyor, yaklaşan etkinliklerden haber veriyoruz.",
+    q: "Luca'ya nasıl katılırım?",
+    a: "Ana sayfadan ücretsiz hesap oluştur; ilgi alanlarını seç, sana göre etkinlik önerileri ve hatırlatmalar al.",
   },
   {
     q: "Üyelik ücretli mi?",
-    a: "Topluluğa katılmak ücretsiz. Bazı etkinliklerde mekân/bilet/yemek katılım ücreti olabilir — her etkinlikte ücret duyuruda açıkça belirtilir.",
+    a: "Hesap açmak ücretsiz. Bazı etkinliklerde bilet/katılım ücreti olabilir — her etkinlikte ücret açıkça belirtilir.",
   },
   {
     q: "Bir etkinlik önerim var, nereye yazayım?",
-    a: "merhaba@novaranetwork.com adresine konu başlığına \"Etkinlik önerisi\" yazarak gönderebilir ya da Instagram DM'den ulaşabilirsin.",
+    a: `${COMPANY.email} adresine konu başlığına "Etkinlik önerisi" yazarak gönderebilir ya da Instagram DM'den ulaşabilirsin.`,
   },
   {
     q: "İş birliği / sponsorluk için nasıl iletişime geçerim?",
-    a: "Aynı e-posta adresinden \"İş birliği\" konusuyla bize yazabilirsin. Marka kiti ve geçmiş etkinlik istatistiklerini paylaşıyoruz.",
+    a: `${COMPANY.email} adresine "İş birliği" konusuyla yazabilirsin. Marka kiti ve geçmiş etkinlik istatistiklerini paylaşıyoruz.`,
   },
   {
     q: "Fotoğrafımın paylaşılmasını istemiyorum, ne yapabilirim?",
-    a: "kvkk@novaranetwork.com'a bildirirsen ilgili kare 48 saat içinde kaldırılır. Daha fazlası için KVKK sayfasına bakabilirsin.",
+    a: `${COMPANY.kvkkEmail} adresine bildirirsen ilgili kare en kısa sürede kaldırılır. Daha fazlası için KVKK sayfasına bakabilirsin.`,
   },
 ];
 

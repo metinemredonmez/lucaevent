@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageShell, Section } from "@/components/legal/page-shell";
+import { COMPANY } from "@/lib/company";
 
 export const metadata: Metadata = {
   title: "Kullanım Koşulları · Luca",
@@ -24,7 +25,7 @@ export default function KosullarPage() {
 
       <Section n="01" title="Taraflar ve tanımlar">
         <p>
-          Bu koşullar, <strong className="text-foreground">[Luca Club — Tam Şirket Ünvanı]</strong>{" "}
+          Bu koşullar, <strong className="text-foreground">{COMPANY.legalName}</strong>{" "}
           (&ldquo;Luca&rdquo;) ile platformu kullanan gerçek kişi (&ldquo;Kullanıcı&rdquo;)
           arasındadır. <em>Platform</em>: lucaclub.com.tr ve Luca mobil uygulaması.{" "}
           <em>Etkinlik</em>: wellness, outdoor &amp; spor, gezi, workshop, sosyal, yeme-içme,
@@ -100,7 +101,7 @@ export default function KosullarPage() {
           Luca bu koşulları güncelleyebilir; önemli değişiklikler uygun kanaldan duyurulur ve
           güncel sürüm yayım tarihinde yürürlüğe girer. Bu koşullara <strong className="text-foreground">
           Türkiye Cumhuriyeti hukuku</strong> uygulanır; uyuşmazlıklarda Tüketici Hakem Heyetleri
-          ve [İstanbul] Mahkemeleri/İcra Daireleri yetkilidir.
+          ve {COMPANY.city} Mahkemeleri/İcra Daireleri yetkilidir.
         </p>
         <p className="mt-3">
           İletişim:{" "}
