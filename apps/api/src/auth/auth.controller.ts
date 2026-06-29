@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -12,6 +13,7 @@ import { Throttle } from '@nestjs/throttler';
 
 import { AuthService } from './auth.service';
 import {
+  ChangePasswordDto,
   ForgotPasswordDto,
   GoogleAuthDto,
   LoginDto,
@@ -20,6 +22,7 @@ import {
   ResendVerificationDto,
   ResetPasswordDto,
   TokenPairDto,
+  UpdateProfileDto,
   VerifyEmailDto,
 } from './dto/auth.dto';
 import { Public } from '../common/decorators/public.decorator';
@@ -115,6 +118,35 @@ export class AuthController {
   @Get('me')
   me(@CurrentUser() user: CurrentUserPayload) {
     return user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('profile')
+  getProfile(@CurrentUser() user: CurrentUserPayload) {
+    return this.auth.getProfile(user.sub);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Patch('profile')
+  updateProfile(
+    @CurrentUser() user: CurrentUserPayload,
+    @Body() dto: UpdateProfileDto,
+  ) {
+    return this.auth.updateProfile(user.sub, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Post('change-password')
+  @HttpCode(200)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  changePassword(
+    @CurrentUser() user: CurrentUserPayload,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    return this.auth.changePassword(user.sub, dto);
   }
 
   @UseGuards(JwtAuthGuard)

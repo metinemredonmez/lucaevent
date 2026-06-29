@@ -4,9 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Menu } from "lucide-react";
+import { Menu, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { getSession } from "@/lib/session";
 
 const LINKS = [
   { href: "#kategoriler", label: "Deneyim" },
@@ -17,12 +18,24 @@ const LINKS = [
 export function Nav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [authed, setAuthed] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    setAuthed(!!getSession());
+    const sync = () => setAuthed(!!getSession());
+    window.addEventListener("focus", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("focus", sync);
+      window.removeEventListener("storage", sync);
+    };
   }, []);
 
   return (
@@ -71,9 +84,17 @@ export function Nav() {
           <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
             <a href="/basvuru">Bize Ulaş</a>
           </Button>
-          <Button asChild size="sm" className="hidden sm:inline-flex">
-            <a href="/giris">Giriş</a>
-          </Button>
+          {authed ? (
+            <Button asChild size="sm" className="hidden sm:inline-flex">
+              <a href="/hesap">
+                <User className="mr-1.5 size-4" /> Hesabım
+              </a>
+            </Button>
+          ) : (
+            <Button asChild size="sm" className="hidden sm:inline-flex">
+              <a href="/giris">Giriş</a>
+            </Button>
+          )}
           <button
             onClick={() => setOpen((s) => !s)}
             className="md:hidden p-2 rounded-md hover:bg-secondary"
@@ -98,8 +119,8 @@ export function Nav() {
               </a>
             ))}
             <Button asChild size="sm" className="mt-2 sm:hidden">
-              <a href="/giris" onClick={() => setOpen(false)}>
-                Giriş
+              <a href={authed ? "/hesap" : "/giris"} onClick={() => setOpen(false)}>
+                {authed ? "Hesabım" : "Giriş"}
               </a>
             </Button>
           </div>

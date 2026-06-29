@@ -13,6 +13,13 @@ const INP =
   "bg-[#171336] border-[#352E6B] text-white placeholder:text-[#6E6796] focus-visible:ring-[#8B5CF6]";
 const LBL = "block text-sm font-medium text-[#C4B5FD] mb-1.5";
 
+/** Giriş sonrası dönülecek güvenli iç rota (?next=/hesap gibi). */
+function nextUrl(): string {
+  if (typeof window === "undefined") return "/";
+  const n = new URLSearchParams(window.location.search).get("next");
+  return n && n.startsWith("/") && !n.startsWith("//") ? n : "/";
+}
+
 export default function Giris() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -26,7 +33,7 @@ export default function Giris() {
     setLoading(true);
     try {
       await loginUser(email, password);
-      router.replace("/");
+      router.replace(nextUrl());
     } catch (e: any) {
       setErr(e.message);
     } finally {
@@ -107,7 +114,7 @@ export default function Giris() {
         <div className="h-px flex-1 bg-[#2E2856]" />
       </div>
 
-      <GoogleButton onSuccess={() => router.replace("/")} onError={setErr} />
+      <GoogleButton onSuccess={() => router.replace(nextUrl())} onError={setErr} />
     </AuthShell>
   );
 }

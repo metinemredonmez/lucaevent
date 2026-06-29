@@ -29,6 +29,34 @@ async function post(path: string, body: unknown) {
   return data;
 }
 
+/** Authed request with the member Bearer token. 401 clears the session. */
+async function authReq(
+  path: string,
+  opts: { method?: string; body?: unknown } = {},
+) {
+  const token = getSession();
+  const res = await fetch(BASE + path, {
+    method: opts.method || "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+  });
+  if (res.status === 401) {
+    clearSession();
+    throw new Error("Oturum süresi doldu. Lütfen tekrar giriş yapın.");
+  }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const msg = Array.isArray(data?.message)
+      ? data.message.join(", ")
+      : data?.message || "İşlem başarısız";
+    throw new Error(msg);
+  }
+  return data;
+}
+
 export type RegisterBody = {
   name?: string;
   email: string;
@@ -118,6 +146,88 @@ export function getUserId(): string | null {
   } catch {
     return null;
   }
+}
+
+// ——— Hesabım (üye profil / biletler / favoriler) ———
+
+export type Profile = {
+  id: string;
+  email: string;
+  name: string | null;
+  avatarUrl: string | null;
+  role: string;
+  phone: string | null;
+  city: string | null;
+  birthDate: string | null;
+  interests: string[];
+  emailVerified: boolean;
+  marketingOptIn: boolean;
+  createdAt: string;
+  hasPassword: boolean;
+  hasGoogle: boolean;
+};
+
+export type ProfileUpdate = {
+  name?: string;
+  phone?: string;
+  city?: string;
+  birthDate?: string;
+  interests?: string[];
+  marketingOptIn?: boolean;
+};
+
+export function getProfile(): Promise<Profile> {
+  return authReq("/auth/profile");
+}
+export function updateProfile(body: ProfileUpdate): Promise<Profile> {
+  return authReq("/auth/profile", { method: "PATCH", body });
+}
+export function changePassword(body: {
+  currentPassword?: string;
+  newPassword: string;
+}): Promise<{ ok: boolean }> {
+  return authReq("/auth/change-password", { method: "POST", body });
+}
+export function deleteAccount(): Promise<{ ok: boolean }> {
+  return authReq("/auth/account", { method: "DELETE" });
+}
+
+export type MyOrder = {
+  id: string;
+  code: string;
+  status: string;
+  totalMinor: number;
+  currency: string;
+  createdAt: string;
+  items: Array<{ id: string; quantity?: number; qty?: number }>;
+  event?: {
+    title: string;
+    slug: string;
+    startsAt: string;
+    coverUrl: string | null;
+  } | null;
+};
+export function getMyBookings(): Promise<MyOrder[]> {
+  return authReq("/me/bookings");
+}
+
+export type FavoriteItem = {
+  id: string;
+  event: {
+    id: string;
+    slug: string;
+    title: string;
+    startsAt: string;
+    coverUrl: string | null;
+    kind: string;
+    category?: { slug: string; name: string } | null;
+  };
+};
+export function getMyFavorites(): Promise<FavoriteItem[]> {
+  return authReq("/me/favorites");
+}
+export function removeFavorite(eventId: string): Promise<unknown> {
+  return authReq(`/me/favorites/${eventId}`, { method: "DELETE" });
 }
 
 // 0..4 — length + lower + upper + digit + symbol

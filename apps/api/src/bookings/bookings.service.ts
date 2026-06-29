@@ -133,7 +133,10 @@ export class BookingsService {
     return this.prisma.order.findMany({
       where: { OR: [{ userId }, { email }] },
       orderBy: { createdAt: 'desc' },
-      include: { items: true },
+      include: {
+        items: true,
+        event: { select: { title: true, slug: true, startsAt: true, coverUrl: true } },
+      },
     });
   }
 

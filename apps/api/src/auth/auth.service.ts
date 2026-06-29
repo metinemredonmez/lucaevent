@@ -238,6 +238,84 @@ export class AuthService {
     return { ok: true };
   }
 
+  /** Full profile for the logged-in member (no secrets). */
+  async getProfile(userId: string) {
+    const u = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        avatarUrl: true,
+        role: true,
+        phone: true,
+        city: true,
+        birthDate: true,
+        interests: true,
+        emailVerified: true,
+        marketingOptIn: true,
+        createdAt: true,
+        passwordHash: true,
+        googleId: true,
+      },
+    });
+    if (!u) throw new UnauthorizedException('Kullanıcı bulunamadı');
+    const { passwordHash, googleId, ...rest } = u;
+    return { ...rest, hasPassword: !!passwordHash, hasGoogle: !!googleId };
+  }
+
+  async updateProfile(
+    userId: string,
+    dto: {
+      name?: string;
+      phone?: string;
+      city?: string;
+      birthDate?: string;
+      interests?: string[];
+      marketingOptIn?: boolean;
+    },
+  ) {
+    const data: Record<string, unknown> = {};
+    if (dto.name !== undefined) data.name = dto.name?.trim() || null;
+    if (dto.phone !== undefined) data.phone = dto.phone?.trim() || null;
+    if (dto.city !== undefined) data.city = dto.city?.trim() || null;
+    if (dto.birthDate !== undefined)
+      data.birthDate = dto.birthDate ? new Date(dto.birthDate) : null;
+    if (dto.interests !== undefined) data.interests = dto.interests;
+    if (dto.marketingOptIn !== undefined) data.marketingOptIn = dto.marketingOptIn;
+    await this.prisma.user.update({ where: { id: userId }, data });
+    return this.getProfile(userId);
+  }
+
+  /**
+   * Change password. Accounts that already have a password must prove the
+   * current one; Google-only accounts may set one for the first time.
+   */
+  async changePassword(
+    userId: string,
+    dto: { currentPassword?: string; newPassword: string },
+  ) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || !user.isActive)
+      throw new UnauthorizedException('Kullanıcı bulunamadı');
+    if (user.passwordHash) {
+      if (!dto.currentPassword)
+        throw new BadRequestException('Mevcut şifre gerekli');
+      const ok = await argon2.verify(user.passwordHash, dto.currentPassword);
+      if (!ok) throw new UnauthorizedException('Mevcut şifre hatalı');
+    }
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: await argon2.hash(dto.newPassword) },
+    });
+    // Revoke other sessions so a changed password takes full effect.
+    await this.prisma.refreshToken.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+    return { ok: true };
+  }
+
   // ---------- email verification & password reset ----------
 
   async verifyEmail(rawToken: string) {
