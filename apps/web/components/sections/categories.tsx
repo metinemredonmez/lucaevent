@@ -24,7 +24,7 @@ export function Categories({ active = "all", onSelect }: Props) {
             <div className="text-xs font-mono uppercase tracking-[0.2em] text-muted-foreground mb-3">
               keşfet
             </div>
-            <h2 className="font-serif text-4xl md:text-5xl font-semibold tracking-tight">
+            <h2 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight">
               Sekiz dünya, <AnimatedGradientText>tek çatı</AnimatedGradientText>.
             </h2>
           </div>

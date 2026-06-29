@@ -29,7 +29,7 @@ export function Activities({ filter = "all" }: Props) {
             <div className="text-xs font-mono uppercase tracking-[0.24em] text-muted-foreground mb-3">
               program / upcoming
             </div>
-            <h2 className="font-serif text-4xl md:text-5xl font-semibold tracking-tight">
+            <h2 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight">
               Bu hafta <AnimatedGradientText>Luca’da</AnimatedGradientText>.
             </h2>
             <p className="mt-4 text-muted-foreground max-w-xl">

@@ -64,7 +64,7 @@ export function Family() {
             <div className="text-xs font-mono uppercase tracking-[0.2em] text-muted-foreground mb-3">
               topluluk
             </div>
-            <h2 className="font-serif text-4xl md:text-5xl font-semibold tracking-tight text-balance">
+            <h2 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight text-balance">
               Her hafta{" "}
               <AnimatedGradientText className="tabular-nums">
                 {FAMILY_COUNT.toLocaleString("tr-TR")}

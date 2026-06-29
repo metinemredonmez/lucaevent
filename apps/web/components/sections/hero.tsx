@@ -116,7 +116,7 @@ export function Hero() {
           </div>
 
           {/* headline — umbrella */}
-          <h1 className="text-balance font-serif text-[clamp(2.75rem,8vw,5.75rem)] font-semibold leading-[1.02] tracking-tight">
+          <h1 className="text-balance font-serif text-[clamp(2.25rem,5.5vw,4.25rem)] font-semibold leading-[1.02] tracking-tight">
             Sadece gece değil.
             <br />
             <AnimatedGradientText className="italic">

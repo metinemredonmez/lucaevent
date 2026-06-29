@@ -60,7 +60,7 @@ export function Subscribe() {
           <div className="text-xs font-mono uppercase tracking-[0.2em] text-muted-foreground mb-4">
             misafir listesi
           </div>
-          <h2 className="font-serif text-4xl md:text-5xl font-semibold tracking-tight text-balance">
+          <h2 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight text-balance">
             Geceyi <AnimatedGradientText>önceden</AnimatedGradientText> kap.
           </h2>
           <p className="mt-5 text-lg text-muted-foreground">
