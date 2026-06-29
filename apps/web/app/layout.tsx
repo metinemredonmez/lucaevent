@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Newsreader, Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { BackgroundMusic } from "@/components/background-music";
 import "./globals.css";
 
 const newsreader = Newsreader({
@@ -85,6 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           disableTransitionOnChange
         >
           {children}
+          <BackgroundMusic />
           <Toaster
             position="bottom-center"
             toastOptions={{

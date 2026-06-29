@@ -65,21 +65,21 @@ export function Family() {
               topluluk
             </div>
             <h2 className="font-serif text-4xl md:text-5xl font-semibold tracking-tight text-balance">
-              Her gece{" "}
+              Her hafta{" "}
               <AnimatedGradientText className="tabular-nums">
                 {FAMILY_COUNT.toLocaleString("tr-TR")}
               </AnimatedGradientText>{" "}
-              kişilik bir hikâye.
+              kişilik bir topluluk.
             </h2>
             <p className="mt-6 text-lg text-muted-foreground max-w-xl">
-              Sahnenin önünde, bardağın etrafında, dansta tanışan yüzler.
-              Luca'nın atmosferi onlarla yazılıyor. Senin için de bir masa
-              ayırdık.
+              Yogada, teknede, atölyede, koşu pistinde ve sahnede tanışan
+              yüzler. Luca’nın atmosferi onlarla yazılıyor — sıradaki etkinlikte
+              yerini ayırdık.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
-                <a href="#rezervasyon">
-                  Yer ayır <ArrowRight className="size-4" />
+                <a href="/kayit">
+                  Aramıza katıl <ArrowRight className="size-4" />
                 </a>
               </Button>
               <Button variant="ghost" size="lg" asChild>

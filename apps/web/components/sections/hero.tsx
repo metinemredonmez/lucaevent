@@ -1,38 +1,96 @@
 "use client";
 
-import Image from "next/image";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
 import { Spotlight } from "@/components/ui/spotlight";
 import { ArrowRight } from "lucide-react";
 
-const GENRES = ["Müzik", "DJ", "Kokteyl", "Özel Etkinlikler"];
+/** Hero arka planında crossfade ile geçen atmosferik kareler.
+ *  En yatay/sinematik etkinlik görsellerinden beslenir — ayrı hero indirmesi gerekmez.
+ *  Dosya yoksa (onError) gizlenir, alttaki canlı mor gradyan görünür. */
+const SLIDES = [
+  "/img/events/bogaz-gun-batimi-tekne.jpg",
+  "/img/events/luca-006-kadikoy.jpg",
+  "/img/events/belgrad-sabah-kosusu.jpg",
+  "/img/events/sunset-yoga-sound-healing.jpg",
+  "/img/events/luca-camp-2026.jpg",
+];
+
+/** Şemsiye modeli vitrine taşıyan dönen "an"lar. */
+const MOMENTS = [
+  "🧘  Sunset yoga & ses banyosu",
+  "⛵  Boğaz’da gün batımı teknesi",
+  "🎨  Seramik atölyesi",
+  "🏃  Belgrad’da sabah koşusu",
+  "🍷  Rooftop’ta şarap & peynir",
+  "🎶  Gece · DJ set",
+];
 
 export function Hero() {
+  const [slide, setSlide] = useState(0);
+  const [moment, setMoment] = useState(0);
+
+  useEffect(() => {
+    const s = setInterval(() => setSlide((i) => (i + 1) % SLIDES.length), 5500);
+    const m = setInterval(() => setMoment((i) => (i + 1) % MOMENTS.length), 2600);
+    return () => {
+      clearInterval(s);
+      clearInterval(m);
+    };
+  }, []);
+
   return (
     <section className="relative isolate flex min-h-[92vh] items-center overflow-hidden text-white dark">
-      {/* ── Background: tek sinematik kare, derin mor/void washe çekilmiş ── */}
+      {/* ── Arka plan: canlı mor/void taban + crossfade fotoğraflar ── */}
       <div className="absolute inset-0 -z-10">
-        <Image
-          src="/img/hero.jpg"
-          alt=""
-          aria-hidden
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
+        {/* taban gradyan — fotoğraf olmasa bile dolu durur */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#1A0E3D] via-[#0E0922] to-[#070510]" />
+
+        {/* sürüklenen ışık küreleri */}
+        <motion.div
+          className="absolute -left-24 top-10 h-[28rem] w-[28rem] rounded-full bg-[#7C3AED]/30 blur-[120px]"
+          animate={{ x: [0, 60, 0], y: [0, 40, 0], scale: [1, 1.15, 1] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
         />
-        {/* void gradient — fotoğrafı atmosfere indirger */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0B0B0D]/70 via-[#0B0B0D]/75 to-[#0B0B0D]" />
-        {/* sol scrim — metin tarafı tam okunur, görsel sağda nefes alır */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0B0D] via-[#0B0B0D]/55 to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(168,85,247,0.10),transparent_55%)]" />
+        <motion.div
+          className="absolute right-[-6rem] bottom-[-4rem] h-[32rem] w-[32rem] rounded-full bg-[#A855F7]/25 blur-[130px]"
+          animate={{ x: [0, -50, 0], y: [0, -30, 0], scale: [1.1, 1, 1.1] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute left-1/2 top-1/3 h-72 w-72 rounded-full bg-[#3B82F6]/20 blur-[110px]"
+          animate={{ x: [0, 40, -30, 0], y: [0, -25, 25, 0] }}
+          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        {/* crossfade fotoğraf katmanları */}
+        {SLIDES.map((src, i) => (
+          <motion.img
+            key={src}
+            src={src}
+            alt=""
+            aria-hidden
+            initial={false}
+            animate={{ opacity: i === slide ? 0.55 : 0 }}
+            transition={{ duration: 1.6, ease: "easeInOut" }}
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = "none";
+            }}
+            className="pointer-events-none absolute inset-0 h-full w-full scale-105 object-cover"
+          />
+        ))}
+
+        {/* okunabilirlik scrim'leri */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#070510]/55 via-[#070510]/65 to-[#050309]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#070510] via-[#070510]/45 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(168,85,247,0.14),transparent_55%)]" />
         {/* alt kenarı bir sonraki bölüme yumuşat */}
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
       </div>
 
-      {/* ── Aceternity: tek efekt — yukarıdan düşen ışık huzmesi ── */}
+      {/* Aceternity tek efekt — yukarıdan düşen ışık huzmesi */}
       <Spotlight className="-top-40 left-0 md:-top-24 md:left-52" fill="#A855F7" />
 
       <div className="container relative z-10 py-24 md:py-32">
@@ -42,70 +100,89 @@ export function Hero() {
           transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
           className="max-w-3xl"
         >
-          {/* badge */}
+          {/* badge — şemsiye dikeyleri */}
           <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-primary/30 bg-white/[0.04] py-1.5 pl-3 pr-4 backdrop-blur-md">
             <span className="relative flex size-2">
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-60" />
               <span className="relative inline-flex size-2 rounded-full bg-primary" />
             </span>
             <span className="font-mono text-[11px] font-medium uppercase tracking-[0.28em] text-white/90 sm:text-xs">
-              Luca · Club
+              Luca · İstanbul
             </span>
             <span className="h-3 w-px bg-white/15" />
             <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-white/55 sm:text-xs">
-              İstanbul
+              Etkinlik · Gezi · Spor
             </span>
           </div>
 
-          {/* headline — Magic UI akan gradient vurgu */}
+          {/* headline — umbrella */}
           <h1 className="text-balance font-serif text-[clamp(2.75rem,8vw,5.75rem)] font-semibold leading-[1.02] tracking-tight">
-            Gece kendi{" "}
-            <AnimatedGradientText className="italic">
-              ritmini
-            </AnimatedGradientText>
+            Sadece gece değil.
             <br />
-            bulur.
+            <AnimatedGradientText className="italic">
+              Bütün bir şehir.
+            </AnimatedGradientText>
           </h1>
 
-          {/* tagline + tür satırı — pill yığını yerine sade mono dizi */}
+          {/* tagline */}
           <p className="mt-6 max-w-xl text-lg text-white/70 md:text-xl">
-            Bir sahne, bir sofra, bir gece.
+            Wellness, gezi, spor, atölye, sosyal ve gece — keşfet, buluş, yaşa.
           </p>
-          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] uppercase tracking-[0.22em] text-white/45">
-            {GENRES.map((g, i) => (
-              <span key={g} className="flex items-center gap-3">
-                {i > 0 && <span className="h-1 w-1 rounded-full bg-white/25" />}
-                {g}
-              </span>
-            ))}
+
+          {/* dönen "an" ticker'ı */}
+          <div className="mt-5 flex h-7 items-center font-mono text-[13px] tracking-wide text-white/55">
+            <span className="mr-3 text-white/30">Bu hafta:</span>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={moment}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
+                className="text-white/80"
+              >
+                {MOMENTS[moment]}
+              </motion.span>
+            </AnimatePresence>
           </div>
 
           {/* CTA */}
           <div className="mt-10 flex flex-wrap items-center gap-3">
             <Button asChild size="lg">
-              <a href="#rezervasyon">
-                Rezervasyon yap <ArrowRight className="size-4" />
+              <a href="#aktiviteler">
+                Etkinlikleri keşfet <ArrowRight className="size-4" />
               </a>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <a href="#aktiviteler">Bu haftanın programı</a>
+              <a href="#kategoriler">Kategoriler</a>
             </Button>
           </div>
 
-          {/* stats */}
+          {/* stats — umbrella */}
           <div className="mt-14 flex items-center gap-6 text-sm text-white/55">
-            <Stat label="Açılış" value="22:00" />
+            <Stat label="Kategori" value="8" />
             <Divider />
-            <Stat label="DJ Set" value="00:00" />
+            <Stat label="Etkinlik / ay" value="120+" />
             <Divider />
-            <Stat label="Mekân" value="Beyoğlu" />
+            <Stat label="Topluluk" value="2.400+" />
           </div>
         </motion.div>
       </div>
 
-      {/* scroll hint */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 font-mono text-xs uppercase tracking-widest text-white/40">
-        ↓ scroll
+      {/* slide göstergeleri */}
+      <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2">
+        {SLIDES.map((_, i) => (
+          <button
+            key={i}
+            aria-label={`Görsel ${i + 1}`}
+            onClick={() => setSlide(i)}
+            className="h-1.5 rounded-full transition-all"
+            style={{
+              width: i === slide ? 22 : 6,
+              backgroundColor: i === slide ? "#A855F7" : "rgba(255,255,255,0.25)",
+            }}
+          />
+        ))}
       </div>
     </section>
   );

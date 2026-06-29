@@ -30,11 +30,11 @@ export function Activities({ filter = "all" }: Props) {
               program / upcoming
             </div>
             <h2 className="font-serif text-4xl md:text-5xl font-semibold tracking-tight">
-              Bu hafta <AnimatedGradientText>sahnede</AnimatedGradientText>.
+              Bu hafta <AnimatedGradientText>Luca’da</AnimatedGradientText>.
             </h2>
             <p className="mt-4 text-muted-foreground max-w-xl">
-              DJ, live set ve özel davetler. Kontenjan kapanmadan listeye
-              yazıl.
+              Yoga, tekne, atölye, koşu, brunch ve gece. Kontenjan kapanmadan
+              yerini ayır.
             </p>
           </div>
           <Button variant="outline" asChild>

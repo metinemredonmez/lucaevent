@@ -112,6 +112,13 @@ export class AuthService {
    * and issue our own JWT pair. Verification uses Google's tokeninfo endpoint
    * (no extra dependency); for scale, switch to local JWKS / google-auth-library.
    */
+  /** Public: frontend'in Google butonunu başlatması için (clientId gizli değildir). */
+  async googleConfig() {
+    const raw = await this.settings.get('auth.google.clientId');
+    const web = raw.split(',').map((s) => s.trim()).filter(Boolean)[0] ?? '';
+    return { enabled: Boolean(web), clientId: web };
+  }
+
   async loginWithGoogle(idToken: string) {
     const clientIds = (await this.settings.get('auth.google.clientId'))
       .split(',')

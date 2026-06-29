@@ -49,7 +49,7 @@ export function Nav() {
           <span className="font-serif text-xl sm:text-2xl font-semibold tracking-[0.18em] truncate group-hover:text-primary transition-colors">
             LUCA
             <span className="text-muted-foreground font-normal ml-2 text-xs tracking-widest uppercase">
-              Club
+              Etkinlik
             </span>
           </span>
         </Link>
@@ -69,7 +69,7 @@ export function Nav() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <Button asChild size="sm" className="hidden sm:inline-flex">
-            <a href="#rezervasyon">Rezervasyon</a>
+            <a href="/giris">Giriş</a>
           </Button>
           <button
             onClick={() => setOpen((s) => !s)}
@@ -95,8 +95,8 @@ export function Nav() {
               </a>
             ))}
             <Button asChild size="sm" className="mt-2 sm:hidden">
-              <a href="#rezervasyon" onClick={() => setOpen(false)}>
-                Rezervasyon
+              <a href="/giris" onClick={() => setOpen(false)}>
+                Giriş
               </a>
             </Button>
           </div>

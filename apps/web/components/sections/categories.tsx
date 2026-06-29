@@ -20,15 +20,15 @@ export function Categories({ active = "all", onSelect }: Props) {
         <div className="flex items-end justify-between mb-10 gap-4">
           <div>
             <div className="text-xs font-mono uppercase tracking-[0.2em] text-muted-foreground mb-3">
-              deneyim
+              keşfet
             </div>
             <h2 className="font-serif text-4xl md:text-5xl font-semibold tracking-tight">
-              Bir mekân, <AnimatedGradientText>yedi atmosfer</AnimatedGradientText>.
+              Sekiz dünya, <AnimatedGradientText>tek çatı</AnimatedGradientText>.
             </h2>
           </div>
           <p className="hidden md:block max-w-sm text-muted-foreground">
-            Lounge'dan dance floor'a, rooftop'tan after party'ye. Her bölge
-            kendi ritmiyle akar — sen geceyi nereden başlatırsan.
+            Yogadan tekne turuna, atölyeden sahneye. Her kategori kendi
+            ritmiyle akar — sen hangi anı yaşamak istersen.
           </p>
         </div>
 
@@ -213,7 +213,7 @@ function AllCard({ isActive, onClick }: { isActive: boolean; onClick: () => void
           Hepsi
         </div>
         <div className="text-[10px] uppercase tracking-[0.2em] text-white/70 font-mono mt-2">
-          Her odadan
+          Tüm dünyalar
         </div>
       </div>
     </motion.button>

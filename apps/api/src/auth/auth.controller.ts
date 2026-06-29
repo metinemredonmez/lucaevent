@@ -49,6 +49,12 @@ export class AuthController {
   }
 
   @Public()
+  @Get('google/config')
+  googleConfig() {
+    return this.auth.googleConfig();
+  }
+
+  @Public()
   @Post('google')
   @HttpCode(200)
   @Throttle({ default: { ttl: 60_000, limit: 10 } })

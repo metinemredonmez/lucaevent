@@ -54,6 +54,21 @@ export async function forgotPassword(email: string) {
   return post("/auth/forgot-password", { email });
 }
 
+export async function getGoogleConfig(): Promise<{ enabled: boolean; clientId: string }> {
+  try {
+    const r = await fetch(BASE + "/auth/google/config");
+    return await r.json();
+  } catch {
+    return { enabled: false, clientId: "" };
+  }
+}
+
+export async function googleLogin(idToken: string) {
+  const data = await post("/auth/google", { idToken });
+  if (data.accessToken) setSession(data.accessToken);
+  return data;
+}
+
 // 0..4 — length + lower + upper + digit + symbol
 export function passwordScore(pw: string): number {
   let s = 0;
