@@ -6,6 +6,7 @@ import {
   ReservationStatus,
   SubmissionStatus,
   SubmissionType,
+  WaitlistStatus,
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -73,6 +74,23 @@ export type ActivityItem = {
   status: string;
   href: string;
 };
+export type UpcomingEventRow = {
+  id: string;
+  title: string;
+  slug: string;
+  startsAt: string;
+  status: string;
+  sold: number;
+  capacity: number;
+};
+export type WaitlistRow = { eventId: string; title: string; waiting: number };
+export type TodayStats = { eventsToday: number; checkinsToday: number };
+export type MemberStats = {
+  total: number;
+  today: number;
+  week: number;
+  series: DayCountPoint[];
+};
 
 /** Richer dashboard payload — series, breakdowns and a merged activity feed.
  *  Every field is zero-safe so the UI renders even with no sales. */
@@ -101,11 +119,23 @@ export class DashboardExtrasResponse {
   @ApiProperty()
   pendingReservations!: number;
 
-  @ApiProperty({ description: 'Ödenmiş gelire göre ilk 3 yayınlı etkinlik' })
+  @ApiProperty({ description: 'Ödenmiş gelire göre ilk 5 yayınlı etkinlik' })
   topEvents!: TopEventRow[];
 
   @ApiProperty({ description: 'Rezervasyon + başvuru + etkinlik birleşik son hareketler (<=8)' })
   activity!: ActivityItem[];
+
+  @ApiProperty({ description: 'Yaklaşan etkinlikler doluluk (sold/capacity) ile — uyarı + liste için' })
+  upcomingEvents!: UpcomingEventRow[];
+
+  @ApiProperty({ description: 'Bugünün etkinlik + check-in sayıları' })
+  today!: TodayStats;
+
+  @ApiProperty({ description: 'Üye toplam/bugün/hafta + 14 günlük yeni üye serisi' })
+  members!: MemberStats;
+
+  @ApiProperty({ description: 'Bekleme listesinde en çok kişi olan etkinlikler (<=5)' })
+  waitlistSummary!: WaitlistRow[];
 }
 
 @Injectable()
@@ -263,7 +293,7 @@ export class StatsService {
         take: 8,
         select: { id: true, title: true, createdAt: true, status: true },
       }),
-      this.topEvents(3),
+      this.topEvents(5),
     ]);
 
     // revenue 30d (paid revenue + paid order count per day)
@@ -342,6 +372,83 @@ export class StatsService {
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
       .slice(0, 8);
 
+    // ——— yaklaşan etkinlikler + doluluk (uyarı paneli + liste) ———
+    const endOfToday = this.daysAgo(startOfToday, -1); // +1 gün
+    const upcomingRaw = await this.prisma.event.findMany({
+      where: { startsAt: { gte: startOfToday } },
+      orderBy: { startsAt: 'asc' },
+      take: 24,
+      select: { id: true, title: true, slug: true, startsAt: true, status: true },
+    });
+    const tierAgg = upcomingRaw.length
+      ? await this.prisma.ticketTier.groupBy({
+          by: ['eventId'],
+          where: { eventId: { in: upcomingRaw.map((e) => e.id) } },
+          _sum: { sold: true, capacity: true },
+        })
+      : [];
+    const tierMap = new Map(
+      tierAgg.map((t) => [t.eventId, { sold: t._sum.sold ?? 0, capacity: t._sum.capacity ?? 0 }]),
+    );
+    const upcomingEvents: UpcomingEventRow[] = upcomingRaw.map((e) => ({
+      id: e.id,
+      title: e.title,
+      slug: e.slug,
+      startsAt: e.startsAt.toISOString(),
+      status: e.status,
+      sold: tierMap.get(e.id)?.sold ?? 0,
+      capacity: tierMap.get(e.id)?.capacity ?? 0,
+    }));
+
+    // ——— bugün + üyeler + bekleme listesi ———
+    const week = this.daysAgo(startOfToday, 6);
+    const [
+      eventsToday,
+      checkinsToday,
+      memberTotal,
+      memberToday,
+      memberWeek,
+      memberRows,
+      wlAgg,
+    ] = await Promise.all([
+      this.prisma.event.count({ where: { startsAt: { gte: startOfToday, lt: endOfToday } } }),
+      this.prisma.issuedTicket.count({
+        where: { checkedInAt: { gte: startOfToday, lt: endOfToday } },
+      }),
+      this.prisma.user.count(),
+      this.prisma.user.count({ where: { createdAt: { gte: startOfToday } } }),
+      this.prisma.user.count({ where: { createdAt: { gte: week } } }),
+      this.prisma.user.findMany({ where: { createdAt: { gte: since14 } }, select: { createdAt: true } }),
+      this.prisma.waitlistEntry.groupBy({
+        by: ['eventId'],
+        where: { status: WaitlistStatus.WAITING },
+        _count: { _all: true },
+        orderBy: { _count: { eventId: 'desc' } },
+        take: 5,
+      }),
+    ]);
+
+    const today: TodayStats = { eventsToday, checkinsToday };
+    const members: MemberStats = {
+      total: memberTotal,
+      today: memberToday,
+      week: memberWeek,
+      series: this.bucketCount(memberRows, startOfToday, 14),
+    };
+
+    const wlEvents = wlAgg.length
+      ? await this.prisma.event.findMany({
+          where: { id: { in: wlAgg.map((w) => w.eventId) } },
+          select: { id: true, title: true },
+        })
+      : [];
+    const wlTitle = new Map(wlEvents.map((e) => [e.id, e.title]));
+    const waitlistSummary: WaitlistRow[] = wlAgg.map((w) => ({
+      eventId: w.eventId,
+      title: wlTitle.get(w.eventId) ?? '—',
+      waiting: w._count._all,
+    }));
+
     return {
       revenueSeries,
       ordersSeries,
@@ -353,6 +460,10 @@ export class StatsService {
       pendingReservations,
       topEvents,
       activity,
+      upcomingEvents,
+      today,
+      members,
+      waitlistSummary,
     };
   }
 

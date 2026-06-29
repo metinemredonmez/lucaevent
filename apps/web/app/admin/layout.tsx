@@ -24,6 +24,8 @@ import {
 } from "lucide-react";
 import { getToken, logout } from "@/lib/api";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { CommandPalette } from "@/components/admin/command-palette";
+import { Search } from "lucide-react";
 
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
@@ -83,6 +85,16 @@ export default function AdminLayout({
             YÖNETİM
           </span>
         </div>
+        <div className="px-3 pt-3">
+          <button
+            onClick={() => window.dispatchEvent(new Event("luca:command"))}
+            className="flex w-full items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/50 transition-colors hover:text-white/80"
+          >
+            <Search className="h-3.5 w-3.5" />
+            <span className="flex-1 text-left">Ara…</span>
+            <kbd className="rounded border border-white/15 px-1.5 py-0.5 text-[10px] text-white/40">⌘K</kbd>
+          </button>
+        </div>
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
           {NAV.map((n) => {
             const active = n.exact
@@ -119,6 +131,7 @@ export default function AdminLayout({
       <main className="flex-1 overflow-auto">
         <div className="mx-auto max-w-6xl px-8 py-8">{children}</div>
       </main>
+      <CommandPalette />
     </div>
   );
 }

@@ -5,20 +5,29 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   TrendingUp,
+  TrendingDown,
   Gauge,
   ClipboardList,
   XCircle,
   ArrowRight,
   Ticket,
+  TicketPercent,
   Plus,
   Bell,
   ScanLine,
   Inbox,
   CalendarCheck,
+  CalendarClock,
   CalendarPlus,
   Check,
   Clock,
   Trophy,
+  Users,
+  UserPlus,
+  AlertTriangle,
+  Flame,
+  Hourglass,
+  ShieldCheck,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { formatDateTR } from "@/lib/utils";
@@ -57,6 +66,10 @@ type Extras = {
   pendingReservations: number;
   topEvents: { id: string; title: string; coverUrl: string | null; soldUnits: number; revenueMinor: number }[];
   activity: { type: "reservation" | "submission" | "event"; id: string; label: string; createdAt: string; status: string; href: string }[];
+  upcomingEvents: { id: string; title: string; slug: string; startsAt: string; status: string; sold: number; capacity: number }[];
+  today: { eventsToday: number; checkinsToday: number };
+  members: { total: number; today: number; week: number; series: DayCount[] };
+  waitlistSummary: { eventId: string; title: string; waiting: number }[];
 };
 type Ev = {
   id: string;
@@ -113,6 +126,13 @@ function deriveExtras(stats: Stats | null, events: Ev[]): Extras {
     pendingReservations: stats?.pendingReservations ?? 0,
     topEvents: [],
     activity: [],
+    upcomingEvents: events
+      .filter((e) => new Date(e.startsAt).getTime() > Date.now())
+      .slice(0, 12)
+      .map((e) => ({ id: e.id, title: e.title, slug: "", startsAt: e.startsAt, status: e.status, sold: 0, capacity: 0 })),
+    today: { eventsToday: 0, checkinsToday: 0 },
+    members: { total: 0, today: 0, week: 0, series: zeroDays(14) },
+    waitlistSummary: [],
   };
 }
 
@@ -255,14 +275,238 @@ function ActivityRow({ a }: { a: Extras["activity"][number] }) {
   );
 }
 
+type Coupon = { id: string; code: string; usedCount: number; maxUses: number | null; isActive: boolean };
+
+const fmtShort = (iso: string) =>
+  iso ? new Date(iso).toLocaleDateString("tr-TR", { day: "numeric", month: "short" }) : "—";
+
+/* ——— Bugün özeti şeridi ——— */
+function TodayStrip({ ext, revToday, revYest }: { ext: Extras; revToday: number; revYest: number }) {
+  const items = [
+    { icon: CalendarClock, label: "Bugün etkinlik", value: String(ext.today.eventsToday) },
+    { icon: ScanLine, label: "Bugün check-in", value: String(ext.today.checkinsToday) },
+    { icon: UserPlus, label: "Yeni üye · hafta", value: `+${ext.members.week}`, sub: `${ext.members.total} toplam` },
+    { icon: TrendingUp, label: "Bugün gelir", value: tl(revToday), sub: revYest > 0 ? `dün ${tl(revYest)}` : undefined },
+  ];
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {items.map((it, i) => (
+        <div key={i} className="flex items-center gap-2.5 rounded-xl border border-border bg-card px-3.5 py-2.5">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <it.icon className="h-4 w-4" />
+          </span>
+          <div className="min-w-0">
+            <div className="truncate text-base font-semibold tabular-nums text-foreground">{it.value}</div>
+            <div className="truncate text-[11px] text-muted-foreground">
+              {it.label}
+              {it.sub ? ` · ${it.sub}` : ""}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ——— Dikkat paneli (uyarılar) ——— */
+const ALERT_STYLE = {
+  danger: { color: "hsl(var(--destructive))", bg: "hsl(var(--destructive) / 0.08)" },
+  warn: { color: "hsl(var(--warn))", bg: "hsl(var(--warn) / 0.08)" },
+  info: { color: "#38BDF8", bg: "rgba(56,189,248,0.08)" },
+};
+function AlertsPanel({ ext }: { ext: Extras }) {
+  const soon = Date.now() + 14 * 864e5;
+  type Al = { kind: keyof typeof ALERT_STYLE; icon: typeof Flame; text: string; href: string };
+  const alerts: Al[] = [];
+  for (const e of ext.upcomingEvents) {
+    const t = new Date(e.startsAt).getTime();
+    const occ = e.capacity > 0 ? e.sold / e.capacity : 0;
+    if ((e.status === "DRAFT" || e.status === "SCHEDULED") && t < soon)
+      alerts.push({ kind: "danger", icon: AlertTriangle, text: `Yaklaşıyor ama yayında değil — ${e.title}`, href: `/admin/events/${e.id}/edit` });
+    else if (e.status === "PUBLISHED" && e.capacity > 0 && occ >= 0.9)
+      alerts.push({ kind: "warn", icon: Flame, text: `Son kontenjan — ${e.title} (%${Math.round(occ * 100)})`, href: `/admin/events/${e.id}/attendees` });
+    else if (e.status === "PUBLISHED" && e.capacity > 0 && occ < 0.2 && t < soon)
+      alerts.push({ kind: "info", icon: TrendingDown, text: `Az satıyor — ${e.title} (%${Math.round(occ * 100)})`, href: `/admin/events/${e.id}/edit` });
+  }
+  const top = alerts.slice(0, 6);
+  return (
+    <Card>
+      <CardHead title="Dikkat gerektirenler" />
+      <div className="space-y-1.5 p-3">
+        {top.length === 0 ? (
+          <div className="flex items-center justify-center gap-2 py-6 text-sm text-emerald-500">
+            <ShieldCheck className="h-4 w-4" /> Her şey yolunda
+          </div>
+        ) : (
+          top.map((a, i) => {
+            const st = ALERT_STYLE[a.kind];
+            return (
+              <Link
+                key={i}
+                href={a.href}
+                className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:brightness-110"
+                style={{ background: st.bg }}
+              >
+                <a.icon className="h-4 w-4 shrink-0" style={{ color: st.color }} />
+                <span className="min-w-0 flex-1 truncate text-[13px] text-foreground">{a.text}</span>
+                <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
+              </Link>
+            );
+          })
+        )}
+      </div>
+    </Card>
+  );
+}
+
+/* ——— Etkinlik doluluğu listesi ——— */
+function OccupancyList({ ext }: { ext: Extras }) {
+  const rows = ext.upcomingEvents.filter((e) => e.status !== "CANCELED").slice(0, 7);
+  return (
+    <Card>
+      <CardHead title="Etkinlik doluluğu" href="/admin/events" />
+      <div className="divide-y divide-border">
+        {rows.map((e) => {
+          const occ = e.capacity > 0 ? e.sold / e.capacity : 0;
+          return (
+            <Link key={e.id} href={`/admin/events/${e.id}/attendees`} className="block px-4 py-2.5 transition-colors hover:bg-muted/40">
+              <div className="flex items-center justify-between gap-3">
+                <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-foreground">{e.title}</span>
+                <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                  {e.capacity > 0 ? `${e.sold}/${e.capacity}` : fmtShort(e.startsAt)}
+                </span>
+              </div>
+              {e.capacity > 0 && (
+                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full transition-all"
+                    style={{ width: `${Math.min(100, occ * 100)}%`, background: occ >= 0.9 ? "hsl(var(--warn))" : "hsl(var(--primary))" }}
+                  />
+                </div>
+              )}
+            </Link>
+          );
+        })}
+        {rows.length === 0 && <div className="px-4 py-8 text-center text-sm text-muted-foreground">Yaklaşan etkinlik yok.</div>}
+      </div>
+    </Card>
+  );
+}
+
+/* ——— Top etkinlikler ——— */
+function TopEventsPanel({ ext }: { ext: Extras }) {
+  const hasRevenue = ext.topEvents.length > 0;
+  const rows = hasRevenue
+    ? ext.topEvents.map((t) => ({ id: t.id, title: t.title, right: tl(t.revenueMinor), sub: `${t.soldUnits} bilet` }))
+    : [...ext.upcomingEvents]
+        .filter((e) => e.capacity > 0)
+        .sort((a, b) => b.sold - a.sold)
+        .slice(0, 5)
+        .map((e) => ({ id: e.id, title: e.title, right: `${e.sold}`, sub: `%${e.capacity > 0 ? Math.round((e.sold / e.capacity) * 100) : 0} dolu` }));
+  return (
+    <Card>
+      <CardHead title={hasRevenue ? "En çok gelir" : "En çok ilgi gören"} href="/admin/events" />
+      <div className="divide-y divide-border">
+        {rows.map((r, i) => (
+          <Link key={r.id} href={`/admin/events/${r.id}/attendees`} className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-muted/40">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-xs font-semibold text-primary">{i + 1}</span>
+            <span className="min-w-0 flex-1 truncate text-[13px] text-foreground">{r.title}</span>
+            <span className="shrink-0 text-right">
+              <span className="block text-[13px] font-semibold tabular-nums text-foreground">{r.right}</span>
+              <span className="block text-[11px] text-muted-foreground">{r.sub}</span>
+            </span>
+          </Link>
+        ))}
+        {rows.length === 0 && <div className="px-4 py-8 text-center text-sm text-muted-foreground">Henüz veri yok.</div>}
+      </div>
+    </Card>
+  );
+}
+
+/* ——— Bekleme listesi özeti ——— */
+function WaitlistPanel({ ext }: { ext: Extras }) {
+  return (
+    <Card>
+      <CardHead title="Bekleme listesi" />
+      <div className="divide-y divide-border">
+        {ext.waitlistSummary.map((w) => (
+          <Link key={w.eventId} href={`/admin/events/${w.eventId}/waitlist`} className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-muted/40">
+            <Hourglass className="h-4 w-4 shrink-0 text-amber-500" />
+            <span className="min-w-0 flex-1 truncate text-[13px] text-foreground">{w.title}</span>
+            <span className="shrink-0 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-medium tabular-nums text-amber-600 dark:text-amber-400">{w.waiting}</span>
+          </Link>
+        ))}
+        {ext.waitlistSummary.length === 0 && <div className="px-4 py-8 text-center text-sm text-muted-foreground">Bekleyen yok.</div>}
+      </div>
+    </Card>
+  );
+}
+
+/* ——— Kupon kullanımı ——— */
+function CouponsPanel({ coupons }: { coupons: Coupon[] | null }) {
+  const active = (coupons ?? []).filter((c) => c.isActive).slice(0, 5);
+  return (
+    <Card>
+      <CardHead title="Kuponlar" href="/admin/coupons" />
+      <div className="divide-y divide-border">
+        {active.map((c) => {
+          const ratio = c.maxUses ? c.usedCount / c.maxUses : 0;
+          return (
+            <div key={c.id} className="px-4 py-2.5">
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex min-w-0 items-center gap-2">
+                  <TicketPercent className="h-3.5 w-3.5 shrink-0 text-primary" />
+                  <span className="truncate font-mono text-[13px] text-foreground">{c.code}</span>
+                </span>
+                <span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+                  {c.usedCount}
+                  {c.maxUses ? `/${c.maxUses}` : ""} kullanım
+                </span>
+              </div>
+              {c.maxUses ? (
+                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted">
+                  <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, ratio * 100)}%` }} />
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
+        {active.length === 0 && <div className="px-4 py-8 text-center text-sm text-muted-foreground">Aktif kupon yok.</div>}
+      </div>
+    </Card>
+  );
+}
+
+/* ——— Zaman aralığı segmenti ——— */
+function RangeToggle({ value, onChange }: { value: number; onChange: (n: number) => void }) {
+  return (
+    <div className="flex items-center gap-0.5 rounded-lg border border-border bg-muted/40 p-0.5">
+      {[7, 14, 30].map((n) => (
+        <button
+          key={n}
+          onClick={() => onChange(n)}
+          className={`rounded-md px-2 py-1 text-xs transition-colors ${
+            value === n ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {n}g
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const [s, setS] = useState<Stats | null>(null);
   const [x, setX] = useState<Extras | null>(null);
   const [events, setEvents] = useState<Ev[]>([]);
+  const [coupons, setCoupons] = useState<Coupon[] | null>(null);
+  const [range, setRange] = useState(30);
   const [err, setErr] = useState("");
 
   useEffect(() => {
     api<Ev[]>("/admin/events?take=100").then(setEvents).catch(() => {});
+    api<Coupon[]>("/admin/coupons").then(setCoupons).catch(() => setCoupons(null));
     api<Stats>("/admin/stats")
       .then(setS)
       .catch((e) => setErr(e.message));
@@ -292,6 +536,10 @@ export default function Dashboard() {
       ? { id: upcoming[0].id, title: upcoming[0].title, coverUrl: upcoming[0].coverUrl ?? null, soldUnits: 0, revenueMinor: 0 }
       : null);
   const spotlightIsTop = !!ext.topEvents[0];
+
+  const revToday = ext.revenueSeries.at(-1)?.revenueMinor ?? 0;
+  const revYest = ext.revenueSeries.at(-2)?.revenueMinor ?? 0;
+  const trendSeries = ext.revenueSeries.slice(-range);
 
   return (
     <div>
@@ -338,6 +586,11 @@ export default function Dashboard() {
 
       {s && (
         <div className="space-y-4">
+          {/* bugün özeti şeridi */}
+          <Reveal delay={0.01}>
+            <TodayStrip ext={ext} revToday={revToday} revYest={revYest} />
+          </Reveal>
+
           {/* KPI rayı */}
           <Reveal className="grid grid-cols-2 gap-3 lg:grid-cols-4" delay={0.02}>
             <KpiTile
@@ -372,25 +625,33 @@ export default function Dashboard() {
             />
           </Reveal>
 
+          {/* dikkat paneli */}
+          <Reveal delay={0.05}>
+            <AlertsPanel ext={ext} />
+          </Reveal>
+
           {/* focal trend + ops kuyrukları */}
           <Reveal className="grid gap-3 lg:grid-cols-3" delay={0.08}>
             <Card className="lg:col-span-2">
               <div className="flex items-center justify-between border-b border-border px-4 py-3">
                 <div>
                   <h2 className="text-[13px] font-semibold text-foreground">Gelir &amp; Sipariş</h2>
-                  <p className="text-xs text-muted-foreground">Son 30 gün</p>
+                  <p className="text-xs text-muted-foreground">Son {range} gün</p>
                 </div>
-                <div className="text-right">
-                  <div className="text-base font-semibold tabular-nums text-foreground">
-                    {tl(ext.revenueSeries.reduce((a, d) => a + d.revenueMinor, 0))}
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <div className="text-base font-semibold tabular-nums text-foreground">
+                      {tl(trendSeries.reduce((a, d) => a + d.revenueMinor, 0))}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {trendSeries.reduce((a, d) => a + d.paidOrders, 0)} sipariş
+                    </div>
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    {ext.revenueSeries.reduce((a, d) => a + d.paidOrders, 0)} sipariş
-                  </div>
+                  <RangeToggle value={range} onChange={setRange} />
                 </div>
               </div>
               <div className="p-4">
-                <AreaTrend series={ext.revenueSeries} format={tl} />
+                <AreaTrend series={trendSeries} format={tl} />
               </div>
             </Card>
 
@@ -485,30 +746,16 @@ export default function Dashboard() {
             )}
           </Reveal>
 
-          {/* yaklaşan etkinlikler */}
-          <Reveal delay={0.2}>
-            <Card>
-              <CardHead title="Yaklaşan etkinlikler" href="/admin/events" />
-              <div className="divide-y divide-border">
-                {upcoming.map((e) => (
-                  <Link key={e.id} href={`/admin/events/${e.id}/attendees`} className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-muted/50">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <Ticket className="h-4 w-4" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-medium text-foreground">{e.title}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {e.category?.name ?? "—"} · {formatDateTR(e.startsAt)}
-                      </div>
-                    </div>
-                    <span className={`text-xs ${STATUS_COLOR[e.status] ?? "text-muted-foreground"}`}>{e.status}</span>
-                  </Link>
-                ))}
-                {upcoming.length === 0 && (
-                  <div className="px-5 py-8 text-center text-sm text-muted-foreground">Yaklaşan etkinlik yok.</div>
-                )}
-              </div>
-            </Card>
+          {/* etkinlik doluluğu + top etkinlikler */}
+          <Reveal className="grid gap-3 lg:grid-cols-2" delay={0.18}>
+            <OccupancyList ext={ext} />
+            <TopEventsPanel ext={ext} />
+          </Reveal>
+
+          {/* bekleme listesi + kuponlar */}
+          <Reveal className="grid gap-3 lg:grid-cols-2" delay={0.22}>
+            <WaitlistPanel ext={ext} />
+            <CouponsPanel coupons={coupons} />
           </Reveal>
         </div>
       )}
