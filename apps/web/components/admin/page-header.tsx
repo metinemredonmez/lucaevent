@@ -57,10 +57,10 @@ export function AdminPageHeader({
           {eyebrow && (
             <div className="mb-1 text-[11px] uppercase tracking-widest text-primary/70">{eyebrow}</div>
           )}
-          <h1 className="text-3xl text-foreground" style={{ fontFamily: SERIF }}>
+          <h1 className="text-2xl text-foreground" style={{ fontFamily: SERIF }}>
             {title}
           </h1>
-          {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
+          {subtitle && <p className="mt-1 text-[13px] text-muted-foreground">{subtitle}</p>}
         </div>
         {actions && <div className="flex items-center gap-2">{actions}</div>}
       </div>
@@ -68,25 +68,25 @@ export function AdminPageHeader({
   }
 
   return (
-    <div className="relative mb-6 overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-[#6366F1]/20 via-card to-card p-6 dark:from-[#6366F1]/14">
+    <div className="relative mb-5 overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-[#6366F1]/20 via-card to-card p-5 dark:from-[#6366F1]/14">
       <div className="bg-noise pointer-events-none absolute inset-0 opacity-60" />
-      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/20 blur-3xl" />
+      <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
       <div className="relative">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             {eyebrow && (
-              <div className="mb-1.5 text-[11px] uppercase tracking-widest text-primary/70">
+              <div className="mb-1 text-[10px] uppercase tracking-widest text-primary/70">
                 {eyebrow}
               </div>
             )}
-            <h1 className="text-3xl text-foreground sm:text-4xl" style={{ fontFamily: SERIF }}>
+            <h1 className="text-2xl text-foreground sm:text-[1.7rem]" style={{ fontFamily: SERIF }}>
               {greeting ? greetingTr() : title}
             </h1>
-            {subtitle && <p className="mt-1.5 text-sm text-muted-foreground">{subtitle}</p>}
+            {subtitle && <p className="mt-1 text-[13px] text-muted-foreground">{subtitle}</p>}
           </div>
           {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
         </div>
-        {meta && <div className="mt-5 flex flex-wrap items-center gap-2">{meta}</div>}
+        {meta && <div className="mt-4 flex flex-wrap items-center gap-2">{meta}</div>}
       </div>
     </div>
   );

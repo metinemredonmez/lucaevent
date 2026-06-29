@@ -130,12 +130,12 @@ function Reveal({ children, delay = 0, className }: { children: React.ReactNode;
 }
 
 function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <div className={`rounded-2xl border border-border bg-card ${className}`}>{children}</div>;
+  return <div className={`rounded-xl border border-border bg-card ${className}`}>{children}</div>;
 }
 function CardHead({ title, href }: { title: string; href?: string }) {
   return (
-    <div className="flex items-center justify-between border-b border-border px-5 py-4">
-      <h2 className="text-sm font-semibold text-foreground">{title}</h2>
+    <div className="flex items-center justify-between border-b border-border px-4 py-3">
+      <h2 className="text-[13px] font-semibold text-foreground">{title}</h2>
       {href && (
         <Link href={href} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary">
           Tümü <ArrowRight className="h-3.5 w-3.5" />
@@ -165,25 +165,25 @@ function KpiTile({
   href?: string;
 }) {
   const inner = (
-    <div className="group h-full rounded-2xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-primary/40">
+    <div className="group h-full rounded-xl border border-border bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-primary/40">
       <div className="flex items-start justify-between">
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ background: `${accent}22`, color: accent }}>
-          <Icon className="h-5 w-5" />
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ background: `${accent}22`, color: accent }}>
+          <Icon className="h-4 w-4" />
         </span>
         {spark ? (
           <Sparkline data={spark} color={accent} />
         ) : href ? (
-          <ArrowRight className="h-4 w-4 text-muted-foreground/40 transition-colors group-hover:text-primary" />
+          <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/40 transition-colors group-hover:text-primary" />
         ) : null}
       </div>
-      <div className="mt-4 text-3xl font-semibold tracking-tight text-foreground">{value}</div>
-      <div className="mt-0.5 text-sm text-muted-foreground">{label}</div>
+      <div className="mt-3 text-2xl font-semibold tracking-tight text-foreground">{value}</div>
+      <div className="mt-0.5 text-xs text-muted-foreground">{label}</div>
       {meter !== undefined && (
-        <div className="mt-3">
+        <div className="mt-2.5">
           <MeterBar value={meter} color={accent} />
         </div>
       )}
-      {sub && <div className="mt-0.5 text-xs text-muted-foreground/60">{sub}</div>}
+      {sub && <div className="mt-0.5 text-[11px] text-muted-foreground/60">{sub}</div>}
     </div>
   );
   return href ? <Link href={href}>{inner}</Link> : inner;
@@ -204,14 +204,14 @@ function QueueRow({
   const zero = count === 0;
   const body = (
     <div
-      className="flex items-center gap-3 rounded-xl border-l-2 px-3 py-2.5 transition-colors hover:bg-muted/40"
+      className="flex items-center gap-3 rounded-lg border-l-2 px-3 py-2 transition-colors hover:bg-muted/40"
       style={{
         borderLeftColor: zero ? "transparent" : WARN,
         background: zero ? undefined : "hsl(var(--warn) / 0.06)",
       }}
     >
       <span
-        className="flex h-8 w-8 items-center justify-center rounded-lg"
+        className="flex h-7 w-7 items-center justify-center rounded-md"
         style={
           zero
             ? { background: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))" }
@@ -220,7 +220,7 @@ function QueueRow({
       >
         <Icon className="h-4 w-4" />
       </span>
-      <span className="flex-1 text-sm text-foreground">{label}</span>
+      <span className="flex-1 text-[13px] text-foreground">{label}</span>
       {zero ? (
         <span className="flex items-center gap-1 text-xs text-emerald-500">
           <Check className="h-3.5 w-3.5" /> Sıra temiz
@@ -305,14 +305,14 @@ export default function Dashboard() {
           <>
             <Link
               href="/admin/events/new"
-              className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-primary px-4 text-sm font-medium text-white transition hover:opacity-90"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3.5 text-[13px] font-medium text-white transition hover:opacity-90"
             >
               <Plus className="h-4 w-4" /> Yeni etkinlik
             </Link>
-            <Link href="/admin/notifications" aria-label="Bildirim gönder" className="grid h-10 w-10 place-items-center rounded-xl border border-border text-muted-foreground transition hover:border-primary/40 hover:text-foreground">
+            <Link href="/admin/notifications" aria-label="Bildirim gönder" className="grid h-9 w-9 place-items-center rounded-lg border border-border text-muted-foreground transition hover:border-primary/40 hover:text-foreground">
               <Bell className="h-4 w-4" />
             </Link>
-            <Link href="/admin/check-in" aria-label="Check-in" className="grid h-10 w-10 place-items-center rounded-xl border border-border text-muted-foreground transition hover:border-primary/40 hover:text-foreground">
+            <Link href="/admin/check-in" aria-label="Check-in" className="grid h-9 w-9 place-items-center rounded-lg border border-border text-muted-foreground transition hover:border-primary/40 hover:text-foreground">
               <ScanLine className="h-4 w-4" />
             </Link>
           </>
@@ -337,9 +337,9 @@ export default function Dashboard() {
       {!s && !err && <p className="text-sm text-muted-foreground">Yükleniyor…</p>}
 
       {s && (
-        <div className="space-y-5">
+        <div className="space-y-4">
           {/* KPI rayı */}
-          <Reveal className="grid grid-cols-2 gap-4 lg:grid-cols-4" delay={0.02}>
+          <Reveal className="grid grid-cols-2 gap-3 lg:grid-cols-4" delay={0.02}>
             <KpiTile
               icon={TrendingUp}
               accent={salesZero ? "#9CA3AF" : "#34D399"}
@@ -373,15 +373,15 @@ export default function Dashboard() {
           </Reveal>
 
           {/* focal trend + ops kuyrukları */}
-          <Reveal className="grid gap-4 lg:grid-cols-3" delay={0.08}>
+          <Reveal className="grid gap-3 lg:grid-cols-3" delay={0.08}>
             <Card className="lg:col-span-2">
-              <div className="flex items-center justify-between border-b border-border px-5 py-4">
+              <div className="flex items-center justify-between border-b border-border px-4 py-3">
                 <div>
-                  <h2 className="text-sm font-semibold text-foreground">Gelir &amp; Sipariş</h2>
+                  <h2 className="text-[13px] font-semibold text-foreground">Gelir &amp; Sipariş</h2>
                   <p className="text-xs text-muted-foreground">Son 30 gün</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-semibold tabular-nums text-foreground">
+                  <div className="text-base font-semibold tabular-nums text-foreground">
                     {tl(ext.revenueSeries.reduce((a, d) => a + d.revenueMinor, 0))}
                   </div>
                   <div className="text-xs text-muted-foreground">
@@ -405,7 +405,7 @@ export default function Dashboard() {
           </Reveal>
 
           {/* kategori dağılımı + doluluk & dönüşüm */}
-          <Reveal className="grid gap-4 lg:grid-cols-2" delay={0.12}>
+          <Reveal className="grid gap-3 lg:grid-cols-2" delay={0.12}>
             <Card>
               <CardHead title="Kategori dağılımı" href="/admin/events" />
               <div className="p-5">
@@ -434,7 +434,7 @@ export default function Dashboard() {
           </Reveal>
 
           {/* son hareketler + spotlight */}
-          <Reveal className="grid gap-4 lg:grid-cols-3" delay={0.16}>
+          <Reveal className="grid gap-3 lg:grid-cols-3" delay={0.16}>
             <Card className="lg:col-span-2">
               <CardHead title="Son hareketler" />
               <div className="px-4 py-2">
@@ -458,7 +458,7 @@ export default function Dashboard() {
                   <div className="flex items-center gap-2 text-xs text-[#4C1D95] dark:text-[#C4B5FD]">
                     <Trophy className="h-4 w-4" /> {spotlightIsTop ? "En popüler etkinlik" : "Sıradaki etkinlik"}
                   </div>
-                  <div className="mt-3 line-clamp-2 text-base font-semibold text-foreground">{spotlight.title}</div>
+                  <div className="mt-2 line-clamp-2 text-sm font-semibold text-foreground">{spotlight.title}</div>
                   <div className="mt-1 text-xs text-muted-foreground">
                     {spotlightIsTop
                       ? `${spotlight.soldUnits} bilet · ${tl(spotlight.revenueMinor)}`
@@ -491,7 +491,7 @@ export default function Dashboard() {
               <CardHead title="Yaklaşan etkinlikler" href="/admin/events" />
               <div className="divide-y divide-border">
                 {upcoming.map((e) => (
-                  <Link key={e.id} href={`/admin/events/${e.id}/attendees`} className="flex items-center gap-4 px-5 py-3 transition-colors hover:bg-muted/50">
+                  <Link key={e.id} href={`/admin/events/${e.id}/attendees`} className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-muted/50">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                       <Ticket className="h-4 w-4" />
                     </span>
