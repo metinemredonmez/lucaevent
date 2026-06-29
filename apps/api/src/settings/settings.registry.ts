@@ -12,6 +12,8 @@ export interface SettingDef {
   category: 'auth' | 'payment' | 'push' | 'mail' | 'general';
   isSecret: boolean;
   label: string;
+  /** DB ve env yoksa kullanılan varsayılan (yalnız public değerler için). */
+  default?: string;
 }
 
 export const SETTINGS_REGISTRY: SettingDef[] = [
@@ -22,6 +24,9 @@ export const SETTINGS_REGISTRY: SettingDef[] = [
     category: 'auth',
     isSecret: false,
     label: 'Google Client ID (web,ios,android — virgülle)',
+    // Public değer (frontend'de zaten görünür) — admin'den değiştirilebilir.
+    default:
+      '631576779866-6irru1m952kvcmpo6dt97vurvjnk5k24.apps.googleusercontent.com',
   },
 
   // Payment

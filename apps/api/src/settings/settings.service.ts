@@ -38,12 +38,16 @@ export class SettingsService {
 
   private async ensureLoaded(): Promise<void> {
     if (this.loaded) return;
-    const rows = await this.prisma.setting.findMany();
-    for (const r of rows) {
-      const def = REGISTRY_BY_KEY.get(r.key);
-      const val =
-        r.value == null ? null : def?.isSecret ? this.decrypt(r.value) : r.value;
-      this.cache.set(r.key, val);
+    try {
+      const rows = await this.prisma.setting.findMany();
+      for (const r of rows) {
+        const def = REGISTRY_BY_KEY.get(r.key);
+        const val =
+          r.value == null ? null : def?.isSecret ? this.decrypt(r.value) : r.value;
+        this.cache.set(r.key, val);
+      }
+    } catch {
+      // Setting tablosu yoksa (migration öncesi) çökme; env/default'a düşeriz.
     }
     this.loaded = true;
   }
@@ -58,6 +62,7 @@ export class SettingsService {
     if (def) {
       const env = this.config.get<string>(def.env);
       if (env) return env;
+      if (def.default) return def.default;
     }
     return '';
   }
