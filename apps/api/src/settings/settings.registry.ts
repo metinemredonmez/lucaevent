@@ -51,6 +51,14 @@ export const SETTINGS_REGISTRY: SettingDef[] = [
     isSecret: true,
     label: 'Iyzico Secret',
   },
+  {
+    key: 'payment.iyzico.baseUrl',
+    env: 'IYZICO_BASE_URL',
+    category: 'payment',
+    isSecret: false,
+    label: 'Iyzico API adresi (sandbox: https://sandbox-api.iyzipay.com · canlı: https://api.iyzipay.com)',
+    default: 'https://sandbox-api.iyzipay.com',
+  },
 
   // Push (OneSignal)
   {

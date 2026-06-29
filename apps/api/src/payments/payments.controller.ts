@@ -1,6 +1,16 @@
-import { Body, Controller, Headers, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Headers,
+  Param,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
 
 import { PaymentsService } from './payments.service';
 import { Public } from '../common/decorators/public.decorator';
@@ -11,7 +21,10 @@ import { Roles } from '../common/decorators/roles.decorator';
 @ApiTags('payments')
 @Controller('payments')
 export class PaymentsController {
-  constructor(private readonly payments: PaymentsService) {}
+  constructor(
+    private readonly payments: PaymentsService,
+    private readonly config: ConfigService,
+  ) {}
 
   @Public()
   @Post('webhook')
@@ -20,6 +33,29 @@ export class PaymentsController {
     @Headers() headers: Record<string, any>,
   ) {
     return this.payments.handleWebhook(payload, headers);
+  }
+
+  /**
+   * Iyzico Checkout Form geri dönüşü — hosted ödeme sonrası Iyzico buraya
+   * `token`'ı POST eder. Sonucu işleyip kullanıcıyı sonuç sayfasına yönlendiririz.
+   */
+  @Public()
+  @Post('iyzico/callback')
+  async iyzicoCallback(@Body() body: any, @Res() res: Response) {
+    const webUrl = this.config.get<string>('WEB_URL') || 'http://localhost:3010';
+    const token = body?.token || '';
+    let durum = 'hata';
+    let kod = '';
+    try {
+      const result = await this.payments.handleIyzicoCallback(token);
+      kod = result.orderCode || '';
+      durum = result.status === 'PAID' ? 'basarili' : 'basarisiz';
+    } catch {
+      durum = 'hata';
+    }
+    const params = new URLSearchParams({ durum });
+    if (kod) params.set('kod', kod);
+    res.redirect(303, `${webUrl}/odeme/sonuc?${params.toString()}`);
   }
 
   // DEV helper to simulate a PAID provider webhook.

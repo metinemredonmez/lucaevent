@@ -9,6 +9,7 @@ import {
 
 import { PrismaService } from '../prisma/prisma.service';
 import { CouponsService } from '../coupons/coupons.service';
+import { PaymentsService } from '../payments/payments.service';
 import { CreateBookingDto } from './dto/booking.dto';
 
 @Injectable()
@@ -16,6 +17,7 @@ export class BookingsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly coupons: CouponsService,
+    private readonly payments: PaymentsService,
   ) {}
 
   private genOrderCode(): string {
@@ -117,13 +119,14 @@ export class BookingsService {
       return created;
     });
 
-    // f. response with mock checkout url
+    // f. aktif sağlayıcıyla (mock | iyzico) ödeme başlat, checkout URL'ini dön
+    const checkout = await this.payments.createCheckout(order);
     return {
       orderCode: order.code,
       status: order.status,
       totalMinor: order.totalMinor,
       currency: order.currency,
-      checkoutUrl: '/api/v1/payments/mock/checkout/' + order.code,
+      checkoutUrl: checkout.checkoutUrl,
     };
   }
 

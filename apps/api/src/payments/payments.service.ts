@@ -14,9 +14,15 @@ import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { WaitlistService } from '../waitlist/waitlist.service';
+import { Order } from '@prisma/client';
 import { MockProvider } from './providers/mock.provider';
 import { IyzicoProvider } from './providers/iyzico.provider';
-import { PaymentProvider } from './providers/payment.provider';
+import {
+  PaymentProvider,
+  ParsedWebhook,
+  CheckoutResult,
+} from './providers/payment.provider';
+import { SettingsService } from '../settings/settings.service';
 
 @Injectable()
 export class PaymentsService {
@@ -31,6 +37,7 @@ export class PaymentsService {
     private readonly waitlist: WaitlistService,
     private readonly mock: MockProvider,
     private readonly iyzico: IyzicoProvider,
+    private readonly settings: SettingsService,
   ) {
     this.providers = new Map<string, PaymentProvider>([
       [mock.name, mock],
@@ -38,8 +45,13 @@ export class PaymentsService {
     ]);
   }
 
-  private getProvider(name?: string): PaymentProvider {
-    const key = name ?? this.config.get<string>('PAYMENT_PROVIDER') ?? 'mock';
+  /** Aktif sağlayıcı: admin Ayarlar (payment.provider) → env → 'mock'. */
+  private async getProvider(name?: string): Promise<PaymentProvider> {
+    const key =
+      name ||
+      (await this.settings.get('payment.provider')) ||
+      this.config.get<string>('PAYMENT_PROVIDER') ||
+      'mock';
     const provider = this.providers.get(key);
     // Fail closed: never silently fall back to the (trust-all) mock provider.
     if (!provider) {
@@ -49,6 +61,17 @@ export class PaymentsService {
       throw new ServiceUnavailableException('Mock payment provider is disabled in production');
     }
     return provider;
+  }
+
+  /** Aktif sağlayıcıyla ödeme başlatır; provider + providerId'yi siparişe yazar. */
+  async createCheckout(order: Order): Promise<CheckoutResult> {
+    const provider = await this.getProvider();
+    const result = await provider.createCheckout(order);
+    await this.prisma.order.update({
+      where: { id: order.id },
+      data: { provider: provider.name, providerId: result.providerId },
+    });
+    return result;
   }
 
   private genTicketCode(): string {
@@ -95,14 +118,30 @@ export class PaymentsService {
    * Returns a small ack object; always succeeds for handled cases.
    */
   async handleWebhook(payload: any, headers: Record<string, any>) {
-    const provider = this.getProvider();
+    const provider = await this.getProvider();
 
     if (!provider.verifyWebhook(payload, headers)) {
       throw new UnauthorizedException('Invalid webhook signature');
     }
 
-    const parsed = provider.parseWebhook(payload);
+    return this.applyResult(provider.parseWebhook(payload));
+  }
 
+  /**
+   * Iyzico hosted ödeme callback'i: token ile sonucu Iyzico'dan çek, siparişi
+   * atomik PAID/FAILED işaretle. (Iyzico klasik webhook değil callback kullanır.)
+   */
+  async handleIyzicoCallback(
+    token: string,
+  ): Promise<{ ok: boolean; orderCode?: string; status: 'PAID' | 'FAILED' }> {
+    const parsed = await this.iyzico.retrieveByToken(token);
+    if (!parsed.orderCode) return { ok: false, status: 'FAILED' };
+    await this.applyResult(parsed);
+    return { ok: true, orderCode: parsed.orderCode, status: parsed.status };
+  }
+
+  /** Parse edilmiş sonucu (PAID/FAILED) idempotent + atomik uygular. */
+  private async applyResult(parsed: ParsedWebhook & { providerId?: string }) {
     const order = await this.prisma.order.findUnique({
       where: { code: parsed.orderCode },
       include: { items: true },
@@ -142,7 +181,12 @@ export class PaymentsService {
     const issued = await this.prisma.$transaction(async (tx) => {
       const gate = await tx.order.updateMany({
         where: { id: order.id, status: 'PENDING' },
-        data: { status: 'PAID', paidAt: new Date() },
+        data: {
+          status: 'PAID',
+          paidAt: new Date(),
+          // İade için gerçek ödeme işlem kimliğini sakla (Iyzico).
+          ...(parsed.providerId ? { providerId: parsed.providerId } : {}),
+        },
       });
       if (gate.count === 0) return false; // concurrent webhook already paid it
 
@@ -197,7 +241,7 @@ export class PaymentsService {
       throw new ConflictException('ORDER_NOT_PAID');
     }
 
-    const provider = this.getProvider(order.provider);
+    const provider = await this.getProvider(order.provider);
     await provider.refund(order.providerId ?? '', order.totalMinor);
 
     const restoreStock = order.event.startsAt > new Date();
