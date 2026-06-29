@@ -36,7 +36,15 @@ export default function Giris() {
   }
 
   return (
-    <AuthShell>
+    <AuthShell
+      headline="Tekrar hoş geldin."
+      caption="Kaldığın yerden devam et."
+      features={[
+        "Biletlerin ve rezervasyonların tek yerde",
+        "Favori etkinliklerini takip et",
+        "İlgi alanına göre sana özel öneriler",
+      ]}
+    >
       <div className="mb-7">
         <h1 className="text-3xl text-white" style={{ fontFamily: "Georgia, serif" }}>
           Giriş yap

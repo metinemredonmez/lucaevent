@@ -1,10 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   Equals,
+  IsArray,
   IsBoolean,
+  IsDateString,
   IsEmail,
   IsOptional,
   IsString,
+  MaxLength,
   MinLength,
 } from 'class-validator';
 
@@ -39,6 +42,30 @@ export class RegisterDto extends LoginDto {
   @IsOptional()
   @IsBoolean()
   marketingOptIn?: boolean;
+
+  // ── onboarding / profil (hepsi opsiyonel) ──
+  @ApiPropertyOptional({ example: '+90 555 555 55 55' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(32)
+  phone?: string;
+
+  @ApiPropertyOptional({ example: 'İstanbul' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  city?: string;
+
+  @ApiPropertyOptional({ example: '1998-05-12', description: 'ISO tarih' })
+  @IsOptional()
+  @IsDateString()
+  birthDate?: string;
+
+  @ApiPropertyOptional({ description: 'İlgi alanı kategori slugları', example: ['wellness', 'nightlife'] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  interests?: string[];
 }
 
 export class RefreshDto {

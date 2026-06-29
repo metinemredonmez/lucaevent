@@ -33,6 +33,10 @@ export type RegisterBody = {
   name?: string;
   email: string;
   password: string;
+  phone?: string;
+  city?: string;
+  birthDate?: string; // ISO (YYYY-MM-DD)
+  interests?: string[];
   kvkkConsent: boolean;
   termsAccepted: boolean;
   marketingOptIn?: boolean;
@@ -52,6 +56,18 @@ export async function loginUser(email: string, password: string) {
 
 export async function forgotPassword(email: string) {
   return post("/auth/forgot-password", { email });
+}
+
+export async function resetPassword(token: string, password: string) {
+  return post("/auth/reset-password", { token, password });
+}
+
+export async function verifyEmail(token: string) {
+  return post("/auth/verify-email", { token });
+}
+
+export async function resendVerification(email: string) {
+  return post("/auth/resend-verification", { email });
 }
 
 export async function getGoogleConfig(): Promise<{ enabled: boolean; clientId: string }> {
