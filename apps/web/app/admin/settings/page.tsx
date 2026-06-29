@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { AdminPageHeader } from "@/components/admin/page-header";
 
 type Setting = {
   key: string;
@@ -67,15 +68,10 @@ export default function SettingsAdmin() {
 
   return (
     <div>
-      <h1
-        className="text-3xl text-foreground mb-1"
-        style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}
-      >
-        Ayarlar & Entegrasyonlar
-      </h1>
-      <p className="text-sm text-muted-foreground mb-6">
-        Anahtarlar burada yönetilir — .env'e dokunmana gerek yok. Secret'lar şifreli saklanır.
-      </p>
+      <AdminPageHeader
+        title="Ayarlar & Entegrasyonlar"
+        subtitle="Anahtarlar burada yönetilir — .env'e dokunmana gerek yok. Secret'lar şifreli saklanır."
+      />
       {err && <p className="text-rose-400 text-sm mb-3">{err}</p>}
       {msg && <p className="text-emerald-400 text-sm mb-3">{msg}</p>}
 

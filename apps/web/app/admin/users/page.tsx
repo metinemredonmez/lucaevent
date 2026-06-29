@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { formatDateTR } from "@/lib/utils";
+import { AdminPageHeader } from "@/components/admin/page-header";
 
 type User = {
   id: string;
@@ -46,13 +47,7 @@ export default function UsersAdmin() {
 
   return (
     <div>
-      <h1
-        className="mb-1 text-3xl text-foreground"
-        style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}
-      >
-        Kullanıcılar
-      </h1>
-      <p className="mb-5 text-sm text-muted-foreground">{rows.length} kayıt</p>
+      <AdminPageHeader title="Kullanıcılar" subtitle="Üyeler ve ekip rolleri." />
 
       {err && <p className="mb-3 text-sm text-rose-400">{err}</p>}
 

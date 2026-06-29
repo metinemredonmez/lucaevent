@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { formatDateTR } from "@/lib/utils";
+import { AdminPageHeader } from "@/components/admin/page-header";
 
 type Sub = {
   id: string;
@@ -60,10 +61,7 @@ export default function SubmissionsAdmin() {
 
   return (
     <div>
-      <h1 className="mb-1 text-3xl text-foreground" style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}>
-        Başvurular & Mesajlar
-      </h1>
-      <p className="mb-5 text-sm text-muted-foreground">{rows.length} kayıt</p>
+      <AdminPageHeader title="Başvurular & Mesajlar" subtitle={`${rows.length} kayıt`} />
 
       <div className="mb-4 flex gap-2">
         {TYPE_FILTERS.map((t) => (

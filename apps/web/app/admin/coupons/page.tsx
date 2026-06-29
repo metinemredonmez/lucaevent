@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { AdminPageHeader } from "@/components/admin/page-header";
 
 type Coupon = {
   id: string;
@@ -60,13 +61,7 @@ export default function CouponsAdmin() {
 
   return (
     <div>
-      <h1
-        className="text-3xl text-foreground mb-1"
-        style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}
-      >
-        Kuponlar
-      </h1>
-      <p className="text-sm text-muted-foreground mb-6">{rows.length} kupon</p>
+      <AdminPageHeader title="Kuponlar" subtitle={`${rows.length} kupon`} />
       {err && <p className="text-rose-400 text-sm mb-3">{err}</p>}
 
       <form onSubmit={add} className="mb-6 flex flex-wrap gap-2 items-end">

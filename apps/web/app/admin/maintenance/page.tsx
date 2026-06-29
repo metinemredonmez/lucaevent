@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { api } from "@/lib/api";
+import { AdminPageHeader } from "@/components/admin/page-header";
 
 type Job = {
   key: string;
@@ -45,10 +46,7 @@ export default function MaintenanceAdmin() {
 
   return (
     <div>
-      <h1 className="mb-1 text-3xl text-foreground" style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}>
-        Bakım / İşler
-      </h1>
-      <p className="mb-6 text-sm text-muted-foreground">Zamanlanmış görevleri elle tetikleyin.</p>
+      <AdminPageHeader title="Bakım / İşler" subtitle="Zamanlanmış görevleri elle tetikleyin." />
 
       {err && <p className="mb-3 text-sm text-rose-400">{err}</p>}
 

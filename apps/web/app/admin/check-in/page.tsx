@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { api } from "@/lib/api";
+import { AdminPageHeader } from "@/components/admin/page-header";
 
 type Result = {
   status: "OK" | "ALREADY_USED" | "INVALID";
@@ -48,15 +49,10 @@ export default function CheckIn() {
 
   return (
     <div>
-      <h1
-        className="text-3xl text-foreground mb-1"
-        style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}
-      >
-        Kapı Check-in
-      </h1>
-      <p className="text-sm text-muted-foreground mb-6">
-        QR okut veya bilet kodunu yapıştır, Enter'a bas. Bu oturumda {okCount} giriş.
-      </p>
+      <AdminPageHeader
+        title="Kapı Check-in"
+        subtitle={`QR okut veya bilet kodunu yapıştır, Enter'a bas. Bu oturumda ${okCount} giriş.`}
+      />
 
       <form onSubmit={submit} className="mb-6">
         <input

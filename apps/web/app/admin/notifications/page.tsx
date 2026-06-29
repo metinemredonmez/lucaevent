@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
+import { AdminPageHeader } from "@/components/admin/page-header";
 
 export default function NotificationsAdmin() {
   const [configured, setConfigured] = useState<boolean | null>(null);
@@ -49,10 +50,7 @@ export default function NotificationsAdmin() {
 
   return (
     <div>
-      <h1 className="mb-1 text-3xl text-foreground" style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}>
-        Bildirim Gönder
-      </h1>
-      <p className="mb-6 text-sm text-muted-foreground">Tüm aboneliklere push bildirimi gönderin.</p>
+      <AdminPageHeader title="Bildirim Gönder" subtitle="Tüm aboneliklere push bildirimi gönderin." />
 
       {configured === false && (
         <div className="mb-5 rounded-xl border border-[#B7791F]/40 bg-[#B7791F]/10 px-4 py-3 text-sm text-amber-400">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
+import { AdminPageHeader } from "@/components/admin/page-header";
 
 type Venue = {
   id: string;
@@ -92,10 +93,7 @@ export default function VenuesAdmin() {
 
   return (
     <div>
-      <h1 className="mb-1 text-3xl text-foreground" style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}>
-        Mekanlar
-      </h1>
-      <p className="mb-5 text-sm text-muted-foreground">{rows.length} kayıt</p>
+      <AdminPageHeader title="Mekanlar" subtitle={`${rows.length} kayıt`} />
 
       {err && <p className="mb-3 text-sm text-rose-400">{err}</p>}
 

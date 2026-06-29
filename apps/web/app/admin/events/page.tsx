@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { formatDateTR } from "@/lib/utils";
+import { AdminPageHeader } from "@/components/admin/page-header";
 
 type Ev = {
   id: string;
@@ -48,23 +49,18 @@ export default function EventsAdmin() {
 
   return (
     <div>
-      <div className="mb-6 flex items-end justify-between gap-4">
-        <div>
-          <h1
-            className="text-3xl text-foreground mb-1"
-            style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}
+      <AdminPageHeader
+        title="Etkinlikler"
+        subtitle={`${rows.length} etkinlik`}
+        actions={
+          <Link
+            href="/admin/events/new"
+            className="rounded-md bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90"
           >
-            Etkinlikler
-          </h1>
-          <p className="text-sm text-muted-foreground">{rows.length} etkinlik</p>
-        </div>
-        <Link
-          href="/admin/events/new"
-          className="rounded-md bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90"
-        >
-          + Yeni etkinlik
-        </Link>
-      </div>
+            + Yeni etkinlik
+          </Link>
+        }
+      />
       {err && <p className="text-rose-400 text-sm mb-3">{err}</p>}
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">

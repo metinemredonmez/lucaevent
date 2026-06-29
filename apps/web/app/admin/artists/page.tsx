@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
+import { AdminPageHeader } from "@/components/admin/page-header";
 
 type Artist = {
   id: string;
@@ -100,13 +101,7 @@ export default function ArtistsAdmin() {
 
   return (
     <div>
-      <h1
-        className="mb-1 text-3xl text-foreground"
-        style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}
-      >
-        Sanatçılar
-      </h1>
-      <p className="mb-6 text-sm text-muted-foreground">{rows.length} sanatçı</p>
+      <AdminPageHeader title="Sanatçılar" subtitle={`${rows.length} sanatçı`} />
 
       {err && <p className="mb-3 text-sm text-rose-400">{err}</p>}
 

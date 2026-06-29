@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
+import { AdminPageHeader } from "@/components/admin/page-header";
 
 type Series = {
   id: string;
@@ -65,13 +66,10 @@ export default function EventSeriesAdmin() {
 
   return (
     <div>
-      <h1
-        className="mb-1 text-3xl text-foreground"
-        style={{ fontFamily: "Georgia, 'Cormorant Garamond', serif" }}
-      >
-        Tekrarlayan Etkinlikler
-      </h1>
-      <p className="mb-5 text-sm text-muted-foreground">{rows.length} seri</p>
+      <AdminPageHeader
+        title="Tekrarlayan etkinlikler"
+        subtitle="Seri tanımları ve otomatik etkinlik üretimi."
+      />
 
       <div className="mb-5 rounded-xl border border-border bg-muted px-4 py-3 text-sm text-muted-foreground">
         Yeni seri oluşturma karmaşık; şu an seriler API'den oluşturulur, burada
