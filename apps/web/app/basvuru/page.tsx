@@ -68,10 +68,13 @@ export default function BasvuruPage() {
         <div className="pointer-events-none absolute -left-24 top-10 h-80 w-80 rounded-full bg-[#7C3AED]/20 blur-[120px]" />
         <div className="pointer-events-none absolute right-[-6rem] top-1/3 h-96 w-96 rounded-full bg-[#A855F7]/15 blur-[130px]" />
 
-        <div className="container relative z-10 mx-auto max-w-xl px-4 py-12">
-          <div className="mb-8 text-center">
-            <h1 className="font-serif text-4xl text-white">Bize ulaş</h1>
-            <p className="mt-2 text-sm text-[#A39DC9]">
+        <div className="container relative z-10 mx-auto max-w-xl px-4 pb-16 pt-8">
+          <div className="mb-7 text-center">
+            <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#A78BFA]">
+              Luca · İletişim
+            </span>
+            <h1 className="mt-3 font-serif text-4xl text-white md:text-5xl">Bize ulaş</h1>
+            <p className="mx-auto mt-2 max-w-md text-sm text-[#A39DC9]">
               Soru sor, etkinlik öner ya da topluluğa katıl — hepsi tek yerden.
             </p>
           </div>
