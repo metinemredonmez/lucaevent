@@ -32,6 +32,7 @@ import { CouponsModule } from './coupons/coupons.module';
 import { SubscribersModule } from './subscribers/subscribers.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { SubmissionsModule } from './submissions/submissions.module';
+import { ContentModule } from './content/content.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { SubmissionsModule } from './submissions/submissions.module';
     SubscribersModule,
     UploadsModule,
     SubmissionsModule,
+    ContentModule,
   ],
   controllers: [HealthController],
   providers: [

@@ -542,3 +542,36 @@ model Submission {
   createdAt DateTime         @default(now())
   @@index([type, status, createdAt])
 }
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// Blog yazıları — admin panelinden yönetilir, /blog'da yayınlanır.
+model Post {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  title       String
+  excerpt     String?
+  coverUrl    String?
+  content     String     // markdown
+  status      PostStatus @default(DRAFT)
+  publishedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  @@index([status, publishedAt])
+}
+
+// Statik içerik sayfaları (hakkimizda, guvenlik, iletisim…) — admin'den düzenlenir.
+model Page {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String?
+  content     String   // markdown
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

@@ -395,6 +395,94 @@ async function main() {
     },
   });
 
+  // ---------- içerik sayfaları (admin'den düzenlenebilir) ----------
+  const pages = [
+    {
+      slug: 'hakkimizda',
+      title: 'Tek çatı, sekiz dünya.',
+      excerpt:
+        "Luca; wellness'tan tekneye, atölyeden sahneye İstanbul'un sekiz dünyasını bir araya getiren etkinlik platformu.",
+      content: `## Biz kimiz
+Luca, İstanbul'da yaşamı tek bir geceye sığdırmayan bir etkinlik ve topluluk platformudur. Sabah yogasından tekne turuna, seramik atölyesinden çatı katı konserine — şehrin nefes alan her anını tek bir yerde topluyoruz.
+
+## Sekiz dünya
+- Wellness
+- Outdoor & Spor
+- Gezi & Seyahat
+- Workshop
+- Social
+- Food & Drink
+- Business
+- Nightlife
+
+## Nasıl çalışır
+Üye ol, ilgi alanlarını seç; sana uygun etkinlikler akışına düşsün. Yerini ayır, biletini al, kapıda QR ile saniyeler içinde içeri gir.`,
+    },
+    {
+      slug: 'guvenlik',
+      title: 'Güvenliğin bizim için öncelik.',
+      excerpt:
+        'Hesap, ödeme ve veri güvenliği için sektör standardı önlemler alıyoruz.',
+      content: `## Hesap güvenliği
+Şifreler sunucularımızda düz metin tutulmaz; modern bir algoritmayla (argon2) özetlenerek saklanır. Oturumlar kısa ömürlü güvenli jetonlarla yönetilir.
+
+## Ödeme güvenliği
+Tüm trafik SSL/TLS ile şifrelenir. Kart bilgilerin Luca sunucularında saklanmaz; ödemeler 3D Secure üzerinden alınır.
+
+## Veri ve gizlilik
+Kişisel verilerini yalnızca hizmeti sunmak için, KVKK'ya uygun şekilde işleriz. İstediğin an hesabını ve verilerini silebilirsin.`,
+    },
+  ];
+  for (const p of pages) {
+    await prisma.page.upsert({
+      where: { slug: p.slug },
+      update: { title: p.title, excerpt: p.excerpt, content: p.content },
+      create: p,
+    });
+  }
+
+  // ---------- örnek blog yazıları ----------
+  const posts = [
+    {
+      slug: 'lucaya-hos-geldin',
+      title: "Luca'ya hoş geldin: Şehrin sekiz dünyası",
+      excerpt:
+        'Sadece gece değil — sabah yogasından tekne turuna kadar tek bir akışta keşfet.',
+      coverUrl: '/img/events/sunset-yoga-sound-healing.jpg',
+      content: `Luca, İstanbul'da yaşamı bütün bir haftaya yayar. Bu ilk yazıda platformu ve sekiz dünyamızı kısaca tanıtıyoruz.
+
+## Neden Luca?
+Çünkü doğru anı, doğru insanlarla bir araya getirmek bir bilet meselesi değil; bir his, bir ritim ve bir topluluk meselesidir.
+
+## Nasıl başlarsın?
+Üye ol, ilgi alanlarını seç ve sana özel akışı keşfet.`,
+    },
+    {
+      slug: 'hafta-sonu-rehberi',
+      title: 'Hafta sonu için 5 etkinlik fikri',
+      excerpt:
+        'Boğaz turundan seramik atölyesine, hafta sonunu dolu dolu geçirmenin yolları.',
+      coverUrl: '/img/events/bogaz-gun-batimi-tekne.jpg',
+      content: `Hafta sonu yaklaşıyor ve planın yok mu? İşte Luca'dan beş fikir.
+
+## 1. Boğaz'da gün batımı
+Tekneyle şehre yukarıdan bak.
+
+## 2. Sabah koşusu
+Belgrad Ormanı'nda güne erken başla.
+
+## 3. Seramik atölyesi
+Ellerinle bir şey üret, zihnini boşalt.`,
+    },
+  ];
+  for (const p of posts) {
+    await prisma.post.upsert({
+      where: { slug: p.slug },
+      update: { title: p.title, excerpt: p.excerpt, coverUrl: p.coverUrl, content: p.content },
+      create: { ...p, status: 'PUBLISHED', publishedAt: new Date() },
+    });
+  }
+
   console.log('✅  Seed complete.');
   console.log(`   Categories: ${catData.length} · Events: ${events.length + 1}`);
   console.log(`   First upcoming: ${upcomingSlug}`);
