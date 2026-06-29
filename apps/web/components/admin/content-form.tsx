@@ -184,7 +184,7 @@ export function ContentForm({
         )}
       </div>
 
-      {err && <p className="text-sm text-rose-400">{err}</p>}
+      {err && <p className="text-sm text-destructive">{err}</p>}
 
       <div className="flex items-center gap-3">
         <button

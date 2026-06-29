@@ -70,7 +70,7 @@ export default function PostsAdmin() {
           </Link>
         }
       />
-      {err && <p className="text-rose-400 text-sm mb-3">{err}</p>}
+      {err && <p className="text-destructive text-sm mb-3">{err}</p>}
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
@@ -111,7 +111,7 @@ export default function PostsAdmin() {
                   <button
                     disabled={busy === p.id}
                     onClick={() => remove(p)}
-                    className="text-xs rounded-md border border-[#A23E48] text-rose-400 px-2 py-1 hover:bg-[#A23E48]/10"
+                    className="text-xs rounded-md border border-destructive/40 text-destructive px-2 py-1 hover:bg-destructive/10 disabled:opacity-50"
                   >
                     Sil
                   </button>

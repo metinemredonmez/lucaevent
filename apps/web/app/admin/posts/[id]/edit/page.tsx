@@ -17,7 +17,7 @@ export default function EditPost() {
     api(`/admin/posts/${id}`).then(setPost).catch((e) => setErr(e.message));
   }, [id]);
 
-  if (err) return <p className="text-sm text-rose-400">{err}</p>;
+  if (err) return <p className="text-sm text-destructive">{err}</p>;
   if (!post) return <p className="text-sm text-muted-foreground">Yükleniyor…</p>;
 
   return (

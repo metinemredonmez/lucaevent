@@ -23,7 +23,7 @@ export default function EditPage() {
     return (
       <div>
         <AdminPageHeader title="Sayfayı düzenle" />
-        <p className="text-sm text-rose-400">{err}</p>
+        <p className="text-sm text-destructive">{err}</p>
       </div>
     );
   }

@@ -56,7 +56,7 @@ export default function PagesAdmin() {
           </Link>
         }
       />
-      {err && <p className="text-rose-400 text-sm mb-3">{err}</p>}
+      {err && <p className="text-destructive text-sm mb-3">{err}</p>}
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
@@ -79,8 +79,8 @@ export default function PagesAdmin() {
                   <span
                     className={`inline-block rounded-full px-2 py-0.5 text-xs ${
                       p.isPublished
-                        ? "bg-[#657257]/15 text-emerald-400"
-                        : "bg-[#6F6F6F]/15 text-muted-foreground"
+                        ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                        : "bg-muted text-muted-foreground"
                     }`}
                   >
                     {p.isPublished ? "Yayında" : "Gizli"}
@@ -97,7 +97,7 @@ export default function PagesAdmin() {
                   <button
                     disabled={busy === p.id}
                     onClick={() => remove(p)}
-                    className="text-xs rounded-md border border-[#A23E48] text-rose-400 px-2 py-1 hover:bg-[#A23E48]/10"
+                    className="text-xs rounded-md border border-destructive/40 text-destructive px-2 py-1 hover:bg-destructive/10 disabled:opacity-50"
                   >
                     Sil
                   </button>
