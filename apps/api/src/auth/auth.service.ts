@@ -259,7 +259,7 @@ export class AuthService {
       await this.mail.sendPasswordResetEmail(
         user.email,
         user.name,
-        `${this.webUrl()}/reset-password?token=${raw}`,
+        `${this.webUrl()}/sifre-sifirla?token=${raw}`,
       );
     }
     return { ok: true }; // always 200 — no account enumeration
@@ -289,7 +289,7 @@ export class AuthService {
     await this.mail.sendVerificationEmail(
       email,
       name,
-      `${this.webUrl()}/verify-email?token=${raw}`,
+      `${this.webUrl()}/dogrula?token=${raw}`,
     );
   }
 
