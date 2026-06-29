@@ -7,7 +7,7 @@ type Station = { name: string; tag: string; color: string; url: string };
 
 /** Sabit favoriler — hepsi HTTPS, test edildi. */
 const FAVORITES: Station[] = [
-  { name: "Dance Wave", tag: "house · electronic", color: "#22D3EE", url: "https://stream.dancewave.online/dance.mp3" },
+  { name: "I Love Dance", tag: "house · electronic", color: "#22D3EE", url: "https://streams.ilovemusic.de/iloveradio2.mp3" },
   { name: "Metro FM", tag: "pop · hit", color: "#A855F7", url: "https://playerservices.streamtheworld.com/api/livestream-redirect/METRO_FM.mp3" },
   { name: "Joy FM", tag: "lounge · yabancı", color: "#F472B6", url: "https://playerservices.streamtheworld.com/api/livestream-redirect/JOY_FM.mp3" },
   { name: "Virgin Radio", tag: "pop", color: "#FB7185", url: "https://playerservices.streamtheworld.com/api/livestream-redirect/VIRGIN_RADIO.mp3" },
