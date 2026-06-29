@@ -70,6 +70,20 @@ export async function resendVerification(email: string) {
   return post("/auth/resend-verification", { email });
 }
 
+export type SubmissionBody = {
+  type: "CONTACT" | "EVENT_PROPOSAL" | "MEMBERSHIP";
+  name: string;
+  email?: string;
+  phone?: string;
+  subject?: string;
+  message?: string;
+  payload?: Record<string, unknown>;
+};
+
+export async function createSubmission(body: SubmissionBody) {
+  return post("/submissions", body);
+}
+
 export async function getGoogleConfig(): Promise<{ enabled: boolean; clientId: string }> {
   try {
     const r = await fetch(BASE + "/auth/google/config");
