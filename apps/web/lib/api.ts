@@ -63,3 +63,21 @@ export function logout() {
   clearToken();
   if (typeof window !== "undefined") window.location.href = "/admin/login";
 }
+
+/** Authenticated file download (CSV vb.) — token'ı header'la gönderip blob indirir. */
+export async function apiDownload(path: string, filename: string) {
+  const token = getToken();
+  const res = await fetch(BASE + path, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) throw new Error("İndirme başarısız");
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}

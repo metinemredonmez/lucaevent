@@ -100,6 +100,12 @@ export default function EventsAdmin() {
                 </td>
                 <td className="px-4 py-3 text-right space-x-2 whitespace-nowrap">
                   <Link
+                    href={`/admin/events/${e.id}/attendees`}
+                    className="text-xs rounded-md border border-[#E3DED5] text-[#6F6F6F] px-2 py-1 hover:bg-[#F7F5F0]"
+                  >
+                    Katılımcılar
+                  </Link>
+                  <Link
                     href={`/admin/events/${e.id}/edit`}
                     className="text-xs rounded-md border border-[#E3DED5] text-[#171717] px-2 py-1 hover:bg-[#F7F5F0]"
                   >

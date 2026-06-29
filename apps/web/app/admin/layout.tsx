@@ -8,6 +8,7 @@ import {
   CalendarDays,
   Tag,
   Ticket,
+  ClipboardList,
   ScanLine,
   Settings,
   LogOut,
@@ -17,6 +18,7 @@ import { getToken, logout } from "@/lib/api";
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/events", label: "Etkinlikler", icon: CalendarDays },
+  { href: "/admin/reservations", label: "Rezervasyonlar", icon: ClipboardList },
   { href: "/admin/categories", label: "Kategoriler", icon: Tag },
   { href: "/admin/coupons", label: "Kuponlar", icon: Ticket },
   { href: "/admin/check-in", label: "Check-in", icon: ScanLine },
