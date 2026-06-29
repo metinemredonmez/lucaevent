@@ -81,7 +81,7 @@ export default function IletisimPage() {
           </div>
         </div>
 
-        <h1 className="mt-5 font-serif text-4xl md:text-6xl leading-[1.05] tracking-tight text-balance font-semibold max-w-3xl">
+        <h1 className="mt-5 font-serif text-3xl md:text-4xl leading-[1.05] tracking-tight text-balance font-semibold max-w-3xl">
           Merhaba de — aramızdan birine denk gelirsin.
         </h1>
 

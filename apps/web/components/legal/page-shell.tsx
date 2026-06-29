@@ -32,7 +32,7 @@ export function PageShell({ eyebrow, title, lead, updatedAt, children }: Props) 
           </div>
         </div>
 
-        <h1 className="mt-5 font-serif text-4xl md:text-6xl leading-[1.05] tracking-tight text-balance font-semibold">
+        <h1 className="mt-5 font-serif text-3xl md:text-4xl leading-[1.05] tracking-tight text-balance font-semibold">
           {title}
         </h1>
 

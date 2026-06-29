@@ -73,7 +73,7 @@ export default function BasvuruPage() {
             <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#A78BFA]">
               Luca · İletişim
             </span>
-            <h1 className="mt-3 font-serif text-4xl text-white md:text-5xl">Bize ulaş</h1>
+            <h1 className="mt-3 font-serif text-3xl text-white md:text-4xl">Bize ulaş</h1>
             <p className="mx-auto mt-2 max-w-md text-sm text-[#A39DC9]">
               Soru sor, etkinlik öner ya da topluluğa katıl — hepsi tek yerden.
             </p>
