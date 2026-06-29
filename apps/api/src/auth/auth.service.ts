@@ -118,9 +118,14 @@ export class AuthService {
    */
   /** Public: frontend'in Google butonunu başlatması için (clientId gizli değildir). */
   async googleConfig() {
-    const raw = await this.settings.get('auth.google.clientId');
-    const web = raw.split(',').map((s) => s.trim()).filter(Boolean)[0] ?? '';
-    return { enabled: Boolean(web), clientId: web };
+    try {
+      const raw = await this.settings.get('auth.google.clientId');
+      const web = raw.split(',').map((s) => s.trim()).filter(Boolean)[0] ?? '';
+      return { enabled: Boolean(web), clientId: web };
+    } catch {
+      // Settings okunamazsa (ör. migration öncesi tablo yok) 500 yerine "kapalı" dön.
+      return { enabled: false, clientId: '' };
+    }
   }
 
   async loginWithGoogle(idToken: string) {
