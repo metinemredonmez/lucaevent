@@ -527,6 +527,84 @@ Belgrad Ormanı'nda güne erken başla.
 ## 3. Seramik atölyesi
 Ellerinle bir şey üret, zihnini boşalt.`,
     },
+    {
+      slug: 'rooftopta-sarap-ve-peynir',
+      title: "Rooftop'ta şarap & peynir: Akşamı yavaşlatmak",
+      excerpt: 'İyi bir kadeh, doğru eşlikçiler ve şehrin ışıkları — akşamı bir ritüele çevirmek.',
+      coverUrl: '/img/events/rooftop-sarap-peynir.jpg',
+      content: `Bazen en iyi gece, koşuşturmanın değil; yavaşlamanın gecesidir.
+
+## Eşleştirmenin temeli
+Ağır bir kırmızıyı olgun bir peynirle, taze bir beyazı keçi peyniriyle düşün. Kural yok; damağına güven.
+
+## Manzara da bir tat
+Şehrin ışıkları masanın bir parçası. Luca rooftop buluşmalarında yeni insanlarla tanışırken kadehini de keşfedersin.`,
+    },
+    {
+      slug: 'sabah-kosusu-neden-her-seyi-degistirir',
+      title: 'Sabah koşusu neden her şeyi değiştiriyor?',
+      excerpt: "Belgrad Ormanı'nda güne erken başlamanın bedenine ve zihnine etkisi.",
+      coverUrl: '/img/events/belgrad-sabah-kosusu.jpg',
+      content: `Erken kalkmak zor; ama ilk adımdan sonra her şey değişir.
+
+## Beden uyanır
+Sabah hareketi metabolizmayı çalıştırır, gün boyu enerjini dengeler.
+
+## Zihin temizlenir
+Ağaçların altında, telefon olmadan atılan birkaç kilometre en iyi meditasyondur. Tek başına zor geliyorsa toplulukla koş — Luca grup koşuları tam bunun için.`,
+    },
+    {
+      slug: 'atolyede-uretmenin-terapisi',
+      title: 'Atölyede üretmenin terapisi',
+      excerpt: 'Seramikten ahşaba: ellerinle bir şey yapmak neden iyi geliyor?',
+      coverUrl: '/img/events/seramik-atolyesi-kupa.jpg',
+      content: `Bir şeyi sıfırdan üretmek, zihni bugünün gürültüsünden koparır.
+
+## Akış hâli
+Çamur tornadayken ne dünü düşünürsün ne yarını; sadece an vardır. Psikologların "flow" dediği bu hâl en iyi dinlenmedir.
+
+## Eve bir hatıra
+Kendi yaptığın kupadan içtiğin ilk kahvenin tadı başkadır. Atölyelerimizde malzeme de eğitmen de hazır; sen sadece gel.`,
+    },
+    {
+      slug: 'ilk-festival-kampina-hazirlik',
+      title: 'Kamp 101: İlk festival-kampına hazırlık',
+      excerpt: 'Çadırdan çantaya, ilk konaklamalı etkinliğine sorunsuz gitmenin yolu.',
+      coverUrl: '/img/events/luca-camp-2026.jpg',
+      content: `İlk kampın heyecan verici — biraz hazırlıkla çok daha keyifli olur.
+
+## Olmazsa olmazlar
+Katmanlı giysi, kafa lambası, powerbank, su matarası ve rahat ayakkabı.
+
+## Gece için
+Akşam serinler; bir polar ve uyku tulumu seni kurtarır. Gerisi müzik, ateş ve yeni dostlar. Luca kamplarında lojistik bizde, anılar sende.`,
+    },
+    {
+      slug: 'networking-sevmeyenler-icin-networking',
+      title: "Networking'i sevmeyenler için networking",
+      excerpt: 'Kartvizit dağıtmadan, samimi şekilde değerli bağlantılar kurmanın yolu.',
+      coverUrl: '/img/events/founders-breakfast.jpg',
+      content: `"Networking" kelimesi kulağa soğuk gelir; oysa mesele insan tanımaktır.
+
+## Soru sor, satış yapma
+İyi bağlantı, ne iş yaptığını anlatmakla değil; karşındakini gerçekten dinlemekle kurulur.
+
+## Küçük masalar kazanır
+Kalabalık salonlar yerine küçük kahvaltı buluşmaları daha derin sohbet getirir. Luca founder kahvaltıları tam ölçekte: tanı, paylaş, birlikte büyü.`,
+    },
+    {
+      slug: 'kadikoy-gecesi-sehrin-ritmi',
+      title: 'Kadıköy gecesi: Şehrin ritmini bulmak',
+      excerpt: 'Plaktan sahaya, Kadıköy gecelerini özel yapan o enerji.',
+      coverUrl: '/img/events/luca-006-kadikoy.jpg',
+      content: `Kadıköy geceleri kendi kuralını koyar: serbest, içten ve müzikle dolu.
+
+## Önce kulak
+İyi bir gece iyi bir line-up'la başlar. Sahnedeki ismi tanımasan da bir akşam onu keşfetmek en güzeli.
+
+## Sonra topluluk
+Aynı şarkıya kapılan yabancılar gece bitmeden tanıdık olur. Luca gecelerinde kapıda kim olduğun değil, nasıl dans ettiğin önemli.`,
+    },
   ];
   for (const p of posts) {
     await prisma.post.upsert({
