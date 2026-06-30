@@ -15,6 +15,7 @@ import {
   EyeOff,
   XCircle,
   Ticket,
+  Radio,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { formatDateTR } from "@/lib/utils";
@@ -29,6 +30,8 @@ type Ev = {
   status: string;
   startsAt: string;
   coverUrl?: string | null;
+  liveStatus?: string;
+  streamUrl?: string | null;
   category?: { name: string; slug: string } | null;
   venue?: { name: string; city: string | null } | null;
   _count?: { tickets: number; orders: number };
@@ -109,6 +112,19 @@ export default function EventsAdmin() {
     setMenu(null);
     try {
       await api(`/admin/events/${id}/${path}`, { method: "POST" });
+      load();
+    } catch (e: any) {
+      setErr(e.message);
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function setLive(id: string, live: boolean) {
+    setBusy(id);
+    setMenu(null);
+    try {
+      await api(`/admin/events/${id}/live`, { method: "POST", body: JSON.stringify({ live }) });
       load();
     } catch (e: any) {
       setErr(e.message);
@@ -318,6 +334,33 @@ export default function EventsAdmin() {
                             className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted"
                           >
                             <EyeOff className="h-4 w-4" /> Geri çek
+                          </button>
+                        )}
+                        {e.status === "PUBLISHED" && e.liveStatus === "LIVE" && (
+                          <>
+                            <button
+                              onClick={() => setLive(e.id, false)}
+                              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted"
+                            >
+                              <Radio className="h-4 w-4" /> Yayını bitir
+                            </button>
+                            <a
+                              href={`/canli/${e.slug}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => setMenu(null)}
+                              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-foreground hover:bg-muted"
+                            >
+                              <Eye className="h-4 w-4" /> Canlı sayfası
+                            </a>
+                          </>
+                        )}
+                        {e.status === "PUBLISHED" && e.liveStatus !== "LIVE" && (
+                          <button
+                            onClick={() => setLive(e.id, true)}
+                            className="flex w-full items-center gap-2 px-3 py-2 text-sm text-emerald-600 hover:bg-muted dark:text-emerald-400"
+                          >
+                            <Radio className="h-4 w-4" /> Yayına başla
                           </button>
                         )}
                         {e.status !== "CANCELED" && (

@@ -1,5 +1,5 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { EventStatus, Prisma } from '@prisma/client';
+import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { EventStatus, Prisma, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
 import { NotificationsService } from '../notifications/notifications.service';
@@ -256,6 +256,72 @@ export class EventsService {
     }
     this.logger.log(`Event ${id} canceled — refunded ${paid.length} order(s)`);
     return { ok: true, refunded: paid.length };
+  }
+
+  // ------- canlı yayın (livestream) -------
+
+  /** Organizatör: yayını başlat/bitir. */
+  async setLive(id: string, live: boolean) {
+    return this.prisma.event.update({
+      where: { id },
+      data: {
+        liveStatus: live ? 'LIVE' : 'ENDED',
+        liveStartedAt: live ? new Date() : undefined,
+      },
+      select: { id: true, liveStatus: true, liveStartedAt: true },
+    });
+  }
+
+  /**
+   * Public yayın meta'sı. Yayın URL'sini YALNIZCA herkese açık (PUBLIC) + canlı
+   * yayında döndürür; MEMBERS/PAID için URL `/stream/play` (kimlik doğrulamalı)
+   * ucundan verilir — böylece korumalı yayın linki sızmaz.
+   */
+  async streamMeta(slug: string) {
+    const e = await this.prisma.event.findUnique({
+      where: { slug },
+      select: {
+        title: true, slug: true, coverUrl: true, status: true,
+        liveStatus: true, streamUrl: true, streamAccess: true,
+        streamPriceMinor: true, liveStartedAt: true,
+      },
+    });
+    if (!e || e.status !== EventStatus.PUBLISHED) throw new NotFoundException('Event not found');
+    const isLive = e.liveStatus === 'LIVE' && !!e.streamUrl;
+    return {
+      title: e.title,
+      slug: e.slug,
+      coverUrl: e.coverUrl,
+      liveStatus: e.liveStatus,
+      access: e.streamAccess,
+      priceMinor: e.streamPriceMinor ?? null,
+      liveStartedAt: e.liveStartedAt,
+      isLive,
+      playbackUrl: isLive && e.streamAccess === 'PUBLIC' ? e.streamUrl : undefined,
+    };
+  }
+
+  /** Kimlik doğrulamalı: yetkiliyse yayın URL'sini döndürür (MEMBERS=her üye, PAID=ödenmiş sipariş, staff=her zaman). */
+  async streamPlay(slug: string, userId: string, role: Role) {
+    const e = await this.prisma.event.findUnique({
+      where: { slug },
+      select: { id: true, status: true, liveStatus: true, streamUrl: true, streamAccess: true },
+    });
+    if (!e || e.status !== EventStatus.PUBLISHED) throw new NotFoundException('Event not found');
+    if (e.liveStatus !== 'LIVE' || !e.streamUrl) {
+      throw new ForbiddenException('Yayın şu an aktif değil.');
+    }
+    const staff = role === Role.SUPERADMIN || role === Role.ADMIN || role === Role.EDITOR;
+    if (staff || e.streamAccess === 'PUBLIC' || e.streamAccess === 'MEMBERS') {
+      return { playbackUrl: e.streamUrl };
+    }
+    // PAID — bu etkinlik için ödenmiş sipariş şart
+    const paid = await this.prisma.order.findFirst({
+      where: { eventId: e.id, userId, status: 'PAID' },
+      select: { id: true },
+    });
+    if (!paid) throw new ForbiddenException('Bu yayını izlemek için bilet/ödeme gerekli.');
+    return { playbackUrl: e.streamUrl };
   }
 
   async icsForSlug(slug: string): Promise<string> {

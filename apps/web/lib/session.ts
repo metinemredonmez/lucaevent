@@ -203,6 +203,29 @@ export function markNotificationsRead(ids?: string[]): Promise<{ ok: boolean }> 
   });
 }
 
+// ——— Canlı yayın (livestream) ———
+export type StreamMeta = {
+  title: string;
+  slug: string;
+  coverUrl: string | null;
+  liveStatus: "OFFLINE" | "LIVE" | "ENDED";
+  access: "PUBLIC" | "MEMBERS" | "PAID";
+  priceMinor: number | null;
+  liveStartedAt: string | null;
+  isLive: boolean;
+  playbackUrl?: string;
+};
+/** Public meta — URL yalnız PUBLIC+canlıda gelir. */
+export async function getStreamMeta(slug: string): Promise<StreamMeta> {
+  const r = await fetch(BASE + `/events/${slug}/stream`);
+  if (!r.ok) throw new Error("Yayın bulunamadı");
+  return r.json();
+}
+/** Korumalı yayın URL'si — kimlik doğrulamalı (üye/ödeme yetkisi). 403 = yetkisiz. */
+export async function getStreamPlay(slug: string): Promise<{ playbackUrl: string }> {
+  return authReq(`/events/${slug}/stream/play`);
+}
+
 export async function getGoogleConfig(): Promise<{ enabled: boolean; clientId: string }> {
   try {
     const r = await fetch(BASE + "/auth/google/config");

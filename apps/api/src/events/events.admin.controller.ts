@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 
 import { EventsService } from './events.service';
-import { EventCreateDto, EventQueryDto, EventUpdateDto } from './dto/event.dto';
+import { EventCreateDto, EventQueryDto, EventUpdateDto, SetLiveDto } from './dto/event.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -49,6 +49,12 @@ export class EventsAdminController {
   @Post(':id/cancel')
   cancel(@Param('id') id: string) {
     return this.events.cancel(id);
+  }
+
+  // canlı yayını başlat/bitir
+  @Post(':id/live')
+  setLive(@Param('id') id: string, @Body() dto: SetLiveDto) {
+    return this.events.setLive(id, dto.live);
   }
 
   @Delete(':id')

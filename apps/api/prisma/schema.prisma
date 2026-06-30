@@ -28,6 +28,18 @@ enum EventStatus {
   ARCHIVED
 }
 
+enum LiveStatus {
+  OFFLINE
+  LIVE
+  ENDED
+}
+
+enum StreamAccess {
+  PUBLIC // herkes izleyebilir
+  MEMBERS // giriş yapmış üyeler
+  PAID // ödenmiş sipariş (bilet) gerekir
+}
+
 enum EventKind {
   PARTY       // club night / single-venue
   CAMP        // multi-day outdoor / festival (konaklamalı)
@@ -258,6 +270,14 @@ model Event {
 
   seoTitle    String?
   seoDesc     String?
+
+  // ---- canlı yayın (livestream) ----
+  liveStatus       LiveStatus   @default(OFFLINE)
+  streamUrl        String?      // HLS .m3u8 / YouTube / embed — organizatör panelden girer
+  streamAccess     StreamAccess @default(PUBLIC)
+  streamPriceMinor Int?         // PAID erişimde izleme ücreti (kuruş)
+  liveStartedAt    DateTime?
+
   publishedAt DateTime?
   reminderSentAt DateTime?
   createdAt   DateTime    @default(now())

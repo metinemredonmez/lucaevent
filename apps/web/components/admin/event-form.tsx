@@ -69,6 +69,11 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
     travelInfo: initial?.travelInfo ?? "",
     campingAllowed: initial?.campingAllowed ?? false,
     status: initial?.status ?? "DRAFT",
+    // canlı yayın
+    liveStatus: initial?.liveStatus ?? "OFFLINE",
+    streamUrl: initial?.streamUrl ?? "",
+    streamAccess: initial?.streamAccess ?? "PUBLIC",
+    streamPrice: initial?.streamPriceMinor != null ? String(initial.streamPriceMinor / 100) : "",
   });
 
   useEffect(() => {
@@ -106,7 +111,15 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
       included: lines(f.included),
       bringList: lines(f.bringList),
     };
-    if (mode === "edit") body.status = f.status;
+    if (mode === "edit") {
+      body.status = f.status;
+      body.liveStatus = f.liveStatus;
+      body.streamUrl = f.streamUrl.trim() || undefined;
+      body.streamAccess = f.streamAccess;
+      if (f.streamPrice !== "" && !Number.isNaN(Number(f.streamPrice))) {
+        body.streamPriceMinor = Math.round(Number(f.streamPrice) * 100);
+      }
+    }
 
     setSaving(true);
     try {
@@ -238,17 +251,83 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
         )}
       </div>
 
+      {/* Canlı Yayın (edit) */}
+      {mode === "edit" && (
+        <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+          <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <span className={`inline-block h-2 w-2 rounded-full ${f.liveStatus === "LIVE" ? "bg-emerald-500" : "bg-muted-foreground/40"}`} />
+            Canlı Yayın
+            {f.liveStatus === "LIVE" && <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] text-emerald-600 dark:text-emerald-400">YAYINDA</span>}
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className={LABEL}>Durum</label>
+              <select className={FIELD} value={f.liveStatus} onChange={(e) => set("liveStatus", e.target.value)}>
+                <option value="OFFLINE">Çevrimdışı</option>
+                <option value="LIVE">Canlı (yayında)</option>
+                <option value="ENDED">Bitti</option>
+              </select>
+            </div>
+            <div>
+              <label className={LABEL}>Erişim</label>
+              <select className={FIELD} value={f.streamAccess} onChange={(e) => set("streamAccess", e.target.value)}>
+                <option value="PUBLIC">Herkese açık</option>
+                <option value="MEMBERS">Sadece üyeler</option>
+                <option value="PAID">Ücretli (bilet/ödeme)</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className={LABEL}>Yayın URL'si (HLS .m3u8 · YouTube · embed)</label>
+            <input
+              className={FIELD}
+              value={f.streamUrl}
+              onChange={(e) => set("streamUrl", e.target.value)}
+              placeholder="https://… .m3u8  veya  https://youtube.com/watch?v=…"
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Yayını OBS/telefon → herhangi bir sağlayıcıya (YouTube Live, Mux, Cloudflare) gönder; oynatma linkini buraya yapıştır. Altyapıyı biz çalıştırmayız.
+            </p>
+          </div>
+          {f.streamAccess === "PAID" && (
+            <div className="sm:w-56">
+              <label className={LABEL}>İzleme ücreti (₺)</label>
+              <input
+                type="number"
+                min={0}
+                step="0.01"
+                className={FIELD}
+                value={f.streamPrice}
+                onChange={(e) => set("streamPrice", e.target.value)}
+                placeholder="49.90"
+              />
+              <p className="mt-1 text-[11px] text-muted-foreground">Üyeler bu etkinliğe bilet/ödeme yapınca izleyebilir.</p>
+            </div>
+          )}
+          {f.streamUrl && (
+            <a
+              href={`/canli/${f.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+            >
+              İzleme sayfasını aç → /canli/{f.slug}
+            </a>
+          )}
+        </div>
+      )}
+
       {/* Durum (edit) */}
       {mode === "edit" && (
         <div className="rounded-xl border border-border bg-card p-5">
-          <label className={LABEL}>Durum</label>
+          <label className={LABEL}>Etkinlik durumu</label>
           <select className={FIELD + " sm:w-56"} value={f.status} onChange={(e) => set("status", e.target.value)}>
             {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
       )}
 
-      {err && <p className="text-sm text-rose-400">{err}</p>}
+      {err && <p className="text-sm text-destructive">{err}</p>}
 
       <div className="flex items-center gap-3">
         <button

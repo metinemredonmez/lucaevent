@@ -14,7 +14,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { EventKind, EventStatus } from '@prisma/client';
+import { EventKind, EventStatus, LiveStatus, StreamAccess } from '@prisma/client';
 
 export class AgendaItemDto {
   @ApiProperty()
@@ -139,6 +139,35 @@ export class EventUpdateDto extends PartialType(EventCreateDto) {
   @IsOptional()
   @IsEnum(EventStatus)
   status?: EventStatus;
+
+  // ---- canlı yayın ----
+  @ApiPropertyOptional({ enum: LiveStatus })
+  @IsOptional()
+  @IsEnum(LiveStatus)
+  liveStatus?: LiveStatus;
+
+  @ApiPropertyOptional({ description: 'Yayın URL (HLS .m3u8 / YouTube / embed)' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  streamUrl?: string;
+
+  @ApiPropertyOptional({ enum: StreamAccess })
+  @IsOptional()
+  @IsEnum(StreamAccess)
+  streamAccess?: StreamAccess;
+
+  @ApiPropertyOptional({ description: 'PAID izleme ücreti (kuruş)' })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  streamPriceMinor?: number;
+}
+
+export class SetLiveDto {
+  @ApiProperty()
+  @IsBoolean()
+  live!: boolean;
 }
 
 export class EventQueryDto {
