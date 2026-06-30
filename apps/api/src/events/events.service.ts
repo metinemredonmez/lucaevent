@@ -144,6 +144,7 @@ export class EventsService {
         venue: { select: { name: true, city: true } },
         category: { select: { name: true, slug: true } },
         _count: { select: { tickets: true, orders: true } },
+        tickets: { select: { sold: true, capacity: true, priceMinor: true } },
       },
     });
   }
