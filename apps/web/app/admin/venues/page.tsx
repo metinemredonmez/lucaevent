@@ -6,7 +6,9 @@ import { Search, Plus, MapPin, Building2, Users, Trash2, Crosshair, Radio, Calen
 import { api } from "@/lib/api";
 import { formatDateTR } from "@/lib/utils";
 import { AdminPageHeader } from "@/components/admin/page-header";
-import { loadMapbox, mapboxStyle } from "@/lib/mapbox";
+import { loadMapbox } from "@/lib/mapbox";
+
+const MAP_STYLE = "mapbox://styles/mapbox/dark-v11";
 
 type EventRef = { id: string; title: string; slug: string; startsAt: string; endsAt?: string | null };
 type Venue = {
@@ -45,12 +47,28 @@ function ensurePinStyle() {
   const st = document.createElement("style");
   st.id = "luca-pin-style";
   st.textContent = `
-    @keyframes lucaPulse { 0%{transform:scale(1);opacity:.65} 70%{transform:scale(2.6);opacity:0} 100%{opacity:0} }
-    .luca-pin{ position:relative; }
-    .luca-pin .dot{ position:absolute; inset:0; border-radius:50%; border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.4); cursor:pointer; }
-    .luca-pin .ring{ position:absolute; inset:0; border-radius:50%; }
-    .luca-pin.live .ring{ animation:lucaPulse 1.6s ease-out infinite; }
-    .mapboxgl-popup-content{ border-radius:10px; padding:10px 12px; font:13px/1.45 system-ui,sans-serif; }
+    @keyframes lucaPulse { 0%{transform:scale(.7);opacity:.55} 70%{transform:scale(2.1);opacity:0} 100%{opacity:0} }
+    .luca-pin{ position:relative; width:20px; height:20px; cursor:pointer; }
+    .luca-pin .glow{ position:absolute; inset:-3px; border-radius:50%; opacity:.35; filter:blur(3px); }
+    .luca-pin .dot{ position:absolute; inset:0; border-radius:50%; border:2.5px solid #0b0b10; box-shadow:0 2px 8px rgba(0,0,0,.55); transition:transform .15s ease; }
+    .luca-pin:hover .dot{ transform:scale(1.3); }
+    .luca-pin.live .glow{ opacity:.5; animation:lucaPulse 1.6s ease-out infinite; }
+    /* premium koyu cam popup */
+    .mapboxgl-popup-content{ background:#15151c; color:#fff; border:1px solid rgba(255,255,255,.10); border-radius:14px; padding:0; box-shadow:0 16px 48px rgba(0,0,0,.55); overflow:hidden; }
+    .mapboxgl-popup-anchor-top .mapboxgl-popup-tip{ border-bottom-color:#15151c !important; }
+    .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip{ border-top-color:#15151c !important; }
+    .mapboxgl-popup-anchor-left .mapboxgl-popup-tip{ border-right-color:#15151c !important; }
+    .mapboxgl-popup-anchor-right .mapboxgl-popup-tip{ border-left-color:#15151c !important; }
+    .mapboxgl-popup-close-button{ color:rgba(255,255,255,.55); font-size:17px; width:24px; height:24px; right:2px; top:1px; }
+    .mapboxgl-popup-close-button:hover{ background:transparent; color:#fff; }
+    .luca-pop{ width:236px; font:13px/1.4 system-ui,-apple-system,sans-serif; }
+    .luca-pop .img{ height:104px; background:#23232c center/cover no-repeat; }
+    .luca-pop .pad{ padding:11px 13px 13px; }
+    .luca-pop .ttl{ font-weight:600; font-size:14px; color:#fff; }
+    .luca-pop .chip{ display:inline-flex; align-items:center; padding:1px 8px; border-radius:999px; font-size:11px; font-weight:500; white-space:nowrap; }
+    .luca-pop .sub{ color:#9aa0ac; font-size:12px; margin-top:3px; }
+    .luca-pop .ev{ margin-top:7px; font-size:12px; }
+    .luca-pop .watch{ display:inline-flex; align-items:center; gap:5px; margin-top:10px; padding:6px 11px; border-radius:9px; background:linear-gradient(90deg,#ef4444,#dc2626); color:#fff; font-size:12px; font-weight:600; text-decoration:none; }
   `;
   document.head.appendChild(st);
 }
@@ -72,16 +90,27 @@ function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string);
 }
 function popupHtml(v: Venue): string {
+  const st = STATUS[v.status ?? "idle"] ?? STATUS.idle;
   const sub = [v.city, v.address].filter(Boolean).join(" · ");
-  const line = v.liveEvent
-    ? `<span style="color:#10b981">● ŞU AN: ${escapeHtml(v.liveEvent.title)}</span>`
+  const cap = v.capacity ? `<span style="color:#6b7280"> · ${v.capacity} kişi</span>` : "";
+  const ev = v.liveEvent
+    ? `<div class="ev" style="color:#10b981">● Şu an: ${escapeHtml(v.liveEvent.title)}</div>`
     : v.nextEvent
-      ? `<span style="color:#8b5cf6">Sıradaki: ${escapeHtml(v.nextEvent.title)} · ${formatDateTR(v.nextEvent.startsAt)}</span>`
-      : `<span style="color:#94a3b8">Etkinlik yok</span>`;
+      ? `<div class="ev" style="color:#c4b5fd">Sıradaki: ${escapeHtml(v.nextEvent.title)} · ${escapeHtml(formatDateTR(v.nextEvent.startsAt))}</div>`
+      : `<div class="ev" style="color:#6b7280">Etkinlik yok</div>`;
+  const watch = v.liveEvent
+    ? `<a class="watch" href="/canli/${encodeURIComponent(v.liveEvent.slug)}" target="_blank" rel="noopener">▶ Canlı İzle</a>`
+    : "";
+  const img = v.coverUrl
+    ? `<div class="img" style="background-image:url('${escapeHtml(v.coverUrl)}')"></div>`
+    : "";
   return (
-    `<strong>${escapeHtml(v.name)}</strong>${sub ? `<br/>${escapeHtml(sub)}` : ""}` +
-    `${v.capacity ? `<br/><span style="color:#888">Kapasite: ${v.capacity}</span>` : ""}` +
-    `<br/>${line}`
+    `<div class="luca-pop">${img}<div class="pad">` +
+    `<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">` +
+    `<span class="ttl">${escapeHtml(v.name)}</span>` +
+    `<span class="chip" style="background:${st.pin}22;color:${st.pin}">${st.label}</span></div>` +
+    `${sub || cap ? `<div class="sub">${escapeHtml(sub)}${cap}</div>` : ""}` +
+    `${ev}${watch}</div></div>`
   );
 }
 
@@ -172,7 +201,7 @@ export default function VenuesAdmin() {
             gl.accessToken = cfg.token;
             const map = new gl.Map({
               container: mapEl.current,
-              style: mapboxStyle(),
+              style: MAP_STYLE,
               center: ISTANBUL,
               zoom: 10,
               attributionControl: true,
@@ -259,10 +288,8 @@ export default function VenuesAdmin() {
       const st = STATUS[v.status ?? "idle"] ?? STATUS.idle;
       const el = document.createElement("div");
       el.className = `luca-pin${v.status === "live" ? " live" : ""}`;
-      el.style.width = "16px";
-      el.style.height = "16px";
-      el.innerHTML = `<span class="ring" style="background:${st.pin}"></span><span class="dot" style="background:${st.pin}"></span>`;
-      const popup = new gl.Popup({ offset: 12, closeButton: false }).setHTML(popupHtml(v));
+      el.innerHTML = `<span class="glow" style="background:${st.pin}"></span><span class="dot" style="background:${st.pin}"></span>`;
+      const popup = new gl.Popup({ offset: 16, closeButton: true, maxWidth: "260px", focusAfterOpen: false }).setHTML(popupHtml(v));
       const m = new gl.Marker({ element: el, anchor: "center" }).setLngLat([v.lng as number, v.lat as number]).setPopup(popup).addTo(map);
       el.addEventListener("click", () => setActive(v.id));
       markersRef.current.set(v.id, m);
