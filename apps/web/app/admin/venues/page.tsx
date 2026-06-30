@@ -53,22 +53,20 @@ function ensurePinStyle() {
     .luca-pin .dot{ position:absolute; inset:0; border-radius:50%; border:2.5px solid #0b0b10; box-shadow:0 2px 8px rgba(0,0,0,.55); transition:transform .15s ease; }
     .luca-pin:hover .dot{ transform:scale(1.3); }
     .luca-pin.live .glow{ opacity:.5; animation:lucaPulse 1.6s ease-out infinite; }
-    /* premium koyu cam popup (!important: Mapbox kendi CSS'ini bunun üstüne yüklüyor) */
-    .mapboxgl-popup-content{ background:#15151c !important; color:#fff !important; border:1px solid rgba(255,255,255,.10) !important; border-radius:14px !important; padding:0 !important; box-shadow:0 16px 48px rgba(0,0,0,.55) !important; overflow:hidden !important; }
-    .mapboxgl-popup-anchor-top .mapboxgl-popup-tip{ border-bottom-color:#15151c !important; }
-    .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip{ border-top-color:#15151c !important; }
-    .mapboxgl-popup-anchor-left .mapboxgl-popup-tip{ border-right-color:#15151c !important; }
-    .mapboxgl-popup-anchor-right .mapboxgl-popup-tip{ border-left-color:#15151c !important; }
-    .mapboxgl-popup-close-button{ color:rgba(255,255,255,.55); font-size:17px; width:24px; height:24px; right:2px; top:1px; }
-    .mapboxgl-popup-close-button:hover{ background:transparent; color:#fff; }
-    .luca-pop{ width:236px; font:13px/1.4 system-ui,-apple-system,sans-serif; }
-    .luca-pop .img{ height:104px; background:#23232c center/cover no-repeat; }
-    .luca-pop .pad{ padding:11px 13px 13px; }
-    .luca-pop .ttl{ font-weight:600; font-size:14px; color:#fff; }
-    .luca-pop .chip{ display:inline-flex; align-items:center; padding:1px 8px; border-radius:999px; font-size:11px; font-weight:500; white-space:nowrap; }
-    .luca-pop .sub{ color:#9aa0ac; font-size:12px; margin-top:3px; }
-    .luca-pop .ev{ margin-top:7px; font-size:12px; }
-    .luca-pop .watch{ display:inline-flex; align-items:center; gap:5px; margin-top:10px; padding:6px 11px; border-radius:9px; background:linear-gradient(90deg,#ef4444,#dc2626); color:#fff; font-size:12px; font-weight:600; text-decoration:none; }
+    /* popup: tüm görsel iç kartta; Mapbox sarmalayıcısını şeffaflaştır (custom className → 2-class specificity kesin kazanır, ok gizli = minimal floating kart) */
+    .luca-popup .mapboxgl-popup-content{ background:transparent !important; padding:0 !important; box-shadow:none !important; border:none !important; }
+    .luca-popup .mapboxgl-popup-tip{ display:none !important; }
+    .luca-popup .mapboxgl-popup-close-button{ position:absolute; top:8px; right:8px; z-index:3; width:24px; height:24px; padding:0; border-radius:8px; background:rgba(0,0,0,.45); color:#fff; font-size:15px; line-height:23px; }
+    .luca-popup .mapboxgl-popup-close-button:hover{ background:rgba(0,0,0,.72); color:#fff; }
+    .luca-pop{ position:relative; width:240px; background:#15151c; border:1px solid rgba(255,255,255,.08); border-radius:16px; box-shadow:0 18px 50px rgba(0,0,0,.6); overflow:hidden; font-family:system-ui,-apple-system,sans-serif; }
+    .luca-pop .img{ height:96px; background:#23232c center/cover no-repeat; }
+    .luca-pop .pad{ padding:12px 14px 14px; }
+    .luca-pop .ttl{ font-weight:600; font-size:14.5px; color:#fff; line-height:1.25; }
+    .luca-pop .chip{ display:inline-flex; align-items:center; gap:5px; margin-top:7px; padding:2px 9px; border-radius:999px; font-size:11px; font-weight:500; white-space:nowrap; }
+    .luca-pop .sub{ color:#9aa0ac; font-size:12px; margin-top:7px; line-height:1.45; }
+    .luca-pop .ev{ margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,.07); font-size:12px; }
+    .luca-pop .watch{ display:inline-flex; align-items:center; gap:6px; margin-top:11px; padding:7px 13px; border-radius:10px; background:#ef4444; color:#fff; font-size:12px; font-weight:600; text-decoration:none; }
+    .luca-pop .watch:hover{ background:#dc2626; }
   `;
   document.head.appendChild(st);
 }
@@ -104,11 +102,11 @@ function popupHtml(v: Venue): string {
   const img = v.coverUrl
     ? `<div class="img" style="background-image:url('${escapeHtml(v.coverUrl)}')"></div>`
     : "";
+  const dot = v.status === "live" ? `<span style="width:6px;height:6px;border-radius:50%;background:${st.pin}"></span>` : "";
   return (
     `<div class="luca-pop">${img}<div class="pad">` +
-    `<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">` +
-    `<span class="ttl">${escapeHtml(v.name)}</span>` +
-    `<span class="chip" style="background:${st.pin}22;color:${st.pin}">${st.label}</span></div>` +
+    `<div class="ttl">${escapeHtml(v.name)}</div>` +
+    `<span class="chip" style="background:${st.pin}1f;color:${st.pin}">${dot}${st.label}</span>` +
     `${sub || cap ? `<div class="sub">${escapeHtml(sub)}${cap}</div>` : ""}` +
     `${ev}${watch}</div></div>`
   );
@@ -289,7 +287,7 @@ export default function VenuesAdmin() {
       const el = document.createElement("div");
       el.className = `luca-pin${v.status === "live" ? " live" : ""}`;
       el.innerHTML = `<span class="glow" style="background:${st.pin}"></span><span class="dot" style="background:${st.pin}"></span>`;
-      const popup = new gl.Popup({ offset: 16, closeButton: true, maxWidth: "260px", focusAfterOpen: false }).setHTML(popupHtml(v));
+      const popup = new gl.Popup({ offset: 14, closeButton: true, maxWidth: "260px", className: "luca-popup", focusAfterOpen: false }).setHTML(popupHtml(v));
       const m = new gl.Marker({ element: el, anchor: "center" }).setLngLat([v.lng as number, v.lat as number]).setPopup(popup).addTo(map);
       el.addEventListener("click", () => setActive(v.id));
       markersRef.current.set(v.id, m);
