@@ -55,7 +55,7 @@ export class EventsService {
         skip: q.skip ?? 0,
         orderBy: { startsAt: q.range === 'past' ? 'desc' : 'asc' },
         include: {
-          venue: { select: { id: true, name: true, city: true } },
+          venue: { select: { id: true, name: true, city: true, address: true, lat: true, lng: true } },
           category: { select: { id: true, slug: true, name: true, icon: true, color: true } },
           lineup: {
             include: { artist: { select: { id: true, name: true, slug: true } } },

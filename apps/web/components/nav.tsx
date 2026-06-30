@@ -68,6 +68,12 @@ export function Nav() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-7">
+          <Link
+            href="/kesfet"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Keşfet
+          </Link>
           {LINKS.map((l) => (
             <a
               key={l.href}
@@ -108,6 +114,9 @@ export function Nav() {
       {open && (
         <div className="md:hidden border-t border-border/40 bg-background">
           <div className="container py-4 flex flex-col gap-1">
+            <Link href="/kesfet" onClick={() => setOpen(false)} className="py-2 text-sm">
+              Keşfet
+            </Link>
             {LINKS.map((l) => (
               <a
                 key={l.href}
