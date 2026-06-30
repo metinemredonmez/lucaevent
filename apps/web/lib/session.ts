@@ -2,6 +2,7 @@
 const BASE =
   (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001") + "/api/v1";
 const KEY = "luca_session";
+const REFRESH_KEY = "luca_session_refresh";
 
 export function getSession(): string | null {
   return typeof window !== "undefined" ? localStorage.getItem(KEY) : null;
@@ -9,8 +10,61 @@ export function getSession(): string | null {
 export function setSession(t: string) {
   localStorage.setItem(KEY, t);
 }
+function getRefresh(): string | null {
+  return typeof window !== "undefined" ? localStorage.getItem(REFRESH_KEY) : null;
+}
+/** Login/register sonrası access + refresh token'ı sakla (30 günlük oturum). */
+function storeTokens(data: { accessToken?: string; refreshToken?: string }) {
+  if (data.accessToken) setSession(data.accessToken);
+  if (data.refreshToken) localStorage.setItem(REFRESH_KEY, data.refreshToken);
+}
 export function clearSession() {
   localStorage.removeItem(KEY);
+  localStorage.removeItem(REFRESH_KEY);
+}
+
+// Eşzamanlı 401'lerde tek refresh (paylaşılan in-flight promise).
+let refreshInFlight: Promise<string | null> | null = null;
+async function refreshAccess(): Promise<string | null> {
+  const rt = getRefresh();
+  if (!rt) return null;
+  if (!refreshInFlight) {
+    refreshInFlight = (async () => {
+      try {
+        const res = await fetch(BASE + "/auth/refresh", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refreshToken: rt }),
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+        if (data?.accessToken) {
+          storeTokens(data); // rotation: yeni access + refresh
+          return data.accessToken as string;
+        }
+        return null;
+      } catch {
+        return null;
+      } finally {
+        refreshInFlight = null;
+      }
+    })();
+  }
+  return refreshInFlight;
+}
+
+/** Üye oturumunu kapat — refresh token'ı sunucuda iptal et (best-effort). */
+export function logoutUser() {
+  const rt = getRefresh();
+  if (rt) {
+    fetch(BASE + "/auth/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken: rt }),
+      keepalive: true,
+    }).catch(() => {});
+  }
+  clearSession();
 }
 
 async function post(path: string, body: unknown) {
@@ -33,7 +87,8 @@ async function post(path: string, body: unknown) {
 async function authReq(
   path: string,
   opts: { method?: string; body?: unknown } = {},
-) {
+  _retried = false,
+): Promise<any> {
   const token = getSession();
   const res = await fetch(BASE + path, {
     method: opts.method || "GET",
@@ -44,6 +99,11 @@ async function authReq(
     body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
   });
   if (res.status === 401) {
+    // access token süresi dolmuş olabilir — refresh ile bir kez yenile, tekrarla
+    if (!_retried) {
+      const fresh = await refreshAccess();
+      if (fresh) return authReq(path, opts, true);
+    }
     clearSession();
     throw new Error("Oturum süresi doldu. Lütfen tekrar giriş yapın.");
   }
@@ -72,13 +132,13 @@ export type RegisterBody = {
 
 export async function registerUser(body: RegisterBody) {
   const data = await post("/auth/register", body);
-  if (data.accessToken) setSession(data.accessToken);
+  storeTokens(data);
   return data;
 }
 
 export async function loginUser(email: string, password: string) {
   const data = await post("/auth/login", { email, password });
-  if (data.accessToken) setSession(data.accessToken);
+  storeTokens(data);
   return data;
 }
 
@@ -154,7 +214,7 @@ export async function getGoogleConfig(): Promise<{ enabled: boolean; clientId: s
 
 export async function googleLogin(idToken: string) {
   const data = await post("/auth/google", { idToken });
-  if (data.accessToken) setSession(data.accessToken);
+  storeTokens(data);
   return data;
 }
 

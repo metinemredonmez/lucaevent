@@ -20,6 +20,7 @@ import {
 import {
   getSession,
   clearSession,
+  logoutUser,
   getProfile,
   updateProfile,
   changePassword,
@@ -85,7 +86,7 @@ export default function HesapPage() {
   }, [router]);
 
   function logout() {
-    clearSession();
+    logoutUser();
     router.push("/");
   }
 
