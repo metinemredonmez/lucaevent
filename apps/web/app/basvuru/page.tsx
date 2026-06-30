@@ -63,7 +63,7 @@ export default function BasvuruPage() {
   return (
     <>
       <Nav />
-      <main className="relative min-h-screen overflow-hidden bg-[#0C0920] pt-16">
+      <main className="relative min-h-screen overflow-hidden bg-[#0C0920] pt-[6.5rem]">
         {/* atmosfer */}
         <div className="pointer-events-none absolute -left-24 top-10 h-80 w-80 rounded-full bg-[#7C3AED]/20 blur-[120px]" />
         <div className="pointer-events-none absolute right-[-6rem] top-1/3 h-96 w-96 rounded-full bg-[#A855F7]/15 blur-[130px]" />

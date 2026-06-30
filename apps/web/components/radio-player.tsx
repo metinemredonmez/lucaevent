@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Play, Pause, Radio, Loader2, Search, X } from "lucide-react";
+import { Play, Pause, Radio, Loader2, Search, X, ChevronDown } from "lucide-react";
 
 type Station = { name: string; tag: string; color: string; url: string };
 
@@ -16,6 +16,7 @@ const FAVORITES: Station[] = [
 
 export function RadioPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
   const [current, setCurrent] = useState<Station>(FAVORITES[0]);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -56,6 +57,15 @@ export function RadioPlayer() {
     return () => clearTimeout(t);
   }, [q]);
 
+  // dışarı tıklayınca paneli kapat
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, []);
+
   function audio() {
     if (!audioRef.current) {
       const a = new Audio();
@@ -90,79 +100,97 @@ export function RadioPlayer() {
 
   const list = q.trim().length >= 2 ? results : FAVORITES;
 
+  const Eq = () => (
+    <span className="flex h-3 items-end gap-[2px]">
+      {[0, 1, 2].map((b) => (
+        <span
+          key={b}
+          className="w-[2px] rounded-full"
+          style={{ height: 4 + b * 3, background: current.color, animation: `lucaEq .9s ${b * 0.15}s ease-in-out infinite alternate` }}
+        />
+      ))}
+    </span>
+  );
+
   return (
-    <div className="fixed bottom-5 right-5 z-50 select-none">
-      {open && (
-        <div className="mb-2 w-64 overflow-hidden rounded-xl border border-white/10 bg-black/80 shadow-2xl shadow-black/50 backdrop-blur-md">
-          {/* arama */}
-          <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2">
-            <Search className="h-3.5 w-3.5 text-white/40" />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Radyo ara… (jazz, türkçe, lofi)"
-              className="w-full bg-transparent text-sm text-white placeholder:text-white/30 focus:outline-none"
-            />
-            {q && (
-              <button onClick={() => setQ("")} aria-label="Temizle">
-                <X className="h-3.5 w-3.5 text-white/40 hover:text-white/70" />
-              </button>
-            )}
-          </div>
-
-          <div className="max-h-72 overflow-y-auto p-1.5">
-            {searching && (
-              <div className="flex items-center gap-2 px-3 py-3 text-xs text-white/40">
-                <Loader2 className="h-3.5 w-3.5 animate-spin" /> aranıyor…
-              </div>
-            )}
-            {!searching && list.length === 0 && (
-              <div className="px-3 py-3 text-xs text-white/40">Sonuç yok.</div>
-            )}
-            {list.map((s, i) => (
-              <button
-                key={s.url + i}
-                onClick={() => play(s)}
-                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
-                  current.url === s.url ? "bg-white/10" : "hover:bg-white/5"
-                }`}
-              >
-                <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: s.color }} />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm text-white/90">{s.name}</span>
-                  <span className="block truncate text-[11px] text-white/40">{s.tag || "radyo"}</span>
-                </span>
-                {current.url === s.url && playing && (
-                  <span className="flex h-3.5 items-end gap-[2px]">
-                    {[0, 1, 2].map((b) => (
-                      <span key={b} className="w-[2px] rounded-full" style={{ height: 5 + b * 3, background: s.color, animation: `lucaEq .9s ${b * 0.15}s ease-in-out infinite alternate` }} />
-                    ))}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="flex items-center gap-2 rounded-full border border-white/15 bg-black/60 py-1.5 pl-1.5 pr-3 backdrop-blur-md">
+    <div
+      ref={wrapRef}
+      className="fixed inset-x-0 top-16 z-40 border-b border-border/40 bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60 select-none"
+    >
+      <div className="container relative flex h-9 items-center gap-2.5">
+        {/* çal / durdur */}
         <button
           onClick={toggle}
           aria-label={playing ? "Durdur" : "Çal"}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-black transition-transform active:scale-95"
+          className="grid size-6 shrink-0 place-items-center rounded-full text-black transition-transform active:scale-95"
           style={{ background: current.color }}
         >
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 translate-x-[1px]" />}
+          {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5 translate-x-[1px]" />}
         </button>
-        <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-2 text-left">
-          <span className="leading-tight">
-            <span className="block max-w-[120px] truncate text-xs text-white/90">{current.name}</span>
-            <span className="block text-[10px] uppercase tracking-wider text-white/40">
-              {playing ? "● canlı" : "radyo"}
-            </span>
-          </span>
-          <Radio className="h-4 w-4 text-white/40" />
+
+        {/* şu an çalıyor */}
+        <div className="flex min-w-0 items-center gap-2">
+          <Radio className="hidden h-3.5 w-3.5 shrink-0 text-muted-foreground sm:block" />
+          <span className="truncate text-xs font-medium text-foreground">{current.name}</span>
+          <span className="hidden truncate text-[11px] text-muted-foreground sm:inline">{current.tag}</span>
+          {playing ? <Eq /> : null}
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{playing ? "● canlı" : "radyo"}</span>
+        </div>
+
+        {/* radyo değiştir */}
+        <button
+          onClick={() => setOpen((o) => !o)}
+          className="ml-auto inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <Search className="h-3 w-3" /> Radyo
+          <ChevronDown className={`h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`} />
         </button>
+
+        {/* panel */}
+        {open && (
+          <div className="absolute right-0 top-full mt-1.5 w-72 overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
+            <div className="flex items-center gap-2 border-b border-border px-3 py-2">
+              <Search className="h-3.5 w-3.5 text-muted-foreground" />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Radyo ara… (jazz, türkçe, lofi)"
+                className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+              />
+              {q && (
+                <button onClick={() => setQ("")} aria-label="Temizle">
+                  <X className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+                </button>
+              )}
+            </div>
+            <div className="max-h-72 overflow-y-auto p-1.5">
+              {searching && (
+                <div className="flex items-center gap-2 px-3 py-3 text-xs text-muted-foreground">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> aranıyor…
+                </div>
+              )}
+              {!searching && list.length === 0 && (
+                <div className="px-3 py-3 text-xs text-muted-foreground">Sonuç yok.</div>
+              )}
+              {list.map((s, i) => (
+                <button
+                  key={s.url + i}
+                  onClick={() => play(s)}
+                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
+                    current.url === s.url ? "bg-muted" : "hover:bg-muted/50"
+                  }`}
+                >
+                  <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: s.color }} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm text-foreground">{s.name}</span>
+                    <span className="block truncate text-[11px] text-muted-foreground">{s.tag || "radyo"}</span>
+                  </span>
+                  {current.url === s.url && playing && <Eq />}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <style>{`@keyframes lucaEq{from{transform:scaleY(.4)}to{transform:scaleY(1)}}`}</style>
