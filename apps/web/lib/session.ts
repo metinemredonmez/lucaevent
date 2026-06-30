@@ -203,6 +203,21 @@ export function markNotificationsRead(ids?: string[]): Promise<{ ok: boolean }> 
   });
 }
 
+// ——— Katılım puanı / rozet ———
+export type MemberScore = {
+  score: number;
+  level: number;
+  badge: string;
+  icon: string;
+  nextBadge: string | null;
+  nextAt: number | null;
+  progress: number;
+  breakdown: { orders: number; favorites: number; reviews: number };
+};
+export function getScore(): Promise<MemberScore> {
+  return authReq("/me/score");
+}
+
 // ——— Canlı yayın (livestream) ———
 export type StreamMeta = {
   title: string;

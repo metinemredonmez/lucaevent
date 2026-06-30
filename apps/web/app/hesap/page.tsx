@@ -16,6 +16,7 @@ import {
   Trash2,
   BadgeCheck,
   AlertTriangle,
+  Trophy,
 } from "lucide-react";
 import {
   getSession,
@@ -28,7 +29,9 @@ import {
   getMyBookings,
   getMyFavorites,
   removeFavorite,
+  getScore,
   passwordScore,
+  type MemberScore,
   type Profile,
   type MyOrder,
   type FavoriteItem,
@@ -102,7 +105,7 @@ export default function HesapPage() {
     (profile?.name?.trim()?.[0] || profile?.email?.[0] || "L").toUpperCase();
 
   return (
-    <main className="min-h-screen bg-background pb-24 pt-24">
+    <main className="min-h-screen bg-background pb-24 pt-[6.5rem]">
       <div className="container max-w-4xl">
         {/* başlık */}
         <div className="mb-8 flex items-center gap-4">
@@ -122,6 +125,8 @@ export default function HesapPage() {
             <LogOut className="h-4 w-4" /> Çıkış
           </button>
         </div>
+
+        <ScoreCard />
 
         {err && !profile && (
           <p className="rounded-lg bg-rose-500/10 px-4 py-3 text-sm text-rose-500">{err}</p>
@@ -174,6 +179,57 @@ export default function HesapPage() {
         </AnimatePresence>
       </div>
     </main>
+  );
+}
+
+/* ——————————————————————— Katılım puanı ——————————————————————— */
+function ScoreCard() {
+  const [s, setS] = useState<MemberScore | null>(null);
+  useEffect(() => {
+    getScore().then(setS).catch(() => {});
+  }, []);
+  if (!s) return null;
+  return (
+    <div className="mb-6 overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-[#6366F1]/15 via-card to-card p-5">
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-2xl shadow-lg">
+          <span aria-hidden>{s.icon}</span>
+        </div>
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="font-serif text-lg font-semibold text-foreground">{s.badge}</span>
+            <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[11px] font-medium text-primary">Seviye {s.level}</span>
+          </div>
+          <div className="mt-0.5 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+            <Trophy className="h-3.5 w-3.5 text-primary" />
+            <span className="font-semibold tabular-nums text-foreground">{s.score}</span> katılım puanı
+          </div>
+        </div>
+        <div className="hidden gap-4 sm:ml-auto sm:flex">
+          {[
+            { l: "Bilet", v: s.breakdown.orders },
+            { l: "Favori", v: s.breakdown.favorites },
+            { l: "Yorum", v: s.breakdown.reviews },
+          ].map((b) => (
+            <div key={b.l} className="text-center">
+              <div className="text-lg font-semibold tabular-nums text-foreground">{b.v}</div>
+              <div className="text-[11px] text-muted-foreground">{b.l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {s.nextBadge && (
+        <div className="mt-4">
+          <div className="mb-1 flex items-center justify-between text-[11px] text-muted-foreground">
+            <span>Sıradaki: <span className="text-foreground">{s.nextBadge}</span></span>
+            <span className="tabular-nums">{s.score}/{s.nextAt}</span>
+          </div>
+          <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+            <div className="h-full rounded-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] transition-all" style={{ width: `${s.progress}%` }} />
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
