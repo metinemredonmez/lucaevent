@@ -53,8 +53,8 @@ function ensurePinStyle() {
     .luca-pin .dot{ position:absolute; inset:0; border-radius:50%; border:2.5px solid #0b0b10; box-shadow:0 2px 8px rgba(0,0,0,.55); transition:transform .15s ease; }
     .luca-pin:hover .dot{ transform:scale(1.3); }
     .luca-pin.live .glow{ opacity:.5; animation:lucaPulse 1.6s ease-out infinite; }
-    /* premium koyu cam popup */
-    .mapboxgl-popup-content{ background:#15151c; color:#fff; border:1px solid rgba(255,255,255,.10); border-radius:14px; padding:0; box-shadow:0 16px 48px rgba(0,0,0,.55); overflow:hidden; }
+    /* premium koyu cam popup (!important: Mapbox kendi CSS'ini bunun üstüne yüklüyor) */
+    .mapboxgl-popup-content{ background:#15151c !important; color:#fff !important; border:1px solid rgba(255,255,255,.10) !important; border-radius:14px !important; padding:0 !important; box-shadow:0 16px 48px rgba(0,0,0,.55) !important; overflow:hidden !important; }
     .mapboxgl-popup-anchor-top .mapboxgl-popup-tip{ border-bottom-color:#15151c !important; }
     .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip{ border-top-color:#15151c !important; }
     .mapboxgl-popup-anchor-left .mapboxgl-popup-tip{ border-right-color:#15151c !important; }
@@ -193,10 +193,10 @@ export default function VenuesAdmin() {
           setNeedsToken(true);
           return;
         }
-        ensurePinStyle();
         loadMapbox()
           .then((gl) => {
             if (cancelled || !mapEl.current || mapRef.current) return;
+            ensurePinStyle(); // Mapbox CSS yüklendikten SONRA enjekte et (cascade sırası)
             glRef.current = gl;
             gl.accessToken = cfg.token;
             const map = new gl.Map({
