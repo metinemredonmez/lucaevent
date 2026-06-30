@@ -575,3 +575,15 @@ model Page {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+// Telefon doğrulama tek kullanımlık kodları (SMS OTP). Kod düz tutulmaz; hash'lenir.
+model PhoneOtp {
+  id         String    @id @default(cuid())
+  phone      String
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+  @@index([phone, createdAt])
+}

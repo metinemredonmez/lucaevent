@@ -112,6 +112,14 @@ export async function createSubmission(body: SubmissionBody) {
   return post("/submissions", body);
 }
 
+// ——— Telefon doğrulama (SMS OTP) ———
+export function sendPhoneOtp(phone: string): Promise<{ ok: boolean; expiresInSec: number }> {
+  return post("/sms/otp/send", { phone });
+}
+export function verifyPhoneOtp(phone: string, code: string): Promise<{ ok: boolean }> {
+  return post("/sms/otp/verify", { phone, code });
+}
+
 export async function getGoogleConfig(): Promise<{ enabled: boolean; clientId: string }> {
   try {
     const r = await fetch(BASE + "/auth/google/config");

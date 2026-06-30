@@ -9,7 +9,7 @@
 export interface SettingDef {
   key: string;
   env: string;
-  category: 'auth' | 'payment' | 'push' | 'mail' | 'general';
+  category: 'auth' | 'payment' | 'push' | 'mail' | 'sms' | 'general';
   isSecret: boolean;
   label: string;
   /** DB ve env yoksa kullanılan varsayılan (yalnız public değerler için). */
@@ -90,6 +90,36 @@ export const SETTINGS_REGISTRY: SettingDef[] = [
     label: 'SMTP Password',
   },
   { key: 'mail.from', env: 'SMTP_FROM', category: 'mail', isSecret: false, label: 'Gönderen (From)' },
+
+  // SMS (Netgsm)
+  {
+    key: 'sms.provider',
+    env: 'SMS_PROVIDER',
+    category: 'sms',
+    isSecret: false,
+    label: 'Aktif SMS sağlayıcı (mock | netgsm)',
+  },
+  {
+    key: 'sms.sender',
+    env: 'SMS_SENDER',
+    category: 'sms',
+    isSecret: false,
+    label: 'SMS başlığı / gönderen adı (msgheader)',
+  },
+  {
+    key: 'sms.netgsm.usercode',
+    env: 'NETGSM_USERCODE',
+    category: 'sms',
+    isSecret: false,
+    label: 'Netgsm kullanıcı kodu',
+  },
+  {
+    key: 'sms.netgsm.password',
+    env: 'NETGSM_PASSWORD',
+    category: 'sms',
+    isSecret: true,
+    label: 'Netgsm şifresi',
+  },
 ];
 
 export const REGISTRY_BY_KEY = new Map<string, SettingDef>(

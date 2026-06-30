@@ -21,6 +21,7 @@ const CAT_LABEL: Record<string, string> = {
   payment: "Ödeme (Iyzico)",
   push: "Push (OneSignal)",
   mail: "E-posta (SMTP)",
+  sms: "SMS (Netgsm)",
   general: "Genel",
 };
 
