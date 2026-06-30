@@ -75,6 +75,14 @@ export function Nav() {
           >
             Keşfet
           </Link>
+          {authed && (
+            <Link
+              href="/takvim"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Takvim
+            </Link>
+          )}
           {LINKS.map((l) => (
             <a
               key={l.href}
@@ -119,6 +127,11 @@ export function Nav() {
             <Link href="/kesfet" onClick={() => setOpen(false)} className="py-2 text-sm">
               Keşfet
             </Link>
+            {authed && (
+              <Link href="/takvim" onClick={() => setOpen(false)} className="py-2 text-sm">
+                Takvim
+              </Link>
+            )}
             {LINKS.map((l) => (
               <a
                 key={l.href}
