@@ -21,6 +21,13 @@ export class VenuesController {
     return this.venues.list();
   }
 
+  // public harita config (Mapbox token) — auth gerekmez
+  @Public()
+  @Get('maps/config')
+  mapsConfig() {
+    return this.venues.mapsConfig();
+  }
+
   @Public()
   @Get('venues/:slug')
   bySlug(@Param('slug') slug: string) {
@@ -28,6 +35,14 @@ export class VenuesController {
   }
 
   // admin
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPERADMIN, Role.ADMIN, Role.EDITOR)
+  @Get('admin/venues')
+  listAdmin() {
+    return this.venues.listAdmin();
+  }
+
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPERADMIN, Role.ADMIN, Role.EDITOR)

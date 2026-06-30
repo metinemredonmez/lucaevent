@@ -60,6 +60,15 @@ export const SETTINGS_REGISTRY: SettingDef[] = [
     default: 'https://sandbox-api.iyzipay.com',
   },
 
+  // Maps (Mapbox) — public 'pk.' token (tarayıcıda görünür, Mapbox'ta URL/referrer kısıtlanmalı)
+  {
+    key: 'maps.mapbox.token',
+    env: 'MAPBOX_TOKEN',
+    category: 'general',
+    isSecret: false,
+    label: 'Mapbox public token (pk.…) — Mapbox panelinde lucaclub.com.tr URL kısıtı ekleyin',
+  },
+
   // Push (OneSignal)
   {
     key: 'push.onesignal.appId',
