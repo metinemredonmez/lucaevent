@@ -218,6 +218,20 @@ export function getScore(): Promise<MemberScore> {
   return authReq("/me/score");
 }
 
+export type LeaderEntry = {
+  rank: number;
+  name: string;
+  avatarUrl: string | null;
+  score: number;
+  badge: string;
+  icon: string;
+  level: number;
+};
+/** Liderlik tablosu — "kim en aktif" (üyeler birbirini görür; sohbet yok). */
+export function getLeaderboard(take = 20): Promise<LeaderEntry[]> {
+  return authReq(`/community/leaderboard?take=${take}`);
+}
+
 // ——— Canlı yayın (livestream) ———
 export type StreamMeta = {
   title: string;

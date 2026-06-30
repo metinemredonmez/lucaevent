@@ -13,7 +13,6 @@ import { getSession } from "@/lib/session";
 const LINKS = [
   { href: "#kategoriler", label: "Deneyim" },
   { href: "#aktiviteler", label: "Program" },
-  { href: "#aile", label: "Topluluk" },
 ];
 
 export function Nav() {
@@ -83,6 +82,14 @@ export function Nav() {
               Takvim
             </Link>
           )}
+          {authed && (
+            <Link
+              href="/topluluk"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Topluluk
+            </Link>
+          )}
           {LINKS.map((l) => (
             <a
               key={l.href}
@@ -130,6 +137,11 @@ export function Nav() {
             {authed && (
               <Link href="/takvim" onClick={() => setOpen(false)} className="py-2 text-sm">
                 Takvim
+              </Link>
+            )}
+            {authed && (
+              <Link href="/topluluk" onClick={() => setOpen(false)} className="py-2 text-sm">
+                Topluluk
               </Link>
             )}
             {LINKS.map((l) => (
