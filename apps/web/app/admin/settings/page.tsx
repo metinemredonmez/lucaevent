@@ -26,9 +26,9 @@ const CAT_LABEL: Record<string, string> = {
 };
 
 const SOURCE_BADGE: Record<string, string> = {
-  db: "bg-[#657257]/15 text-emerald-400",
-  env: "bg-[#3E5A78]/15 text-sky-400",
-  unset: "bg-[#A23E48]/15 text-rose-400",
+  db: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+  env: "bg-sky-500/15 text-sky-600 dark:text-sky-400",
+  unset: "bg-rose-500/15 text-rose-600 dark:text-rose-400",
 };
 
 export default function SettingsAdmin() {
@@ -73,8 +73,8 @@ export default function SettingsAdmin() {
         title="Ayarlar & Entegrasyonlar"
         subtitle="Anahtarlar burada yönetilir — .env'e dokunmana gerek yok. Secret'lar şifreli saklanır."
       />
-      {err && <p className="text-rose-400 text-sm mb-3">{err}</p>}
-      {msg && <p className="text-emerald-400 text-sm mb-3">{msg}</p>}
+      {err && <p className="text-destructive text-sm mb-3">{err}</p>}
+      {msg && <p className="text-emerald-600 dark:text-emerald-400 text-sm mb-3">{msg}</p>}
 
       <div className="space-y-6">
         {cats.map((cat) => (

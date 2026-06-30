@@ -53,13 +53,13 @@ export default function NotificationsAdmin() {
       <AdminPageHeader title="Bildirim Gönder" subtitle="Tüm aboneliklere push bildirimi gönderin." />
 
       {configured === false && (
-        <div className="mb-5 rounded-xl border border-[#B7791F]/40 bg-[#B7791F]/10 px-4 py-3 text-sm text-amber-400">
+        <div className="mb-5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-400">
           OneSignal anahtarı girilmemiş — Ayarlar'dan gir.
         </div>
       )}
 
-      {err && <p className="mb-3 text-sm text-rose-400">{err}</p>}
-      {ok && <p className="mb-3 text-sm text-emerald-400">{ok}</p>}
+      {err && <p className="mb-3 text-sm text-destructive">{err}</p>}
+      {ok && <p className="mb-3 text-sm text-emerald-600 dark:text-emerald-400">{ok}</p>}
 
       <div className="max-w-lg rounded-xl border border-border bg-card p-6">
         <label className="mb-1 block text-xs font-medium text-muted-foreground">Başlık</label>

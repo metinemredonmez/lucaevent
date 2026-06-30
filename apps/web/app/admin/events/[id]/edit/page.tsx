@@ -30,7 +30,7 @@ export default function EditEvent() {
       </h1>
       <p className="mb-6 text-sm text-muted-foreground">{ev ? ev.title : "Yükleniyor…"}</p>
 
-      {err && <p className="text-sm text-rose-400">{err}</p>}
+      {err && <p className="text-sm text-destructive">{err}</p>}
       {ev && <EventForm mode="edit" id={id} initial={ev} />}
     </div>
   );

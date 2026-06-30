@@ -13,12 +13,12 @@ type Result = {
 };
 
 const STYLE: Record<string, { box: string; label: string }> = {
-  OK: { box: "border-[#657257] bg-[#657257]/10 text-emerald-400", label: "GİRİŞ OK ✓" },
+  OK: { box: "border-[#657257] bg-[#657257]/10 text-emerald-600 dark:text-emerald-400", label: "GİRİŞ OK ✓" },
   ALREADY_USED: {
     box: "border-[#B5852A] bg-[#B5852A]/10 text-[#8a6410]",
     label: "ZATEN KULLANILDI ⚠",
   },
-  INVALID: { box: "border-[#A23E48] bg-[#A23E48]/10 text-rose-400", label: "GEÇERSİZ ✕" },
+  INVALID: { box: "border-[#A23E48] bg-[#A23E48]/10 text-rose-600 dark:text-rose-400", label: "GEÇERSİZ ✕" },
 };
 
 export default function CheckIn() {

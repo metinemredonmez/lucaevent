@@ -48,7 +48,7 @@ export default function MaintenanceAdmin() {
     <div>
       <AdminPageHeader title="Bakım / İşler" subtitle="Zamanlanmış görevleri elle tetikleyin." />
 
-      {err && <p className="mb-3 text-sm text-rose-400">{err}</p>}
+      {err && <p className="mb-3 text-sm text-destructive">{err}</p>}
 
       <div className="grid gap-4 sm:grid-cols-2">
         {JOBS.map((job) => {

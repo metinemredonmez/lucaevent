@@ -394,6 +394,59 @@ async function main() {
       note: 'Doğum günü kutlaması',
     },
   });
+  await prisma.reservation.upsert({
+    where: { code: 'RES-DEMO02' },
+    update: {},
+    create: {
+      code: 'RES-DEMO02',
+      venueId: hangar.id,
+      area: 'Lounge',
+      date: hours(days(12), 21),
+      partySize: 4,
+      fullName: 'Ece Demir',
+      phone: '+90 555 111 2233',
+      email: 'ece@example.com',
+      status: 'CONFIRMED',
+      note: 'Pencere kenarı',
+    },
+  });
+  await prisma.reservation.upsert({
+    where: { code: 'RES-DEMO03' },
+    update: {},
+    create: {
+      code: 'RES-DEMO03',
+      venueId: hangar.id,
+      area: 'VIP',
+      date: hours(days(20), 23),
+      partySize: 8,
+      fullName: 'Mert Kaya',
+      phone: '+90 555 444 5566',
+      email: 'mert@example.com',
+      status: 'PENDING',
+    },
+  });
+
+  // ---------- başvurular / mesajlar ----------
+  const submissions: any[] = [
+    { type: 'CONTACT', name: 'Selin A.', email: 'selin@example.com', subject: 'Genel soru', message: 'Etkinliklere nasıl katılabilirim?', status: 'NEW' },
+    { type: 'EVENT_PROPOSAL', name: 'Burak Yıldız', email: 'burak@example.com', phone: '+90 555 222 3344', subject: 'DJ gecesi önerisi', message: "Kadıköy'de bir mekan için organizasyon yapmak istiyoruz.", status: 'NEW' },
+    { type: 'MEMBERSHIP', name: 'Aylin Toprak', email: 'aylin@example.com', subject: 'Üyelik', message: 'Topluluğa katılmak istiyorum.', status: 'REVIEWED' },
+    { type: 'CONTACT', name: 'Can Öz', email: 'can@example.com', subject: 'İş birliği', message: 'Sponsorluk görüşmesi yapmak isteriz.', status: 'NEW' },
+  ];
+  for (const s of submissions) {
+    const exists = await prisma.submission.findFirst({ where: { email: s.email, subject: s.subject } });
+    if (!exists) await prisma.submission.create({ data: s });
+  }
+
+  // ---------- kuponlar ----------
+  const coupons: any[] = [
+    { code: 'HOSGELDIN', type: 'PERCENT', value: 15, maxUses: 100, isActive: true },
+    { code: 'YAZ50', type: 'FIXED', value: 5000, maxUses: 50, minSubtotalMinor: 20000, isActive: true },
+    { code: 'VIP10', type: 'PERCENT', value: 10, isActive: false },
+  ];
+  for (const c of coupons) {
+    await prisma.coupon.upsert({ where: { code: c.code }, update: {}, create: c });
+  }
 
   // ---------- içerik sayfaları (admin'den düzenlenebilir) ----------
   const pages = [

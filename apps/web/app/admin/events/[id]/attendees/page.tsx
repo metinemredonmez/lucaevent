@@ -26,9 +26,9 @@ type WaitEntry = {
 };
 
 const WAIT_COLOR: Record<string, string> = {
-  WAITING: "bg-[#B7791F]/15 text-amber-400",
-  NOTIFIED: "bg-[#3E5A78]/15 text-sky-400",
-  CONVERTED: "bg-[#657257]/15 text-emerald-400",
+  WAITING: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+  NOTIFIED: "bg-sky-500/15 text-sky-600 dark:text-sky-400",
+  CONVERTED: "bg-[#657257]/15 text-emerald-600 dark:text-emerald-400",
   EXPIRED: "bg-[#6F6F6F]/15 text-muted-foreground",
 };
 
@@ -82,12 +82,12 @@ export default function EventAttendees() {
         </button>
       </div>
 
-      {err && <p className="mb-3 text-sm text-rose-400">{err}</p>}
+      {err && <p className="mb-3 text-sm text-destructive">{err}</p>}
 
       {/* Katılımcılar */}
       <div className="mb-3 flex items-center gap-3 text-sm text-muted-foreground">
         <span className="font-medium text-foreground">{att.length}</span> bilet ·
-        <span className="font-medium text-emerald-400">{checkedCount}</span> giriş yaptı
+        <span className="font-medium text-emerald-600 dark:text-emerald-400">{checkedCount}</span> giriş yaptı
       </div>
       <div className="mb-8 overflow-hidden rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
@@ -107,7 +107,7 @@ export default function EventAttendees() {
                 <td className="px-4 py-3 text-muted-foreground">{a.tier}</td>
                 <td className="px-4 py-3">
                   {a.checkedIn ? (
-                    <span className="inline-flex items-center gap-1 text-xs text-emerald-400">
+                    <span className="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
                       <Check className="h-3.5 w-3.5" /> {a.checkedInAt ? formatDateTR(a.checkedInAt) : "Evet"}
                     </span>
                   ) : (
