@@ -2,6 +2,7 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EventStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { EventCreateDto, EventQueryDto, EventUpdateDto } from './dto/event.dto';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class EventsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly mail: MailService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   async listPublic(q: EventQueryDto) {
@@ -236,6 +238,20 @@ export class EventsService {
     // should be wired here when the live provider lands — backlog.
     for (const o of paid) {
       await this.mail.sendEventCanceled(o.email, o.fullName, event.title).catch(() => undefined);
+    }
+    // uygulama-içi bildirim — hesabı olan katılımcılara
+    const userIds = paid
+      .map((o) => o.userId)
+      .filter((u): u is string => !!u);
+    if (userIds.length) {
+      await this.notifications
+        .notifyUsers(userIds, {
+          type: 'event',
+          title: 'Etkinlik iptal edildi',
+          body: `${event.title} iptal edildi — ücret iadesi yapılacak.`,
+          href: '/hesap',
+        })
+        .catch(() => undefined);
     }
     this.logger.log(`Event ${id} canceled — refunded ${paid.length} order(s)`);
     return { ok: true, refunded: paid.length };

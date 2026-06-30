@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { NotificationBell } from "@/components/notification-bell";
 import { Menu, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -86,6 +87,7 @@ export function Nav() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <NotificationBell />
           <ThemeToggle />
           <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
             <a href="/basvuru">Bize Ulaş</a>

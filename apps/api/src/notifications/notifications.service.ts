@@ -4,11 +4,19 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { SettingsService } from '../settings/settings.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 export interface PushOptions {
   url?: string;
   data?: Record<string, unknown>;
   segment?: string;
+}
+
+export interface InAppPayload {
+  type: 'order' | 'waitlist' | 'event' | 'system';
+  title: string;
+  body?: string;
+  href?: string;
 }
 
 /**
@@ -23,7 +31,54 @@ export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
   private readonly endpoint = 'https://onesignal.com/api/v1/notifications';
 
-  constructor(private readonly settings: SettingsService) {}
+  constructor(
+    private readonly settings: SettingsService,
+    private readonly prisma: PrismaService,
+  ) {}
+
+  /**
+   * Hedefli bildirim: uygulama-içi (DB inbox) kaydı + push (OneSignal) birlikte.
+   * Kanca noktaları (bilet onayı, bekleme, iptal) bunu çağırır.
+   */
+  async notifyUsers(userIds: string[], p: InAppPayload): Promise<void> {
+    const ids = [...new Set(userIds.filter(Boolean))];
+    if (ids.length === 0) return;
+    // in-app
+    await this.prisma.notification.createMany({
+      data: ids.map((userId) => ({
+        userId,
+        type: p.type,
+        title: p.title,
+        body: p.body ?? null,
+        href: p.href ?? null,
+      })),
+    });
+    // push (yapılandırılmamışsa sessizce skip)
+    await this.sendToUsers(ids, p.title, p.body ?? '', { url: p.href }).catch((e) =>
+      this.logger.warn(`push skipped: ${(e as Error).message}`),
+    );
+  }
+
+  // ——— inbox (uygulama-içi bildirim merkezi) ———
+  listForUser(userId: string, take = 30) {
+    return this.prisma.notification.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take,
+    });
+  }
+
+  unreadCount(userId: string) {
+    return this.prisma.notification.count({ where: { userId, read: false } });
+  }
+
+  async markRead(userId: string, ids?: string[]): Promise<{ ok: true }> {
+    await this.prisma.notification.updateMany({
+      where: { userId, read: false, ...(ids?.length ? { id: { in: ids } } : {}) },
+      data: { read: true },
+    });
+    return { ok: true };
+  }
 
   private async creds() {
     return {

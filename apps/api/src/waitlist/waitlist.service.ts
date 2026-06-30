@@ -104,8 +104,11 @@ export class WaitlistService {
         .catch(() => undefined);
       if (e.userId) {
         await this.notifications
-          .sendToUsers([e.userId], 'Yer açıldı 🎟️', `${e.event.title} — bekleme listenden yer açıldı`, {
-            url: link,
+          .notifyUsers([e.userId], {
+            type: 'waitlist',
+            title: 'Yer açıldı 🎟️',
+            body: `${e.event.title} — bekleme listenden yer açıldı`,
+            href: '/hesap',
           })
           .catch(() => undefined);
       }

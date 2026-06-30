@@ -120,6 +120,7 @@ model User {
   favorites     Favorite[]
   reviews       Review[]
   waitlist      WaitlistEntry[]
+  notifications Notification[]
 }
 
 model RefreshToken {
@@ -586,4 +587,18 @@ model PhoneOtp {
   consumedAt DateTime?
   createdAt  DateTime  @default(now())
   @@index([phone, createdAt])
+}
+
+// Uygulama içi bildirim (çan/merkez) — bilet onayı, bekleme, etkinlik iptali vb.
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // order | waitlist | event | system
+  title     String
+  body      String?
+  href      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  @@index([userId, read, createdAt])
 }

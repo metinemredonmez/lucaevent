@@ -105,12 +105,12 @@ export class PaymentsService {
     );
 
     if (order.userId) {
-      await this.notifications.sendToUsers(
-        [order.userId],
-        'Biletin hazır 🎟️',
-        `${order.event.title} — ${ticketCount} bilet onaylandı`,
-        { url: link },
-      );
+      await this.notifications.notifyUsers([order.userId], {
+        type: 'order',
+        title: 'Biletin hazır 🎟️',
+        body: `${order.event.title} — ${ticketCount} bilet onaylandı`,
+        href: '/hesap',
+      });
     }
   }
 

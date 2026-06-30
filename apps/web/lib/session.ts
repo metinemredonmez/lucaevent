@@ -120,6 +120,29 @@ export function verifyPhoneOtp(phone: string, code: string): Promise<{ ok: boole
   return post("/sms/otp/verify", { phone, code });
 }
 
+// ——— Uygulama-içi bildirim merkezi (çan) ———
+export type AppNotification = {
+  id: string;
+  type: string;
+  title: string;
+  body: string | null;
+  href: string | null;
+  read: boolean;
+  createdAt: string;
+};
+export function getNotifications(): Promise<AppNotification[]> {
+  return authReq("/me/notifications");
+}
+export function getUnreadCount(): Promise<{ count: number }> {
+  return authReq("/me/notifications/unread-count");
+}
+export function markNotificationsRead(ids?: string[]): Promise<{ ok: boolean }> {
+  return authReq("/me/notifications/read", {
+    method: "POST",
+    body: ids?.length ? { ids } : {},
+  });
+}
+
 export async function getGoogleConfig(): Promise<{ enabled: boolean; clientId: string }> {
   try {
     const r = await fetch(BASE + "/auth/google/config");
