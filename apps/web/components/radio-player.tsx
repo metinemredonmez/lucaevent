@@ -352,8 +352,8 @@ export function RadioPlayer() {
 
   // dropdown içeriği — admin/public ortak; yalnız konumu değişir.
   // Açılır kategoriler (accordion): Türler + Dünya. Aynı anda tek kategori açık.
-  const panelBody = (
-    <div className="w-[min(25rem,calc(100vw-1rem))] overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
+  const renderPanel = (widthCls: string, wide = false) => (
+    <div className={`${widthCls} overflow-hidden rounded-xl border border-border bg-card shadow-2xl`}>
       {/* arama */}
       <div className="flex items-center gap-2 border-b border-border px-3 py-2.5">
         <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -496,20 +496,22 @@ export function RadioPlayer() {
         {!searching && list.length === 0 && (
           <div className="px-3 py-3 text-xs text-muted-foreground">Sonuç yok.</div>
         )}
-        {list.map((s, i) => {
-          const active = current.url === s.url;
-          return (
-            <button key={s.url + i} onClick={() => play(s)}
-              className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-all ${active ? "bg-muted" : "hover:bg-muted/60"}`}>
-              <span className="size-2 shrink-0 rounded-full transition-transform group-hover:scale-125" style={{ background: s.color }} />
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm text-foreground">{s.name}</span>
-                <span className="block truncate text-[11px] text-muted-foreground">{s.tag || "radyo"}</span>
-              </span>
-              {active && playing ? <Eq /> : <Play className="size-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />}
-            </button>
-          );
-        })}
+        <div className={wide ? "grid grid-cols-2 gap-1 lg:grid-cols-3" : ""}>
+          {list.map((s, i) => {
+            const active = current.url === s.url;
+            return (
+              <button key={s.url + i} onClick={() => play(s)}
+                className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-all ${active ? "bg-muted" : "hover:bg-muted/60"}`}>
+                <span className="size-2 shrink-0 rounded-full transition-transform group-hover:scale-125" style={{ background: s.color }} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm text-foreground">{s.name}</span>
+                  <span className="block truncate text-[11px] text-muted-foreground">{s.tag || "radyo"}</span>
+                </span>
+                {active && playing ? <Eq /> : <Play className="size-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -520,7 +522,7 @@ export function RadioPlayer() {
   if (isAdmin) {
     return (
       <div ref={wrapRef} className="fixed bottom-5 right-5 z-40 select-none">
-        {open && <div className="absolute bottom-full right-0 mb-2">{panelBody}</div>}
+        {open && <div className="absolute bottom-full right-0 mb-2">{renderPanel("w-[min(25rem,calc(100vw-1rem))]")}</div>}
         <div className="flex items-center gap-2 rounded-full border border-primary/30 bg-background/95 py-1.5 pl-1.5 pr-3 shadow-lg shadow-primary/10 backdrop-blur">
           <button onClick={toggle} aria-label={playing ? "Durdur" : "Çal"}
             className="grid size-8 shrink-0 place-items-center rounded-full text-black transition-transform active:scale-95" style={{ background: current.color }}>
@@ -606,7 +608,7 @@ export function RadioPlayer() {
         </button>
 
         {/* panel */}
-        {open && <div className="absolute right-0 top-full mt-1.5">{panelBody}</div>}
+        {open && <div className="absolute inset-x-0 top-full mt-1.5">{renderPanel("w-full", true)}</div>}
       </div>
 
       {eqKeyframes}
