@@ -126,6 +126,7 @@ async function main() {
     agenda?: { time: string; title: string }[];
     included?: string[];
     bringList?: string[];
+    cover?: string; // varsa coverUrl olarak yazılır (repo'daki /img/events/<slug>.jpg)
   };
 
   const events: Ev[] = [
@@ -133,6 +134,7 @@ async function main() {
     {
       slug: 'sile-kampi',
       title: "Şile'de Kamptayız!",
+      cover: '/img/events/sile-kampi.jpg',
       tagline: 'Denize sıfır kamp — 3-5 Temmuz.',
       description:
         "3-5 Temmuz'da Şile'de, denize sıfır kamp alanında buluşuyoruz. At biniciliği, ATV safari, " +
@@ -150,6 +152,7 @@ async function main() {
     {
       slug: 'parfum-workshopu',
       title: 'Parfüm Workshopu',
+      cover: '/img/events/parfum-workshopu.jpg',
       tagline: 'Kendi kokunu keşfet — terasta deniz manzarasına karşı.',
       description:
         "İstanbul'da keyifli bir akşamda, terasta deniz manzarasına karşı parfüm dünyasına adım atıyoruz. " +
@@ -167,6 +170,7 @@ async function main() {
     {
       slug: 'yaza-merhaba-burgazada',
       title: 'Yaza Merhaba · Burgazada',
+      cover: '/img/events/yaza-merhaba-burgazada.jpg',
       tagline: 'Canlan, dengelen, temas et — bir günü kendine ayır.',
       description:
         'Birlikte yaza merhaba diyoruz! Bir günü kendine ayır; hareket et, sosyalleş, denizin ve adanın tadını çıkar. ' +
@@ -360,8 +364,9 @@ async function main() {
   ];
 
   for (const e of events) {
-    // coverUrl bilerek set edilmiyor (404 & re-run'da uploaded kapağı ezmemek için).
+    // coverUrl yalnız e.cover verilmişse yazılır (aksi halde dokunmaz → uploaded kapağı ezmez).
     const data = {
+      ...(e.cover ? { coverUrl: e.cover } : {}),
       title: e.title,
       tagline: e.tagline,
       description: e.description,
