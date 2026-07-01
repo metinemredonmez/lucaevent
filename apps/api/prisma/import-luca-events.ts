@@ -8,6 +8,40 @@
  * re-run yüklenen kapağı EZMEZ.
  */
 import { EventKind, EventStatus, PrismaClient } from '@prisma/client';
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
+
+// DATABASE_URL yoksa/geçersizse, app ile AYNI .env dosyalarından yükle (prod'da env pm2
+// başlangıç ortamında değil, dosyada; PrismaClient env'i instantiate anında okuduğu için
+// bu blok new PrismaClient()'tan ÖNCE çalışmalı).
+(function loadDbUrl() {
+  const valid = (v?: string) => !!v && /^postgres(ql)?:\/\//.test(v);
+  if (valid(process.env.DATABASE_URL)) return;
+  const dirs = [join(__dirname, '..'), process.cwd()]; // apps/api + çalışma dizini
+  const files = ['.env.dev', '.env.prod', '.env']; // app ile aynı sıra (ilk geçerli kazanır)
+  for (const d of dirs) {
+    for (const f of files) {
+      const p = join(d, f);
+      if (!existsSync(p)) continue;
+      for (const raw of readFileSync(p, 'utf8').split('\n')) {
+        const line = raw.trim();
+        if (!line || line.startsWith('#')) continue;
+        const eq = line.indexOf('=');
+        if (eq < 0) continue;
+        const key = line.slice(0, eq).trim();
+        let val = line.slice(eq + 1).trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+          val = val.slice(1, -1);
+        }
+        if (key === 'DATABASE_URL' && valid(val)) {
+          process.env.DATABASE_URL = val;
+          console.log(`ℹ️  DATABASE_URL ${f} dosyasından yüklendi.`);
+          return;
+        }
+      }
+    }
+  }
+})();
 
 const prisma = new PrismaClient();
 
