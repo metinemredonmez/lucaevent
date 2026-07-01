@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Play, Pause, Radio, Loader2, Search, X, ChevronDown, ChevronUp } from "lucide-react";
 
 type Station = { name: string; tag: string; color: string; url: string };
@@ -49,6 +50,8 @@ async function rbFetch(path: string): Promise<any[]> {
 export function RadioPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const pathname = usePathname();
+  const isAdmin = !!pathname && pathname.startsWith("/admin");
   const [current, setCurrent] = useState<Station>(FAVORITES[0]);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -174,6 +177,101 @@ export function RadioPlayer() {
     </span>
   );
 
+  // dropdown içeriği — admin/public ortak; yalnız konumu değişir
+  const panelBody = (
+    <div className="w-[min(25rem,calc(100vw-1rem))] overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
+      <div className="flex items-center gap-2 border-b border-border px-3 py-2.5">
+        <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <input
+          value={q}
+          onChange={(e) => { setQ(e.target.value); if (e.target.value) { setTag(""); setCountry(""); } }}
+          placeholder="İstasyon adı ara…"
+          className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
+        />
+        {q && (
+          <button onClick={() => setQ("")} aria-label="Temizle">
+            <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+          </button>
+        )}
+      </div>
+      <div className="flex flex-wrap gap-1.5 border-b border-border px-3 py-2.5">
+        {GENRES.map((g) => {
+          const on = tag === g.t && !q.trim();
+          return (
+            <button key={g.t} onClick={() => { setQ(""); setCountry(""); setTag(on ? "" : g.t); }}
+              className={`rounded-full px-2.5 py-1 text-[11px] transition ${on ? "bg-primary text-white" : "border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"}`}>
+              {g.l}
+            </button>
+          );
+        })}
+      </div>
+      <div className="flex flex-wrap items-center gap-1.5 border-b border-border px-3 py-2.5">
+        <span className="mr-0.5 text-[10px] uppercase tracking-wider text-muted-foreground/50">Dünya</span>
+        {COUNTRIES.map((c) => {
+          const on = country === c.c && !q.trim() && !tag;
+          return (
+            <button key={c.c} onClick={() => { setQ(""); setTag(""); setCountry(on ? "" : c.c); }}
+              className={`rounded-full px-2.5 py-1 text-[11px] transition ${on ? "bg-primary text-white" : "border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"}`}>
+              {c.l}
+            </button>
+          );
+        })}
+      </div>
+      <div className="max-h-80 overflow-y-auto p-1.5">
+        <div className="px-2 pb-1 pt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground/60">
+          {q.trim().length >= 2 ? "Arama sonuçları" : tag ? GENRES.find((g) => g.t === tag)?.l : country ? COUNTRIES.find((c) => c.c === country)?.l : "Favoriler"}
+        </div>
+        {searching && (
+          <div className="flex items-center gap-2 px-3 py-3 text-xs text-muted-foreground">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" /> aranıyor…
+          </div>
+        )}
+        {!searching && list.length === 0 && (
+          <div className="px-3 py-3 text-xs text-muted-foreground">Sonuç yok.</div>
+        )}
+        {list.map((s, i) => {
+          const active = current.url === s.url;
+          return (
+            <button key={s.url + i} onClick={() => play(s)}
+              className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-all ${active ? "bg-muted" : "hover:bg-muted/60"}`}>
+              <span className="size-2 shrink-0 rounded-full transition-transform group-hover:scale-125" style={{ background: s.color }} />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm text-foreground">{s.name}</span>
+                <span className="block truncate text-[11px] text-muted-foreground">{s.tag || "radyo"}</span>
+              </span>
+              {active && playing ? <Eq /> : <Play className="size-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  const eqKeyframes = <style>{`@keyframes lucaEq{from{transform:scaleY(.4)}to{transform:scaleY(1)}}`}</style>;
+
+  // ADMIN: sağ-altta kompakt çalar (üst şerit değil — içeriği örtmez)
+  if (isAdmin) {
+    return (
+      <div ref={wrapRef} className="fixed bottom-5 right-5 z-40 select-none">
+        {open && <div className="absolute bottom-full right-0 mb-2">{panelBody}</div>}
+        <div className="flex items-center gap-2 rounded-full border border-primary/30 bg-background/95 py-1.5 pl-1.5 pr-3 shadow-lg shadow-primary/10 backdrop-blur">
+          <button onClick={toggle} aria-label={playing ? "Durdur" : "Çal"}
+            className="grid size-8 shrink-0 place-items-center rounded-full text-black transition-transform active:scale-95" style={{ background: current.color }}>
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 translate-x-[1px]" />}
+          </button>
+          <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-2 text-left">
+            <span className="leading-tight">
+              <span className="block max-w-[120px] truncate text-xs font-medium text-foreground">{current.name}</span>
+              <span className="block text-[10px] uppercase tracking-wider text-muted-foreground">{playing ? "● canlı" : "radyo"}</span>
+            </span>
+            <ChevronUp className={`h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+          </button>
+        </div>
+        {eqKeyframes}
+      </div>
+    );
+  }
+
   // gizli: köşede minik çalar-baloncuk (aç butonuyla geri gelir)
   if (collapsed) {
     return (
@@ -241,104 +339,10 @@ export function RadioPlayer() {
         </button>
 
         {/* panel */}
-        {open && (
-          <div className="absolute right-0 top-full mt-1.5 w-[min(25rem,calc(100vw-1rem))] overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
-            <div className="flex items-center gap-2 border-b border-border px-3 py-2.5">
-              <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-              <input
-                value={q}
-                onChange={(e) => { setQ(e.target.value); if (e.target.value) { setTag(""); setCountry(""); } }}
-                placeholder="İstasyon adı ara…"
-                className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
-              />
-              {q && (
-                <button onClick={() => setQ("")} aria-label="Temizle">
-                  <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                </button>
-              )}
-            </div>
-            {/* tür filtreleri */}
-            <div className="flex flex-wrap gap-1.5 border-b border-border px-3 py-2.5">
-              {GENRES.map((g) => {
-                const on = tag === g.t && !q.trim();
-                return (
-                  <button
-                    key={g.t}
-                    onClick={() => { setQ(""); setCountry(""); setTag(on ? "" : g.t); }}
-                    className={`rounded-full px-2.5 py-1 text-[11px] transition ${
-                      on ? "bg-primary text-white" : "border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                    }`}
-                  >
-                    {g.l}
-                  </button>
-                );
-              })}
-            </div>
-            {/* dünya (ülke kategorileri) */}
-            <div className="flex flex-wrap items-center gap-1.5 border-b border-border px-3 py-2.5">
-              <span className="mr-0.5 text-[10px] uppercase tracking-wider text-muted-foreground/50">Dünya</span>
-              {COUNTRIES.map((c) => {
-                const on = country === c.c && !q.trim() && !tag;
-                return (
-                  <button
-                    key={c.c}
-                    onClick={() => { setQ(""); setTag(""); setCountry(on ? "" : c.c); }}
-                    className={`rounded-full px-2.5 py-1 text-[11px] transition ${
-                      on ? "bg-primary text-white" : "border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                    }`}
-                  >
-                    {c.l}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="max-h-80 overflow-y-auto p-1.5">
-              <div className="px-2 pb-1 pt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground/60">
-                {q.trim().length >= 2
-                  ? "Arama sonuçları"
-                  : tag
-                    ? GENRES.find((g) => g.t === tag)?.l
-                    : country
-                      ? COUNTRIES.find((c) => c.c === country)?.l
-                      : "Favoriler"}
-              </div>
-              {searching && (
-                <div className="flex items-center gap-2 px-3 py-3 text-xs text-muted-foreground">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" /> aranıyor…
-                </div>
-              )}
-              {!searching && list.length === 0 && (
-                <div className="px-3 py-3 text-xs text-muted-foreground">Sonuç yok.</div>
-              )}
-              {list.map((s, i) => {
-                const active = current.url === s.url;
-                return (
-                <button
-                  key={s.url + i}
-                  onClick={() => play(s)}
-                  className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-all ${
-                    active ? "bg-muted" : "hover:bg-muted/60"
-                  }`}
-                >
-                  <span className="size-2 shrink-0 rounded-full transition-transform group-hover:scale-125" style={{ background: s.color }} />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm text-foreground">{s.name}</span>
-                    <span className="block truncate text-[11px] text-muted-foreground">{s.tag || "radyo"}</span>
-                  </span>
-                  {active && playing ? (
-                    <Eq />
-                  ) : (
-                    <Play className="size-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-                  )}
-                </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
+        {open && <div className="absolute right-0 top-full mt-1.5">{panelBody}</div>}
       </div>
 
-      <style>{`@keyframes lucaEq{from{transform:scaleY(.4)}to{transform:scaleY(1)}}`}</style>
+      {eqKeyframes}
     </div>
   );
 }
