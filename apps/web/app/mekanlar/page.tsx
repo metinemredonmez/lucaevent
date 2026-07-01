@@ -43,23 +43,25 @@ function ensurePinStyle() {
   const st = document.createElement("style");
   st.id = "luca-pin-style";
   st.textContent = `
-    @keyframes lucaPulse { 0%{transform:scale(.7);opacity:.55} 70%{transform:scale(2.1);opacity:0} 100%{opacity:0} }
-    .luca-pin{ position:relative; width:20px; height:20px; cursor:pointer; }
-    .luca-pin .glow{ position:absolute; inset:-3px; border-radius:50%; opacity:.35; filter:blur(3px); }
-    .luca-pin .dot{ position:absolute; inset:0; border-radius:50%; border:2.5px solid #0b0b10; box-shadow:0 2px 8px rgba(0,0,0,.55); transition:transform .15s ease; }
-    .luca-pin:hover .dot{ transform:scale(1.3); }
-    .luca-pin.live .glow{ opacity:.5; animation:lucaPulse 1.6s ease-out infinite; }
+    @keyframes lucaPulse { 0%{transform:scale(.6);opacity:.6} 70%{transform:scale(2.3);opacity:0} 100%{opacity:0} }
+    .luca-pin{ position:relative; width:24px; height:24px; cursor:pointer; }
+    .luca-pin .glow{ position:absolute; inset:-5px; border-radius:50%; opacity:.4; filter:blur(6px); }
+    .luca-pin .dot{ position:absolute; inset:0; border-radius:50%; border:2.5px solid #fff; box-shadow:0 4px 13px rgba(0,0,0,.55); transition:transform .15s ease; }
+    .luca-pin .dot::after{ content:''; position:absolute; inset:6.5px; border-radius:50%; background:#fff; opacity:.92; }
+    .luca-pin:hover .dot{ transform:scale(1.28); }
+    .luca-pin.live .glow{ opacity:.65; animation:lucaPulse 1.5s ease-out infinite; }
     .luca-popup .mapboxgl-popup-content{ background:transparent !important; padding:0 !important; box-shadow:none !important; border:none !important; }
     .luca-popup .mapboxgl-popup-tip{ display:none !important; }
-    .luca-popup .mapboxgl-popup-close-button{ position:absolute; top:8px; right:8px; z-index:3; width:24px; height:24px; padding:0; border-radius:8px; background:rgba(0,0,0,.45); color:#fff; font-size:15px; line-height:23px; }
-    .luca-pop{ position:relative; width:240px; background:#15151c; border:1px solid rgba(255,255,255,.08); border-radius:16px; box-shadow:0 18px 50px rgba(0,0,0,.6); overflow:hidden; font-family:system-ui,-apple-system,sans-serif; }
-    .luca-pop .img{ height:96px; background:#23232c center/cover no-repeat; }
-    .luca-pop .pad{ padding:12px 14px 14px; }
-    .luca-pop .ttl{ font-weight:600; font-size:14.5px; color:#fff; line-height:1.25; }
-    .luca-pop .chip{ display:inline-flex; align-items:center; gap:5px; margin-top:7px; padding:2px 9px; border-radius:999px; font-size:11px; font-weight:500; white-space:nowrap; }
-    .luca-pop .sub{ color:#9aa0ac; font-size:12px; margin-top:7px; line-height:1.45; }
-    .luca-pop .ev{ margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,.07); font-size:12px; }
-    .luca-pop .watch{ display:inline-flex; align-items:center; gap:6px; margin-top:11px; padding:7px 13px; border-radius:10px; background:#ef4444; color:#fff; font-size:12px; font-weight:600; text-decoration:none; }
+    .luca-popup .mapboxgl-popup-close-button{ position:absolute; top:8px; right:8px; z-index:3; width:24px; height:24px; padding:0; border-radius:8px; background:rgba(0,0,0,.5); color:#fff; font-size:15px; line-height:23px; }
+    .luca-pop{ position:relative; width:250px; background:#15151c; border:1px solid rgba(255,255,255,.09); border-radius:18px; box-shadow:0 22px 55px rgba(0,0,0,.62); overflow:hidden; font-family:system-ui,-apple-system,sans-serif; }
+    .luca-pop .hero{ height:74px; position:relative; background-size:cover; background-position:center; }
+    .luca-pop .heroScrim{ position:absolute; inset:0; background:linear-gradient(to top,rgba(21,21,28,.92),transparent 62%); }
+    .luca-pop .pad{ padding:11px 14px 14px; }
+    .luca-pop .ttl{ font-weight:650; font-size:15px; color:#fff; line-height:1.25; }
+    .luca-pop .chip{ display:inline-flex; align-items:center; gap:5px; margin-top:8px; padding:3px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; }
+    .luca-pop .sub{ color:#a3a9b5; font-size:12px; margin-top:8px; line-height:1.45; }
+    .luca-pop .ev{ margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,.08); font-size:12px; }
+    .luca-pop .watch{ display:flex; justify-content:center; align-items:center; gap:6px; margin-top:12px; padding:9px 12px; border-radius:12px; color:#fff; font-size:12.5px; font-weight:600; text-decoration:none; }
   `;
   document.head.appendChild(st);
 }
@@ -67,25 +69,33 @@ function ensurePinStyle() {
 function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string);
 }
+const STATUS_GRAD: Record<string, string> = {
+  live: "linear-gradient(135deg,#047857,#10b981)",
+  upcoming: "linear-gradient(135deg,#6d28d9,#a855f7)",
+  idle: "linear-gradient(135deg,#374151,#4b5563)",
+};
 function popupHtml(v: Venue): string {
-  const st = STATUS[v.status ?? "idle"] ?? STATUS.idle;
+  const status = v.status ?? "idle";
+  const st = STATUS[status] ?? STATUS.idle;
+  const hero = v.coverUrl
+    ? `<div class="hero" style="background-image:url('${escapeHtml(v.coverUrl)}')"><div class="heroScrim"></div></div>`
+    : `<div class="hero" style="background:${STATUS_GRAD[status]}"><div class="heroScrim"></div></div>`;
   const sub = [v.city, v.address].filter(Boolean).join(" · ");
   const ev = v.liveEvent
-    ? `<div class="ev" style="color:#10b981">● Şu an: ${escapeHtml(v.liveEvent.title)}</div>`
+    ? `<div class="ev" style="color:#34d399">● Şu an: ${escapeHtml(v.liveEvent.title)}</div>`
     : v.nextEvent
       ? `<div class="ev" style="color:#c4b5fd">Sıradaki: ${escapeHtml(v.nextEvent.title)} · ${escapeHtml(formatDateTR(v.nextEvent.startsAt))}</div>`
       : `<div class="ev" style="color:#6b7280">Etkinlik yok</div>`;
   const watch = v.liveEvent
-    ? `<a class="watch" href="/canli/${encodeURIComponent(v.liveEvent.slug)}">▶ Canlı İzle</a>`
+    ? `<a class="watch" style="background:#ef4444" href="/canli/${encodeURIComponent(v.liveEvent.slug)}">▶ Canlı İzle</a>`
     : v.nextEvent
-      ? `<a class="watch" style="background:#8b5cf6" href="/etkinlik/${encodeURIComponent(v.nextEvent.slug)}">Detay</a>`
+      ? `<a class="watch" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)" href="/etkinlik/${encodeURIComponent(v.nextEvent.slug)}">Detayı gör →</a>`
       : "";
-  const img = v.coverUrl ? `<div class="img" style="background-image:url('${escapeHtml(v.coverUrl)}')"></div>` : "";
-  const dot = v.status === "live" ? `<span style="width:6px;height:6px;border-radius:50%;background:${st.pin}"></span>` : "";
+  const dot = v.status === "live" ? `<span style="width:6px;height:6px;border-radius:50%;background:#fff"></span>` : "";
   return (
-    `<div class="luca-pop">${img}<div class="pad">` +
+    `<div class="luca-pop">${hero}<div class="pad">` +
     `<div class="ttl">${escapeHtml(v.name)}</div>` +
-    `<span class="chip" style="background:${st.pin}1f;color:${st.pin}">${dot}${st.label}</span>` +
+    `<span class="chip" style="background:${st.pin}26;color:${st.pin}">${dot}${st.label}</span>` +
     `${sub ? `<div class="sub">${escapeHtml(sub)}</div>` : ""}${ev}${watch}</div></div>`
   );
 }
