@@ -83,29 +83,35 @@ export class ScoreService {
     const scored = [...acc.entries()]
       .map(([uid, c]) => ({ uid, score: c.o * PTS.order + c.f * PTS.favorite + c.r * PTS.review }))
       .filter((s) => s.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, limit);
+      .sort((a, b) => b.score - a.score);
 
     if (scored.length === 0) return [];
 
+    // demo/sistem hesaplarını (@luca.test) liderlikten hariç tut
     const users = await this.prisma.user.findMany({
-      where: { id: { in: scored.map((s) => s.uid) } },
+      where: {
+        id: { in: scored.map((s) => s.uid) },
+        NOT: { email: { endsWith: '@luca.test' } },
+      },
       select: { id: true, name: true, avatarUrl: true },
     });
     const byId = new Map(users.map((u) => [u.id, u]));
 
-    return scored.map((s, i) => {
-      const u = byId.get(s.uid);
-      const b = badgeFor(s.score);
-      return {
-        rank: i + 1,
-        name: displayName(u?.name),
-        avatarUrl: u?.avatarUrl ?? null,
-        score: s.score,
-        badge: b.name,
-        icon: b.icon,
-        level: b.level,
-      };
-    });
+    return scored
+      .filter((s) => byId.has(s.uid))
+      .slice(0, limit)
+      .map((s, i) => {
+        const u = byId.get(s.uid)!;
+        const b = badgeFor(s.score);
+        return {
+          rank: i + 1,
+          name: displayName(u.name),
+          avatarUrl: u.avatarUrl ?? null,
+          score: s.score,
+          badge: b.name,
+          icon: b.icon,
+          level: b.level,
+        };
+      });
   }
 }

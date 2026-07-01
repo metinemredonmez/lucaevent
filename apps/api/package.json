@@ -18,7 +18,8 @@
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "db:seed": "ts-node prisma/seed.ts",
-    "import:events": "ts-node prisma/import-luca-events.ts"
+    "import:events": "ts-node prisma/import-luca-events.ts",
+    "clean:demo": "ts-node prisma/clean-demo.ts"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
