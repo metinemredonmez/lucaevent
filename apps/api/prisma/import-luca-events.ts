@@ -42,6 +42,24 @@ import { join } from 'path';
       }
     }
   }
+  // son çare: env dosyada değil pm2'deyse — çalışan luca-api sürecinin ortamından oku
+  if (!valid(process.env.DATABASE_URL)) {
+    try {
+      const cp = require('child_process');
+      const pid = String(cp.execSync('pm2 pid luca-api', { encoding: 'utf8' })).split('\n')[0].trim();
+      if (/^\d+$/.test(pid)) {
+        for (const kv of readFileSync(`/proc/${pid}/environ`, 'utf8').split('\0')) {
+          const eq = kv.indexOf('=');
+          if (eq > 0 && kv.slice(0, eq) === 'DATABASE_URL' && valid(kv.slice(eq + 1))) {
+            process.env.DATABASE_URL = kv.slice(eq + 1);
+            break;
+          }
+        }
+      }
+    } catch {
+      /* yoksay */
+    }
+  }
 })();
 
 const prisma = new PrismaClient();
