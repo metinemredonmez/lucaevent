@@ -84,7 +84,7 @@ export function Hero() {
             alt=""
             aria-hidden
             initial={false}
-            animate={{ opacity: i === slide ? 0.55 : 0 }}
+            animate={{ opacity: i === slide ? 0.78 : 0 }}
             transition={{ duration: 1.6, ease: "easeInOut" }}
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).style.display = "none";
@@ -93,10 +93,10 @@ export function Hero() {
           />
         ))}
 
-        {/* okunabilirlik scrim'leri */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#070510]/55 via-[#070510]/65 to-[#050309]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#070510] via-[#070510]/45 to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(168,85,247,0.14),transparent_55%)]" />
+        {/* okunabilirlik scrim'leri — görsel belirgin, sol yazı korumalı */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#070510]/30 via-[#070510]/35 to-[#050309]/90" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#070510] via-[#070510]/30 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(168,85,247,0.09),transparent_55%)]" />
         {/* alt kenarı bir sonraki bölüme yumuşat */}
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
       </div>
