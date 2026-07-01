@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Play, Pause, Radio, Loader2, Search, X, ChevronDown, ChevronUp, Globe2, Music2 } from "lucide-react";
+import { Play, Pause, Radio, Loader2, Search, X, ChevronDown, ChevronUp, Globe2, Music2, Flame } from "lucide-react";
 
 type Station = { name: string; tag: string; color: string; url: string };
 
@@ -80,6 +80,16 @@ async function rbFetch(path: string): Promise<any[]> {
   return [];
 }
 
+// Kampta dinlemelik hazır mix'ler — tek tık, en iyi eşleşen canlı istasyonu çalar.
+// (Canlı radyo widget'ı sabit şarkı listesi çalamaz; her mix o vibe'ı çalan istasyona bağlanır.)
+const MIXES: { l: string; s: string; e: string; q: string; by: "name" | "tag"; hero?: boolean }[] = [
+  { l: "KAMP ÖZEL", s: "Türkçe rock · 25 yılın en iyileri", e: "🔥", q: "eksen", by: "name", hero: true },
+  { l: "Türkçe Pop", s: "hit & yeni", e: "🎵", q: "power türk", by: "name" },
+  { l: "Rock", s: "yabancı rock klasikleri", e: "🎸", q: "rock", by: "tag" },
+  { l: "Slow · Akşam", s: "sakin, ateş başı", e: "🌙", q: "slow türk", by: "name" },
+  { l: "Nostalji", s: "90'lar / 2000'ler", e: "📻", q: "nostalji", by: "name" },
+];
+
 export function RadioPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -123,7 +133,8 @@ export function RadioPlayer() {
   const [country, setCountry] = useState(""); // ülke filtresi (countrycode)
   const [results, setResults] = useState<Station[]>([]);
   const [searching, setSearching] = useState(false);
-  const [openCat, setOpenCat] = useState<"genre" | "world" | null>("genre"); // açılır kategori
+  const [openCat, setOpenCat] = useState<"mix" | "genre" | "world" | null>("mix"); // açılır kategori
+  const [mixBusy, setMixBusy] = useState(""); // yükleniyor olan mix etiketi
 
   // Debounced radio-browser arama/filtre (ücretsiz, anahtarsız; çoklu mirror fallback)
   useEffect(() => {
@@ -255,6 +266,23 @@ export function RadioPlayer() {
     }
   }
 
+  // Mix'e tıkla → en iyi eşleşen canlı istasyonu bul ve çal.
+  async function playMix(m: (typeof MIXES)[number]) {
+    setMixBusy(m.l);
+    try {
+      const param = m.by === "name" ? `name=${encodeURIComponent(m.q)}` : `tag=${encodeURIComponent(m.q)}`;
+      const data = await rbFetch(
+        `/json/stations/search?${param}&limit=20&hidebroken=true&order=clickcount&reverse=true`,
+      );
+      const st = data.find((s) => typeof s.url_resolved === "string" && s.url_resolved.startsWith("https"));
+      if (st) {
+        play({ name: (st.name || m.l).trim().slice(0, 32), tag: `mix · ${m.l.toLowerCase()}`, color: "#8B5CF6", url: st.url_resolved });
+      }
+    } finally {
+      setMixBusy("");
+    }
+  }
+
   const list = q.trim().length >= 2 || tag || country ? results : FAVORITES;
   const GENRES = [
     { l: "Türkçe", t: "turkish" },
@@ -339,6 +367,53 @@ export function RadioPlayer() {
           <button onClick={() => setQ("")} aria-label="Temizle">
             <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
           </button>
+        )}
+      </div>
+
+      {/* kategori: Mixler (kampta dinlemelik hazır — tek tık çalar) */}
+      <div className="border-b border-border">
+        <button
+          onClick={() => setOpenCat((c) => (c === "mix" ? null : "mix"))}
+          className="flex w-full items-center justify-between px-3 py-2.5 text-left transition-colors hover:bg-muted/40"
+        >
+          <span className="flex items-center gap-2 text-xs font-medium text-foreground">
+            <Flame className="h-3.5 w-3.5 text-primary" /> Mixler
+            <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-primary">kamp</span>
+          </span>
+          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${openCat === "mix" ? "rotate-180" : ""}`} />
+        </button>
+        {openCat === "mix" && (
+          <div className="space-y-2 px-3 pb-3">
+            {MIXES.map((m) => {
+              const busy = mixBusy === m.l;
+              return (
+                <button
+                  key={m.l}
+                  onClick={() => playMix(m)}
+                  disabled={!!mixBusy}
+                  className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition disabled:opacity-60 ${
+                    m.hero
+                      ? "border-primary/40 bg-gradient-to-r from-[#6366F1]/20 to-[#8B5CF6]/20 hover:border-primary/60"
+                      : "border-border hover:border-primary/40 hover:bg-muted/40"
+                  }`}
+                >
+                  <span className="text-lg leading-none">{m.e}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className={`block truncate text-sm text-foreground ${m.hero ? "font-semibold tracking-wide" : ""}`}>{m.l}</span>
+                    <span className="block truncate text-[11px] text-muted-foreground">{m.s}</span>
+                  </span>
+                  {busy ? (
+                    <Loader2 className="h-4 w-4 shrink-0 animate-spin text-primary" />
+                  ) : (
+                    <Play className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  )}
+                </button>
+              );
+            })}
+            <p className="px-1 pt-0.5 text-[10px] leading-snug text-muted-foreground/60">
+              Mix'ler o türü çalan canlı istasyona bağlanır (sabit şarkı listesi değil).
+            </p>
+          </div>
         )}
       </div>
 
