@@ -3,8 +3,9 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Users, MapPin, Clock, ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CATEGORIES, UPCOMING_ACTIVITIES, type Activity, type CategorySlug } from "@/lib/data";
+import { discoverEvents, type DiscoverEvent } from "@/lib/events";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
@@ -15,11 +16,52 @@ interface Props {
   filter?: CategorySlug | "all";
 }
 
+// API kategori slug'ları ana sayfa taksonomisiyle birebir değil — eşle.
+const CAT_ALIAS: Record<string, CategorySlug> = {
+  "outdoor-spor": "outdoor",
+  "gezi-seyahat": "gezi",
+  "food-drink": "food",
+};
+function normCategory(slug?: string | null): CategorySlug {
+  if (!slug) return "social";
+  const alias = CAT_ALIAS[slug];
+  if (alias) return alias;
+  const known = CATEGORIES.find((c) => c.slug === slug);
+  return (known?.slug as CategorySlug) ?? "social";
+}
+function toActivity(e: DiscoverEvent): Activity {
+  return {
+    id: e.slug,
+    category: normCategory(e.category?.slug),
+    title: e.title,
+    date: e.startsAt,
+    location: e.venue?.name ?? e.venue?.city ?? "İstanbul",
+    attendees: 0,
+    capacity: 0, // public /events kapasite/satış döndürmüyor → kapasite çubuğu gizlenir
+    cover: e.coverUrl ?? "",
+  };
+}
+
 export function Activities({ filter = "all" }: Props) {
+  // Yayınlanan yaklaşan etkinlikleri API'den çek; boşsa/erişilemezse küratörlü listeye düş.
+  const [remote, setRemote] = useState<Activity[] | null>(null);
+  useEffect(() => {
+    let alive = true;
+    discoverEvents({ range: "upcoming", take: 12 })
+      .then((evs) => {
+        if (!alive) return;
+        const mapped = evs.map(toActivity);
+        if (mapped.length) setRemote(mapped);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const source = remote ?? UPCOMING_ACTIVITIES;
   const items =
-    filter === "all"
-      ? UPCOMING_ACTIVITIES
-      : UPCOMING_ACTIVITIES.filter((a) => a.category === filter);
+    filter === "all" ? source : source.filter((a) => a.category === filter);
 
   return (
     <section id="aktiviteler" className="relative py-24 md:py-32 bg-secondary/30">
@@ -72,8 +114,11 @@ function ActivityCard({ activity, index }: { activity: Activity; index: number }
     hour: "2-digit",
     minute: "2-digit",
   });
-  const pct = Math.round((activity.attendees / activity.capacity) * 100);
-  const almostFull = pct >= 80;
+  const hasCapacity = activity.capacity > 0;
+  const pct = hasCapacity
+    ? Math.round((activity.attendees / activity.capacity) * 100)
+    : 0;
+  const almostFull = hasCapacity && pct >= 80;
 
   return (
     <motion.article
@@ -89,7 +134,7 @@ function ActivityCard({ activity, index }: { activity: Activity; index: number }
           <PosterFallback category={cat} />
         </div>
 
-        {!imgFailed && (
+        {!imgFailed && activity.cover && (
           <Image
             src={activity.cover}
             alt={activity.title}
@@ -150,27 +195,31 @@ function ActivityCard({ activity, index }: { activity: Activity; index: number }
             <MapPin className="size-4 shrink-0 opacity-70" strokeWidth={1.5} />
             <span className="truncate">{activity.location}</span>
           </div>
-          <div className="flex items-center gap-2.5">
-            <Users className="size-4 shrink-0 opacity-70" strokeWidth={1.5} />
-            <span>
-              <span className="text-foreground font-medium tabular-nums">
-                {activity.attendees}
-              </span>{" "}
-              <span className="opacity-70">/ {activity.capacity}</span>
-            </span>
-          </div>
+          {hasCapacity && (
+            <div className="flex items-center gap-2.5">
+              <Users className="size-4 shrink-0 opacity-70" strokeWidth={1.5} />
+              <span>
+                <span className="text-foreground font-medium tabular-nums">
+                  {activity.attendees}
+                </span>{" "}
+                <span className="opacity-70">/ {activity.capacity}</span>
+              </span>
+            </div>
+          )}
         </dl>
 
         {/* Capacity bar */}
-        <div className="mt-4 h-0.5 rounded-full bg-border overflow-hidden">
-          <div
-            className={cn(
-              "h-full transition-all",
-              almostFull ? "bg-primary" : "bg-foreground/40"
-            )}
-            style={{ width: `${pct}%` }}
-          />
-        </div>
+        {hasCapacity && (
+          <div className="mt-4 h-0.5 rounded-full bg-border overflow-hidden">
+            <div
+              className={cn(
+                "h-full transition-all",
+                almostFull ? "bg-primary" : "bg-foreground/40"
+              )}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+        )}
 
         <Button asChild size="sm" className="w-full mt-5 group/btn">
           <a href={`#rsvp-${activity.id}`}>

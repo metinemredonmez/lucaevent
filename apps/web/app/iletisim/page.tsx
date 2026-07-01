@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Instagram, Youtube, Mail, MapPin, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { COMPANY } from "@/lib/company";
+import { getPage } from "@/lib/content";
+import { ContactForm } from "@/components/contact-form";
 
 export const metadata: Metadata = {
   title: "İletişim",
@@ -58,7 +58,16 @@ const FAQS = [
   },
 ];
 
-export default function IletisimPage() {
+const FALLBACK_TITLE = "Merhaba de — aramızdan birine denk gelirsin.";
+const FALLBACK_INTRO =
+  "Sorun, fikrin, iş birliği teklifin mi var? En hızlı yanıtı Instagram DM üzerinden alırsın. Daha detaylı konular için e-posta ya da formu kullan.";
+
+export default async function IletisimPage() {
+  // Başlık + giriş metni admin panelinden ("iletisim" sayfası) düzenlenebilir; yoksa varsayılan.
+  const page = await getPage("iletisim");
+  const heroTitle = page?.title?.trim() || FALLBACK_TITLE;
+  const heroIntro = page?.excerpt?.trim() || FALLBACK_INTRO;
+
   return (
     <main className="pt-28 md:pt-36 pb-28">
       <div className="container max-w-5xl">
@@ -82,71 +91,14 @@ export default function IletisimPage() {
         </div>
 
         <h1 className="mt-5 font-serif text-3xl md:text-4xl leading-[1.05] tracking-tight text-balance font-semibold max-w-3xl">
-          Merhaba de — aramızdan birine denk gelirsin.
+          {heroTitle}
         </h1>
 
-        <p className="mt-5 text-lg text-muted-foreground max-w-2xl">
-          Sorun, fikrin, iş birliği teklifin mi var? En hızlı yanıtı Instagram DM
-          üzerinden alırsın. Daha detaylı konular için e-posta ya da formu kullan.
-        </p>
+        <p className="mt-5 text-lg text-muted-foreground max-w-2xl">{heroIntro}</p>
 
         <div className="mt-16 grid lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-16">
-          {/* Contact form */}
-          <form className="space-y-5">
-            <div className="text-xs font-mono uppercase tracking-[0.22em] text-muted-foreground mb-2">
-              01 / Form
-            </div>
-            <h2 className="font-serif text-2xl md:text-3xl font-semibold tracking-tight">
-              Bize bir mesaj bırak
-            </h2>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-                  Ad Soyad
-                </label>
-                <Input className="mt-2" placeholder="Adını yaz" />
-              </div>
-              <div>
-                <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-                  E-posta
-                </label>
-                <Input type="email" className="mt-2" placeholder="ornek@eposta.com" />
-              </div>
-            </div>
-            <div>
-              <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-                Konu
-              </label>
-              <select className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
-                <option>Genel</option>
-                <option>Etkinlik önerisi</option>
-                <option>İş birliği / sponsorluk</option>
-                <option>Medya / basın</option>
-                <option>KVKK / gizlilik</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
-                Mesajın
-              </label>
-              <textarea
-                rows={6}
-                placeholder="Bir şey soracak mısın, paylaşmak ister misin?"
-                className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-              />
-            </div>
-            <Button size="lg" className="w-full sm:w-auto">
-              Mesajı gönder
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              Gönderdiğin bilgiler yalnız bu konuyu cevaplamak için kullanılır.
-              Detay için{" "}
-              <Link className="underline hover:text-primary" href="/kvkk">
-                KVKK aydınlatma metni
-              </Link>
-              .
-            </p>
-          </form>
+          {/* Contact form — gerçek /submissions POST */}
+          <ContactForm />
 
           {/* Channels + meta */}
           <div className="space-y-10">
