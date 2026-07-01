@@ -198,15 +198,50 @@ export function RadioPlayer() {
   const list = q.trim().length >= 2 || tag || country ? results : FAVORITES;
   const GENRES = [
     { l: "Türkçe", t: "turkish" },
-    { l: "Pop", t: "pop" },
-    { l: "Dance", t: "dance" },
-    { l: "Jazz", t: "jazz" },
-    { l: "Lofi", t: "lofi" },
-    { l: "Rock", t: "rock" },
-    { l: "Chill", t: "chillout" },
+    { l: "Türkü", t: "türkü" },
     { l: "Arabesk", t: "arabesk" },
+    { l: "Damar", t: "damar" },
     { l: "Slow", t: "slow" },
+    { l: "Nostalji", t: "nostalji" },
+    { l: "Pop", t: "pop" },
+    { l: "Rock", t: "rock" },
+    { l: "Dance", t: "dance" },
+    { l: "Elektronik", t: "electronic" },
+    { l: "House", t: "house" },
+    { l: "Techno", t: "techno" },
+    { l: "Trance", t: "trance" },
+    { l: "EDM", t: "edm" },
+    { l: "Deep House", t: "deep house" },
+    { l: "Hip-Hop", t: "hip hop" },
+    { l: "Rap", t: "rap" },
+    { l: "R&B", t: "rnb" },
+    { l: "Jazz", t: "jazz" },
+    { l: "Blues", t: "blues" },
+    { l: "Soul", t: "soul" },
+    { l: "Funk", t: "funk" },
+    { l: "Disco", t: "disco" },
+    { l: "Reggae", t: "reggae" },
+    { l: "Latin", t: "latin" },
+    { l: "Klasik", t: "classical" },
+    { l: "Opera", t: "opera" },
+    { l: "Metal", t: "metal" },
+    { l: "Punk", t: "punk" },
+    { l: "Indie", t: "indie" },
+    { l: "Alternatif", t: "alternative" },
+    { l: "Folk", t: "folk" },
+    { l: "Country", t: "country" },
+    { l: "Akustik", t: "acoustic" },
+    { l: "Lofi", t: "lofi" },
+    { l: "Chill", t: "chillout" },
+    { l: "Lounge", t: "lounge" },
+    { l: "Ambient", t: "ambient" },
+    { l: "80'ler", t: "80s" },
+    { l: "90'lar", t: "90s" },
+    { l: "Oldies", t: "oldies" },
+    { l: "K-Pop", t: "k-pop" },
+    { l: "Meditasyon", t: "meditation" },
     { l: "Haber", t: "news" },
+    { l: "Spor", t: "sport" },
   ];
 
   const Eq = () => (
@@ -255,6 +290,7 @@ export function RadioPlayer() {
         >
           <span className="flex items-center gap-2 text-xs font-medium text-foreground">
             <Music2 className="h-3.5 w-3.5 text-primary" /> Türler
+            <span className="text-[10px] text-muted-foreground/60">{GENRES.length}</span>
           </span>
           <span className="flex items-center gap-1.5">
             {genreLabel && openCat !== "genre" && (
@@ -264,15 +300,17 @@ export function RadioPlayer() {
           </span>
         </button>
         {openCat === "genre" && (
-          <div className="flex flex-wrap gap-1.5 px-3 pb-3">
-            {GENRES.map((g) => {
-              const on = tag === g.t && !q.trim();
-              return (
-                <button key={g.t} onClick={() => { setQ(""); setCountry(""); setTag(on ? "" : g.t); }} className={chip(on)}>
-                  {g.l}
-                </button>
-              );
-            })}
+          <div className="max-h-44 overflow-y-auto px-3 pb-3">
+            <div className="flex flex-wrap gap-1.5">
+              {GENRES.map((g) => {
+                const on = tag === g.t && !q.trim();
+                return (
+                  <button key={g.t} onClick={() => { setQ(""); setCountry(""); setTag(on ? "" : g.t); }} className={chip(on)}>
+                    {g.l}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
