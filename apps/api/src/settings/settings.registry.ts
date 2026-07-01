@@ -9,7 +9,7 @@
 export interface SettingDef {
   key: string;
   env: string;
-  category: 'auth' | 'payment' | 'push' | 'mail' | 'sms' | 'general';
+  category: 'auth' | 'payment' | 'push' | 'mail' | 'sms' | 'storage' | 'general';
   isSecret: boolean;
   label: string;
   /** DB ve env yoksa kullanılan varsayılan (yalnız public değerler için). */
@@ -128,6 +128,52 @@ export const SETTINGS_REGISTRY: SettingDef[] = [
     category: 'sms',
     isSecret: true,
     label: 'Netgsm şifresi',
+  },
+
+  // Storage (Cloudflare R2 / S3-uyumlu) — görsel & video yükleme (presigned PUT).
+  // R2 credentials'ı buraya girin; bucket CORS'unu Cloudflare panelinden site origin'ine açın.
+  {
+    key: 'storage.endpoint',
+    env: 'S3_ENDPOINT',
+    category: 'storage',
+    isSecret: false,
+    label: 'Depolama Endpoint (R2: https://<accountid>.r2.cloudflarestorage.com)',
+  },
+  {
+    key: 'storage.bucket',
+    env: 'S3_BUCKET',
+    category: 'storage',
+    isSecret: false,
+    label: 'Bucket adı',
+  },
+  {
+    key: 'storage.accessKeyId',
+    env: 'S3_ACCESS_KEY',
+    category: 'storage',
+    isSecret: true,
+    label: 'Access Key ID (R2 API token)',
+  },
+  {
+    key: 'storage.secretAccessKey',
+    env: 'S3_SECRET_KEY',
+    category: 'storage',
+    isSecret: true,
+    label: 'Secret Access Key',
+  },
+  {
+    key: 'storage.region',
+    env: 'S3_REGION',
+    category: 'storage',
+    isSecret: false,
+    label: "Region (R2 için 'auto', MinIO için 'us-east-1')",
+    default: 'auto',
+  },
+  {
+    key: 'storage.publicBaseUrl',
+    env: 'S3_PUBLIC_URL',
+    category: 'storage',
+    isSecret: false,
+    label: 'Public URL tabanı (R2 public/custom domain, ör. https://cdn.lucaclub.com.tr) — boşsa nesneler herkese açık olmaz',
   },
 ];
 

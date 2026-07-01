@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import { MediaUpload } from "@/components/admin/media-upload";
 
 const KINDS = [
   { v: "PARTY", l: "Parti / Gece" },
@@ -186,8 +187,11 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
           </div>
         </div>
         <div>
-          <label className={LABEL}>Kapak görseli (URL/yol)</label>
-          <input className={FIELD} value={f.coverUrl} onChange={(e) => set("coverUrl", e.target.value)} placeholder="/img/events/slug.jpg" />
+          <label className={LABEL}>Kapak görseli</label>
+          <input className={FIELD} value={f.coverUrl} onChange={(e) => set("coverUrl", e.target.value)} placeholder="/img/events/slug.jpg  ·  ya da yükle →" />
+          <div className="mt-2">
+            <MediaUpload kind="image" folder="events" value={f.coverUrl} onChange={(url) => set("coverUrl", url)} />
+          </div>
         </div>
         <div>
           <label className={LABEL}>Kısa açıklama (tagline)</label>
@@ -278,15 +282,23 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
             </div>
           </div>
           <div>
-            <label className={LABEL}>Yayın URL'si (HLS .m3u8 · YouTube · embed)</label>
+            <label className={LABEL}>Yayın kaynağı</label>
+            <div className="mb-2">
+              <MediaUpload
+                kind="video"
+                folder="videos"
+                onChange={(url) => set("streamUrl", url)}
+                buttonLabel="Video yükle (R2 · mp4)"
+              />
+            </div>
             <input
               className={FIELD}
               value={f.streamUrl}
               onChange={(e) => set("streamUrl", e.target.value)}
-              placeholder="https://… .m3u8  veya  https://youtube.com/watch?v=…"
+              placeholder="…ya da URL yapıştır: https://… .m3u8  ·  youtube.com/watch?v=…"
             />
             <p className="mt-1 text-[11px] text-muted-foreground">
-              Yayını OBS/telefon → herhangi bir sağlayıcıya (YouTube Live, Mux, Cloudflare) gönder; oynatma linkini buraya yapıştır. Altyapıyı biz çalıştırmayız.
+              Dosya yükle (R2'ye kaydolur, mp4 olarak oynar) ya da URL yapıştır. YouTube Live/video ve HLS (.m3u8) oynatılır; Instagram gömülemez (yalnız link kalır).
             </p>
           </div>
           {f.streamAccess === "PAID" && (
