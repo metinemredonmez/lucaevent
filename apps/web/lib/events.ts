@@ -46,7 +46,7 @@ export type DiscoverEvent = {
 export type DiscoverParams = {
   q?: string;
   categoryId?: string;
-  range?: "today" | "tomorrow" | "weekend" | "upcoming";
+  range?: "today" | "tomorrow" | "weekend" | "upcoming" | "past";
   take?: number;
 };
 

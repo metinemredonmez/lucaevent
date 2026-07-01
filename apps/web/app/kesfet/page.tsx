@@ -12,6 +12,7 @@ const RANGES = [
   { v: "today", l: "Bugün" },
   { v: "tomorrow", l: "Yarın" },
   { v: "weekend", l: "Hafta sonu" },
+  { v: "past", l: "Geçmiş" },
 ] as const;
 type Range = (typeof RANGES)[number]["v"];
 
