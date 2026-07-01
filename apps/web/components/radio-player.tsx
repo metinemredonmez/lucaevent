@@ -83,6 +83,10 @@ async function rbFetch(path: string): Promise<any[]> {
 export function RadioPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const wantRef = useRef(false); // kullanıcı çalmasını istiyor mu (reconnect kararı)
+  const curRef = useRef<Station>(FAVORITES[0]); // aktif istasyon (event closure'ları için)
+  const retryRef = useRef(0); // ardışık yeniden bağlanma denemesi
+  const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pathname = usePathname();
   const isAdmin = !!pathname && pathname.startsWith("/admin");
   const [current, setCurrent] = useState<Station>(FAVORITES[0]);
@@ -163,35 +167,91 @@ export function RadioPlayer() {
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
+  // reconnect timer'ını unmount'ta temizle
+  useEffect(() => () => { if (reconnectRef.current) clearTimeout(reconnectRef.current); }, []);
+
+  // sekme/uygulama arka plandan dönünce, çalması isteniyorsa ama duraksadıysa devam ettir
+  useEffect(() => {
+    const onVis = () => {
+      const a = audioRef.current;
+      if (document.visibilityState === "visible" && wantRef.current && a && a.paused) {
+        retryRef.current = 0;
+        try { a.src = curRef.current.url; a.play().catch(() => {}); } catch { /* yoksay */ }
+      }
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => document.removeEventListener("visibilitychange", onVis);
+  }, []);
+
+  // Yayın koparsa (ücretsiz radyolar sık koparır) istek varsa üssel backoff'la yeniden bağlan.
+  function scheduleReconnect() {
+    if (!wantRef.current) { setLoading(false); setPlaying(false); return; }
+    if (reconnectRef.current) return; // zaten planlı
+    if (retryRef.current >= 6) { // ~1 dk boyunca gelmiyorsa vazgeç
+      wantRef.current = false;
+      setLoading(false);
+      setPlaying(false);
+      return;
+    }
+    setPlaying(false);
+    setLoading(true);
+    const delay = Math.min(1500 * 2 ** retryRef.current, 15000); // 1.5s → 15s
+    reconnectRef.current = setTimeout(() => {
+      reconnectRef.current = null;
+      const a = audioRef.current;
+      if (!a || !wantRef.current) return;
+      retryRef.current += 1;
+      try {
+        a.src = curRef.current.url; // aynı yayına yeniden bağlan
+        a.play().catch(() => scheduleReconnect());
+      } catch {
+        scheduleReconnect();
+      }
+    }, delay);
+  }
+
   function audio() {
     if (!audioRef.current) {
       const a = new Audio();
       a.preload = "none";
       a.volume = 0.6;
-      a.onplaying = () => { setPlaying(true); setLoading(false); };
-      a.onpause = () => setPlaying(false);
+      a.onplaying = () => { setPlaying(true); setLoading(false); retryRef.current = 0; };
+      a.onpause = () => { if (!wantRef.current) setPlaying(false); };
       a.onwaiting = () => setLoading(true);
-      a.onerror = () => { setLoading(false); setPlaying(false); };
+      a.onstalled = () => scheduleReconnect();
+      a.onended = () => scheduleReconnect();
+      a.onerror = () => scheduleReconnect();
       audioRef.current = a;
     }
     return audioRef.current;
   }
 
-  function play(s: Station) {
+  function startPlaying(s: Station) {
     const a = audio();
     setCurrent(s);
+    curRef.current = s;
+    wantRef.current = true;
+    retryRef.current = 0;
+    if (reconnectRef.current) { clearTimeout(reconnectRef.current); reconnectRef.current = null; }
     setLoading(true);
     a.src = s.url;
-    a.play().catch(() => { setLoading(false); setPlaying(false); });
+    a.play().catch(() => scheduleReconnect());
+  }
+
+  function play(s: Station) {
+    startPlaying(s);
   }
 
   function toggle() {
-    const a = audio();
-    if (playing) a.pause();
-    else {
-      if (!a.src) a.src = current.url;
-      setLoading(true);
-      a.play().catch(() => { setLoading(false); setPlaying(false); });
+    if (wantRef.current) {
+      // kullanıcı durdurdu → reconnect'i iptal et
+      wantRef.current = false;
+      if (reconnectRef.current) { clearTimeout(reconnectRef.current); reconnectRef.current = null; }
+      audioRef.current?.pause();
+      setPlaying(false);
+      setLoading(false);
+    } else {
+      startPlaying(current);
     }
   }
 
