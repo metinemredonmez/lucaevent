@@ -689,6 +689,18 @@ Aynı şarkıya kapılan yabancılar gece bitmeden tanıdık olur. Luca geceleri
     }
   }
 
+  // ---------- demo canlı yayın (harita canlı pin + /canli dolsun) ----------
+  // Yalnız dokunulmamışsa ayarla (admin kapatırsa seed geri açmaz).
+  await prisma.event.updateMany({
+    where: { slug: upcomingSlug || 'sunset-yoga-sound-healing', liveStatus: 'OFFLINE', streamUrl: null },
+    data: {
+      liveStatus: 'LIVE',
+      streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', // Mux herkese açık test HLS
+      streamAccess: 'PUBLIC',
+      liveStartedAt: new Date(),
+    },
+  });
+
   console.log('✅  Seed complete.');
   console.log(`   Categories: ${catData.length} · Events: ${events.length + 1}`);
   console.log(`   First upcoming: ${upcomingSlug}`);

@@ -23,24 +23,29 @@ export function RadioPlayer() {
   const [open, setOpen] = useState(false);
 
   const [q, setQ] = useState("");
+  const [tag, setTag] = useState(""); // tür filtresi (radio-browser tag)
   const [results, setResults] = useState<Station[]>([]);
   const [searching, setSearching] = useState(false);
 
-  // Debounced radio-browser arama (ücretsiz, anahtarsız; yalnız HTTPS stream'ler)
+  // Debounced radio-browser arama/filtre (ücretsiz, anahtarsız; yalnız HTTPS stream'ler)
   useEffect(() => {
     const query = q.trim();
-    if (query.length < 2) { setResults([]); setSearching(false); return; }
+    const byName = query.length >= 2;
+    if (!byName && !tag) { setResults([]); setSearching(false); return; }
     setSearching(true);
     const t = setTimeout(async () => {
       try {
+        const param = byName ? `name=${encodeURIComponent(query)}` : `tag=${encodeURIComponent(tag)}`;
         const r = await fetch(
-          `https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(query)}&limit=25&hidebroken=true&order=clickcount&reverse=true`,
+          `https://de1.api.radio-browser.info/json/stations/search?${param}&limit=40&hidebroken=true&order=clickcount&reverse=true`,
         );
         const data: any[] = await r.json();
+        const seen = new Set<string>();
         setResults(
           data
             .filter((s) => typeof s.url_resolved === "string" && s.url_resolved.startsWith("https"))
-            .slice(0, 12)
+            .filter((s) => { const k = s.url_resolved; if (seen.has(k)) return false; seen.add(k); return true; })
+            .slice(0, 16)
             .map((s) => ({
               name: (s.name || "—").trim().slice(0, 32),
               tag: [s.countrycode, (s.tags || "").split(",")[0]].filter(Boolean).join(" · ").slice(0, 34),
@@ -53,9 +58,9 @@ export function RadioPlayer() {
       } finally {
         setSearching(false);
       }
-    }, 450);
+    }, 400);
     return () => clearTimeout(t);
-  }, [q]);
+  }, [q, tag]);
 
   // dışarı tıklayınca paneli kapat
   useEffect(() => {
@@ -98,7 +103,19 @@ export function RadioPlayer() {
     }
   }
 
-  const list = q.trim().length >= 2 ? results : FAVORITES;
+  const list = q.trim().length >= 2 || tag ? results : FAVORITES;
+  const GENRES = [
+    { l: "Türkçe", t: "turkish" },
+    { l: "Pop", t: "pop" },
+    { l: "Dance", t: "dance" },
+    { l: "Jazz", t: "jazz" },
+    { l: "Lofi", t: "lofi" },
+    { l: "Rock", t: "rock" },
+    { l: "Chill", t: "chillout" },
+    { l: "Arabesk", t: "arabesk" },
+    { l: "Slow", t: "slow" },
+    { l: "Haber", t: "news" },
+  ];
 
   const Eq = () => (
     <span className="flex h-3 items-end gap-[2px]">
@@ -148,22 +165,42 @@ export function RadioPlayer() {
 
         {/* panel */}
         {open && (
-          <div className="absolute right-0 top-full mt-1.5 w-72 overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
-            <div className="flex items-center gap-2 border-b border-border px-3 py-2">
-              <Search className="h-3.5 w-3.5 text-muted-foreground" />
+          <div className="absolute right-0 top-full mt-1.5 w-[min(25rem,calc(100vw-1rem))] overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
+            <div className="flex items-center gap-2 border-b border-border px-3 py-2.5">
+              <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
               <input
                 value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Radyo ara… (jazz, türkçe, lofi)"
+                onChange={(e) => { setQ(e.target.value); if (e.target.value) setTag(""); }}
+                placeholder="İstasyon adı ara…"
                 className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
               />
               {q && (
                 <button onClick={() => setQ("")} aria-label="Temizle">
-                  <X className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+                  <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                 </button>
               )}
             </div>
-            <div className="max-h-72 overflow-y-auto p-1.5">
+            {/* tür filtreleri */}
+            <div className="flex flex-wrap gap-1.5 border-b border-border px-3 py-2.5">
+              {GENRES.map((g) => {
+                const on = tag === g.t && !q.trim();
+                return (
+                  <button
+                    key={g.t}
+                    onClick={() => { setQ(""); setTag(on ? "" : g.t); }}
+                    className={`rounded-full px-2.5 py-1 text-[11px] transition ${
+                      on ? "bg-primary text-white" : "border border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {g.l}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="max-h-80 overflow-y-auto p-1.5">
+              <div className="px-2 pb-1 pt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground/60">
+                {q.trim().length >= 2 ? "Arama sonuçları" : tag ? GENRES.find((g) => g.t === tag)?.l : "Favoriler"}
+              </div>
               {searching && (
                 <div className="flex items-center gap-2 px-3 py-3 text-xs text-muted-foreground">
                   <Loader2 className="h-3.5 w-3.5 animate-spin" /> aranıyor…
