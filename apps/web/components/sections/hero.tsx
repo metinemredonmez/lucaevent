@@ -6,35 +6,46 @@ import { Button } from "@/components/ui/button";
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
 import { Spotlight } from "@/components/ui/spotlight";
 import { ArrowRight } from "lucide-react";
+import { discoverEvents } from "@/lib/events";
 
-/** Hero arka planında crossfade ile geçen atmosferik kareler.
- *  En yatay/sinematik etkinlik görsellerinden beslenir — ayrı hero indirmesi gerekmez.
+/** Hero arka planında crossfade ile geçen atmosferik kareler (gerçek etkinlik görselleri).
  *  Dosya yoksa (onError) gizlenir, alttaki canlı mor gradyan görünür. */
 const SLIDES = [
-  "/img/events/bogaz-gun-batimi-tekne.jpg",
-  "/img/events/luca-006-kadikoy.jpg",
-  "/img/events/belgrad-sabah-kosusu.jpg",
-  "/img/events/sunset-yoga-sound-healing.jpg",
-  "/img/events/luca-camp-2026.jpg",
+  "/img/events/sile-kampi.jpg",
+  "/img/events/yaza-merhaba-burgazada.jpg",
+  "/img/events/parfum-workshopu.jpg",
 ];
 
-/** Şemsiye modeli vitrine taşıyan dönen "an"lar. */
-const MOMENTS = [
-  "🧘  Sunset yoga & ses banyosu",
-  "⛵  Boğaz’da gün batımı teknesi",
-  "🎨  Seramik atölyesi",
-  "🏃  Belgrad’da sabah koşusu",
-  "🍷  Rooftop’ta şarap & peynir",
-  "🎶  Gece · DJ set",
-];
+// kategori → emoji (API slug'ları) — "Bu hafta:" tickerında etkinlik başına ikon
+const CAT_EMOJI: Record<string, string> = {
+  wellness: "🧘",
+  "outdoor-spor": "🏃",
+  "gezi-seyahat": "⛵",
+  workshop: "🎨",
+  social: "☕",
+  "food-drink": "🍷",
+  business: "💼",
+  nightlife: "🎶",
+};
+const FALLBACK_MOMENTS = ["✨  Şehirde yeni anlar", "🎟️  Yaklaşan etkinlikler seni bekliyor"];
 
 export function Hero() {
   const [slide, setSlide] = useState(0);
   const [moment, setMoment] = useState(0);
+  const [moments, setMoments] = useState<string[]>(FALLBACK_MOMENTS);
+
+  useEffect(() => {
+    discoverEvents({ range: "upcoming", take: 8 })
+      .then((evs) => {
+        const list = evs.map((e) => `${CAT_EMOJI[e.category?.slug ?? ""] ?? "✨"}  ${e.title}`);
+        if (list.length) setMoments(list);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const s = setInterval(() => setSlide((i) => (i + 1) % SLIDES.length), 5500);
-    const m = setInterval(() => setMoment((i) => (i + 1) % MOMENTS.length), 2600);
+    const m = setInterval(() => setMoment((i) => i + 1), 2600);
     return () => {
       clearInterval(s);
       clearInterval(m);
@@ -141,7 +152,7 @@ export function Hero() {
                 transition={{ duration: 0.35, ease: "easeOut" }}
                 className="text-white/80"
               >
-                {MOMENTS[moment]}
+                {moments[moment % moments.length]}
               </motion.span>
             </AnimatePresence>
           </div>

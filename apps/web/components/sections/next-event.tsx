@@ -48,15 +48,19 @@ export function NextEvent() {
     <section className="container pt-4">
       <Link
         href={`/etkinlik/${ev.slug}`}
-        className="group flex flex-col gap-4 rounded-2xl border border-primary/25 bg-gradient-to-r from-[#6366F1]/12 via-card to-[#8B5CF6]/12 p-4 sm:flex-row sm:items-center sm:justify-between"
+        className="group flex flex-col gap-4 rounded-2xl border border-primary/25 bg-gradient-to-r from-[#6366F1]/12 via-card to-[#8B5CF6]/12 p-4 transition-colors hover:border-primary/45 sm:flex-row sm:items-center sm:justify-between"
       >
-        <div className="flex items-center gap-3">
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
+        <div className="flex items-center gap-3.5">
+          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-white shadow-sm">
             <CalendarClock className="size-5" />
           </span>
           <div className="min-w-0">
-            <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-primary/70">
-              Sıradaki etkinlik · geri sayım
+            <div className="mb-0.5 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-primary/80">
+              <span className="relative flex size-1.5">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary/70" />
+                <span className="relative inline-flex size-1.5 rounded-full bg-primary" />
+              </span>
+              Sıradaki etkinlik
             </div>
             <div className="truncate font-serif text-lg font-semibold leading-tight">{ev.title}</div>
             <div className="truncate text-xs text-muted-foreground">
@@ -66,17 +70,16 @@ export function NextEvent() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:gap-2.5">
           {cells.map(([label, val]) => (
-            <div
-              key={label}
-              className="min-w-[54px] rounded-xl border border-border bg-background/60 px-2 py-1.5 text-center"
-            >
-              <div className="font-mono text-xl font-semibold tabular-nums">{pad(val)}</div>
-              <div className="text-[9px] uppercase tracking-wider text-muted-foreground">{label}</div>
+            <div key={label} className="flex flex-col items-center">
+              <div className="grid size-12 place-items-center rounded-xl border border-primary/20 bg-primary/10 font-mono text-2xl font-semibold tabular-nums text-foreground sm:size-14 sm:text-[26px]">
+                {pad(val)}
+              </div>
+              <div className="mt-1 text-[9px] font-medium uppercase tracking-wider text-muted-foreground">{label}</div>
             </div>
           ))}
-          <ArrowRight className="hidden size-5 text-primary transition-transform group-hover:translate-x-1 sm:block" />
+          <ArrowRight className="hidden size-5 shrink-0 text-primary transition-transform group-hover:translate-x-1 sm:block" />
         </div>
       </Link>
     </section>
