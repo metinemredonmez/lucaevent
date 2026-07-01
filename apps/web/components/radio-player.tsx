@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Play, Pause, Radio, Loader2, Search, X, ChevronDown, ChevronUp } from "lucide-react";
+import { Play, Pause, Radio, Loader2, Search, X, ChevronDown, ChevronUp, Globe2, Music2 } from "lucide-react";
 
 type Station = { name: string; tag: string; color: string; url: string };
 
@@ -15,7 +15,7 @@ const FAVORITES: Station[] = [
   { name: "Süper FM", tag: "türkçe pop", color: "#34D399", url: "https://playerservices.streamtheworld.com/api/livestream-redirect/SUPER_FM.mp3" },
 ];
 
-// dünya kategorileri (ülke) — radio-browser countrycode
+// dünya kategorileri (ülke) — radio-browser countrycode (ISO 3166-1 alpha-2)
 const COUNTRIES = [
   { l: "🇹🇷 Türkiye", c: "TR" },
   { l: "🇺🇸 ABD", c: "US" },
@@ -25,6 +25,39 @@ const COUNTRIES = [
   { l: "🇮🇹 İtalya", c: "IT" },
   { l: "🇪🇸 İspanya", c: "ES" },
   { l: "🇳🇱 Hollanda", c: "NL" },
+  { l: "🇷🇺 Rusya", c: "RU" },
+  { l: "🇺🇦 Ukrayna", c: "UA" },
+  { l: "🇬🇷 Yunanistan", c: "GR" },
+  { l: "🇵🇹 Portekiz", c: "PT" },
+  { l: "🇸🇪 İsveç", c: "SE" },
+  { l: "🇳🇴 Norveç", c: "NO" },
+  { l: "🇩🇰 Danimarka", c: "DK" },
+  { l: "🇫🇮 Finlandiya", c: "FI" },
+  { l: "🇵🇱 Polonya", c: "PL" },
+  { l: "🇧🇪 Belçika", c: "BE" },
+  { l: "🇨🇭 İsviçre", c: "CH" },
+  { l: "🇦🇹 Avusturya", c: "AT" },
+  { l: "🇮🇪 İrlanda", c: "IE" },
+  { l: "🇨🇿 Çekya", c: "CZ" },
+  { l: "🇷🇴 Romanya", c: "RO" },
+  { l: "🇭🇺 Macaristan", c: "HU" },
+  { l: "🇨🇦 Kanada", c: "CA" },
+  { l: "🇲🇽 Meksika", c: "MX" },
+  { l: "🇧🇷 Brezilya", c: "BR" },
+  { l: "🇦🇷 Arjantin", c: "AR" },
+  { l: "🇯🇵 Japonya", c: "JP" },
+  { l: "🇰🇷 G. Kore", c: "KR" },
+  { l: "🇨🇳 Çin", c: "CN" },
+  { l: "🇮🇳 Hindistan", c: "IN" },
+  { l: "🇦🇺 Avustralya", c: "AU" },
+  { l: "🇸🇦 S. Arabistan", c: "SA" },
+  { l: "🇦🇪 BAE", c: "AE" },
+  { l: "🇪🇬 Mısır", c: "EG" },
+  { l: "🇲🇦 Fas", c: "MA" },
+  { l: "🇿🇦 G. Afrika", c: "ZA" },
+  { l: "🇦🇿 Azerbaycan", c: "AZ" },
+  { l: "🇮🇷 İran", c: "IR" },
+  { l: "🇮🇱 İsrail", c: "IL" },
 ];
 
 // birden çok radio-browser mirror'ı — biri düşerse diğerine geç (drive-tune yaklaşımı)
@@ -86,6 +119,7 @@ export function RadioPlayer() {
   const [country, setCountry] = useState(""); // ülke filtresi (countrycode)
   const [results, setResults] = useState<Station[]>([]);
   const [searching, setSearching] = useState(false);
+  const [openCat, setOpenCat] = useState<"genre" | "world" | null>("genre"); // açılır kategori
 
   // Debounced radio-browser arama/filtre (ücretsiz, anahtarsız; çoklu mirror fallback)
   useEffect(() => {
@@ -187,9 +221,17 @@ export function RadioPlayer() {
     </span>
   );
 
-  // dropdown içeriği — admin/public ortak; yalnız konumu değişir
+  // seçili filtrelerin etiketleri (kapalı kategori başlığında rozet olarak gösterilir)
+  const genreLabel = tag ? GENRES.find((g) => g.t === tag)?.l : null;
+  const countryLabel = country ? COUNTRIES.find((c) => c.c === country)?.l : null;
+  const chip = (on: boolean) =>
+    `rounded-full px-2.5 py-1 text-[11px] transition ${on ? "bg-primary text-white" : "border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"}`;
+
+  // dropdown içeriği — admin/public ortak; yalnız konumu değişir.
+  // Açılır kategoriler (accordion): Türler + Dünya. Aynı anda tek kategori açık.
   const panelBody = (
     <div className="w-[min(25rem,calc(100vw-1rem))] overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
+      {/* arama */}
       <div className="flex items-center gap-2 border-b border-border px-3 py-2.5">
         <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
         <input
@@ -204,32 +246,74 @@ export function RadioPlayer() {
           </button>
         )}
       </div>
-      <div className="flex flex-wrap gap-1.5 border-b border-border px-3 py-2.5">
-        {GENRES.map((g) => {
-          const on = tag === g.t && !q.trim();
-          return (
-            <button key={g.t} onClick={() => { setQ(""); setCountry(""); setTag(on ? "" : g.t); }}
-              className={`rounded-full px-2.5 py-1 text-[11px] transition ${on ? "bg-primary text-white" : "border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"}`}>
-              {g.l}
-            </button>
-          );
-        })}
+
+      {/* kategori: Türler (açılır) */}
+      <div className="border-b border-border">
+        <button
+          onClick={() => setOpenCat((c) => (c === "genre" ? null : "genre"))}
+          className="flex w-full items-center justify-between px-3 py-2.5 text-left transition-colors hover:bg-muted/40"
+        >
+          <span className="flex items-center gap-2 text-xs font-medium text-foreground">
+            <Music2 className="h-3.5 w-3.5 text-primary" /> Türler
+          </span>
+          <span className="flex items-center gap-1.5">
+            {genreLabel && openCat !== "genre" && (
+              <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] text-primary">{genreLabel}</span>
+            )}
+            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${openCat === "genre" ? "rotate-180" : ""}`} />
+          </span>
+        </button>
+        {openCat === "genre" && (
+          <div className="flex flex-wrap gap-1.5 px-3 pb-3">
+            {GENRES.map((g) => {
+              const on = tag === g.t && !q.trim();
+              return (
+                <button key={g.t} onClick={() => { setQ(""); setCountry(""); setTag(on ? "" : g.t); }} className={chip(on)}>
+                  {g.l}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
-      <div className="flex flex-wrap items-center gap-1.5 border-b border-border px-3 py-2.5">
-        <span className="mr-0.5 text-[10px] uppercase tracking-wider text-muted-foreground/50">Dünya</span>
-        {COUNTRIES.map((c) => {
-          const on = country === c.c && !q.trim() && !tag;
-          return (
-            <button key={c.c} onClick={() => { setQ(""); setTag(""); setCountry(on ? "" : c.c); }}
-              className={`rounded-full px-2.5 py-1 text-[11px] transition ${on ? "bg-primary text-white" : "border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"}`}>
-              {c.l}
-            </button>
-          );
-        })}
+
+      {/* kategori: Dünya · Ülkeler (açılır, çok ülke → kendi içinde kayar) */}
+      <div className="border-b border-border">
+        <button
+          onClick={() => setOpenCat((c) => (c === "world" ? null : "world"))}
+          className="flex w-full items-center justify-between px-3 py-2.5 text-left transition-colors hover:bg-muted/40"
+        >
+          <span className="flex items-center gap-2 text-xs font-medium text-foreground">
+            <Globe2 className="h-3.5 w-3.5 text-primary" /> Dünya · Ülkeler
+            <span className="text-[10px] text-muted-foreground/60">{COUNTRIES.length}</span>
+          </span>
+          <span className="flex items-center gap-1.5">
+            {countryLabel && openCat !== "world" && (
+              <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] text-primary">{countryLabel}</span>
+            )}
+            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${openCat === "world" ? "rotate-180" : ""}`} />
+          </span>
+        </button>
+        {openCat === "world" && (
+          <div className="max-h-44 overflow-y-auto px-3 pb-3">
+            <div className="flex flex-wrap gap-1.5">
+              {COUNTRIES.map((c) => {
+                const on = country === c.c && !q.trim() && !tag;
+                return (
+                  <button key={c.c} onClick={() => { setQ(""); setTag(""); setCountry(on ? "" : c.c); }} className={chip(on)}>
+                    {c.l}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
-      <div className="max-h-80 overflow-y-auto p-1.5">
+
+      {/* istasyon listesi */}
+      <div className="max-h-72 overflow-y-auto p-1.5">
         <div className="px-2 pb-1 pt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground/60">
-          {q.trim().length >= 2 ? "Arama sonuçları" : tag ? GENRES.find((g) => g.t === tag)?.l : country ? COUNTRIES.find((c) => c.c === country)?.l : "Favoriler"}
+          {q.trim().length >= 2 ? "Arama sonuçları" : genreLabel ? genreLabel : countryLabel ? countryLabel : "Favoriler"}
         </div>
         {searching && (
           <div className="flex items-center gap-2 px-3 py-3 text-xs text-muted-foreground">
