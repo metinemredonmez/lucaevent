@@ -112,6 +112,63 @@ export class NotificationsService {
     });
   }
 
+  /**
+   * Detaylı gönderim: hedef (herkes / belirli etkinlik katılımcıları) +
+   * kanal (uygulama-içi çan / OneSignal push). Uygulama-içi anahtar gerektirmez.
+   */
+  async dispatch(o: {
+    title: string;
+    message: string;
+    url?: string;
+    target: 'all' | 'event';
+    eventId?: string;
+    inapp: boolean;
+    push: boolean;
+  }): Promise<{ recipients: number; inapp: number; push: unknown }> {
+    // hedef kullanıcıları çöz
+    let userIds: string[] = [];
+    if (o.target === 'event' && o.eventId) {
+      const rows = await this.prisma.order.findMany({
+        where: { eventId: o.eventId, status: 'PAID', userId: { not: null } },
+        select: { userId: true },
+        distinct: ['userId'],
+      });
+      userIds = rows.map((r) => r.userId!).filter(Boolean);
+    } else {
+      const rows = await this.prisma.user.findMany({
+        where: { isActive: true },
+        select: { id: true },
+      });
+      userIds = rows.map((r) => r.id);
+    }
+
+    // uygulama-içi (çan) — anahtar gerekmez
+    let inapp = 0;
+    if (o.inapp && userIds.length) {
+      await this.prisma.notification.createMany({
+        data: userIds.map((userId) => ({
+          userId,
+          type: 'admin',
+          title: o.title,
+          body: o.message || null,
+          href: o.url || null,
+        })),
+      });
+      inapp = userIds.length;
+    }
+
+    // push
+    let push: unknown = { skipped: true, reason: 'push kapalı' };
+    if (o.push) {
+      push =
+        o.target === 'all'
+          ? await this.broadcast(o.title, o.message, { url: o.url })
+          : await this.sendToUsers(userIds, o.title, o.message, { url: o.url });
+    }
+
+    return { recipients: userIds.length, inapp, push };
+  }
+
   sendToUsers(
     externalUserIds: string[],
     title: string,

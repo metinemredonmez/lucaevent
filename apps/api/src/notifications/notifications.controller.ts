@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 
 import { NotificationsService } from './notifications.service';
-import { BroadcastDto, SendToUsersDto } from './dto/notification.dto';
+import { BroadcastDto, DispatchDto, SendToUsersDto } from './dto/notification.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -33,6 +33,20 @@ export class NotificationsController {
   send(@Body() dto: SendToUsersDto) {
     return this.notifications.sendToUsers(dto.userIds, dto.title, dto.message, {
       url: dto.url,
+    });
+  }
+
+  // detaylı gönderim: hedef (herkes/etkinlik) + kanal (uygulama-içi/push)
+  @Post('dispatch')
+  dispatch(@Body() dto: DispatchDto) {
+    return this.notifications.dispatch({
+      title: dto.title,
+      message: dto.message,
+      url: dto.url,
+      target: dto.target,
+      eventId: dto.eventId,
+      inapp: dto.inapp,
+      push: dto.push,
     });
   }
 }
