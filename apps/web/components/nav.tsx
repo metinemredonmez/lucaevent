@@ -74,6 +74,12 @@ export function Nav() {
           >
             Keşfet
           </Link>
+          <Link
+            href="/mekanlar"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Mekanlar
+          </Link>
           {authed && (
             <Link
               href="/takvim"
@@ -133,6 +139,9 @@ export function Nav() {
           <div className="container py-4 flex flex-col gap-1">
             <Link href="/kesfet" onClick={() => setOpen(false)} className="py-2 text-sm">
               Keşfet
+            </Link>
+            <Link href="/mekanlar" onClick={() => setOpen(false)} className="py-2 text-sm">
+              Mekanlar
             </Link>
             {authed && (
               <Link href="/takvim" onClick={() => setOpen(false)} className="py-2 text-sm">

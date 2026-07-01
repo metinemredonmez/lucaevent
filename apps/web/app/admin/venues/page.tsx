@@ -293,10 +293,17 @@ export default function VenuesAdmin() {
       markersRef.current.set(v.id, m);
       bounds.extend([v.lng as number, v.lat as number]);
     }
+    // Akıllı çerçeve: tek → uç; sıkı küme → sığdır; dağınık (Mardin gibi uzak) → İstanbul'da kal.
     if (geo.length === 1) {
       map.flyTo({ center: [geo[0].lng as number, geo[0].lat as number], zoom: 13, duration: 0 });
     } else if (geo.length > 1) {
-      map.fitBounds(bounds, { padding: 50, maxZoom: 14, duration: 0 });
+      const spanLng = bounds.getEast() - bounds.getWest();
+      const spanLat = bounds.getNorth() - bounds.getSouth();
+      if (spanLng < 2.5 && spanLat < 2.5) {
+        map.fitBounds(bounds, { padding: 50, maxZoom: 14, duration: 0 });
+      } else {
+        map.easeTo({ center: ISTANBUL, zoom: 10, duration: 0 });
+      }
     }
   }, [list, mapReady]);
 

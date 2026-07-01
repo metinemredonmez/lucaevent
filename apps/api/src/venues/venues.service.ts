@@ -73,6 +73,12 @@ export class VenuesService {
     });
   }
 
+  /** Public harita — yalnız konumlu mekanlar + o anki durum (live/upcoming/idle). */
+  async mapVenues() {
+    const all = await this.listAdmin();
+    return all.filter((v) => v.lat != null && v.lng != null);
+  }
+
   async bySlug(slug: string) {
     const v = await this.prisma.venue.findUnique({ where: { slug } });
     if (!v) throw new NotFoundException('Venue not found');

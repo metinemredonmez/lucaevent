@@ -28,6 +28,13 @@ export class VenuesController {
     return this.venues.mapsConfig();
   }
 
+  // public harita — konumlu mekanlar + durum (':slug'tan ÖNCE olmalı)
+  @Public()
+  @Get('venues/map')
+  map() {
+    return this.venues.mapVenues();
+  }
+
   @Public()
   @Get('venues/:slug')
   bySlug(@Param('slug') slug: string) {
