@@ -619,8 +619,8 @@ export function RadioPlayer() {
         </button>
         </div>
 
-        {/* mix şeridi — yatay kayar, tek tık çalar */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 pt-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {/* mix şeridi — yatay kayar, tek tık çalar (üstte ayraç çizgi) */}
+        <div className="flex items-center gap-1.5 overflow-x-auto border-t border-primary/15 pb-1.5 pt-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {MIXES.map((m) => {
             const busy = mixBusy === m.l;
             const Icon = m.Icon;
@@ -629,7 +629,7 @@ export function RadioPlayer() {
                 key={m.l}
                 onClick={() => playMix(m)}
                 disabled={!!mixBusy}
-                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] transition disabled:opacity-60 ${
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition disabled:opacity-60 ${
                   m.hero
                     ? "border-primary/50 bg-primary/15 font-medium text-primary"
                     : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
@@ -642,7 +642,7 @@ export function RadioPlayer() {
           })}
           <button
             onClick={() => { setOpen(true); setOpenCat("genre"); }}
-            className="inline-flex shrink-0 items-center gap-1 rounded-full border border-border px-3 py-1.5 text-[13px] text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+            className="inline-flex shrink-0 items-center gap-1 rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
           >
             <Music2 className="h-3.5 w-3.5" /> Türler
             <ChevronDown className="h-3 w-3" />
