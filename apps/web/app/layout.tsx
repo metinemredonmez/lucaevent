@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { RadioPlayer } from "@/components/radio-player";
 import { PushInit } from "@/components/push-init";
+import { PwaRegister } from "@/components/pwa-register";
 import "./globals.css";
 
 const newsreader = Newsreader({
@@ -61,6 +62,12 @@ export const metadata: Metadata = {
     icon: "/favicon.ico",
     apple: "/apple-icon.png",
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Luca",
+  },
+  applicationName: "Luca",
 };
 
 export const viewport: Viewport = {
@@ -88,6 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           {children}
           <PushInit />
+          <PwaRegister />
           <RadioPlayer />
           <Toaster
             position="bottom-center"
