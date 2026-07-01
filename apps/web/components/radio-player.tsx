@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Play, Pause, Radio, Loader2, Search, X, ChevronDown, ChevronUp, Globe2, Music2, Flame } from "lucide-react";
+import { Play, Pause, Radio, Loader2, Search, X, ChevronDown, ChevronUp, Globe2, Music2, Flame, Moon, Guitar, Disc3, type LucideIcon } from "lucide-react";
 
 type Station = { name: string; tag: string; color: string; url: string };
 
@@ -82,12 +82,12 @@ async function rbFetch(path: string): Promise<any[]> {
 
 // Kampta dinlemelik hazır mix'ler — tek tık, en iyi eşleşen canlı istasyonu çalar.
 // (Canlı radyo widget'ı sabit şarkı listesi çalamaz; her mix o vibe'ı çalan istasyona bağlanır.)
-const MIXES: { l: string; s: string; e: string; q: string; by: "name" | "tag"; hero?: boolean }[] = [
-  { l: "KAMP ÖZEL", s: "Türkçe rock · 25 yılın en iyileri", e: "🔥", q: "eksen", by: "name", hero: true },
-  { l: "Türkçe Pop", s: "hit & yeni", e: "🎵", q: "power türk", by: "name" },
-  { l: "Rock", s: "yabancı rock klasikleri", e: "🎸", q: "rock", by: "tag" },
-  { l: "Slow · Akşam", s: "sakin, ateş başı", e: "🌙", q: "slow türk", by: "name" },
-  { l: "Nostalji", s: "90'lar / 2000'ler", e: "📻", q: "nostalji", by: "name" },
+const MIXES: { l: string; s: string; q: string; by: "name" | "tag"; hero?: boolean; Icon: LucideIcon }[] = [
+  { l: "KAMP ÖZEL", s: "Türkçe rock · 25 yılın en iyileri", q: "eksen", by: "name", hero: true, Icon: Flame },
+  { l: "Türkçe Pop", s: "hit & yeni", q: "power türk", by: "name", Icon: Music2 },
+  { l: "Rock", s: "yabancı rock klasikleri", q: "rock", by: "tag", Icon: Guitar },
+  { l: "Slow · Akşam", s: "sakin, ateş başı", q: "slow türk", by: "name", Icon: Moon },
+  { l: "Nostalji", s: "90'lar / 2000'ler", q: "nostalji", by: "name", Icon: Disc3 },
 ];
 
 export function RadioPlayer() {
@@ -118,12 +118,22 @@ export function RadioPlayer() {
     }
   }
 
-  // Üst şerit görünürken sayfa içeriğini aşağı it (fixed şerit hero'yu örtmesin).
-  // Admin (sağ-alt çalar) veya gizli durumda boşluk sıfırlanır.
+  // Üst şerit (iki satır: radyo + mix) görünürken sayfa içeriğini şerit boyu kadar aşağı it.
+  // Yüksekliği ölçerek uygularız (mix şeridi eklendi, sabit değer yetmez). Admin/gizli → sıfır.
   useEffect(() => {
     const stripVisible = !isAdmin && !collapsed;
-    document.body.style.paddingTop = stripVisible ? "2.25rem" : "";
+    if (!stripVisible) {
+      document.body.style.paddingTop = "";
+      return;
+    }
+    const apply = () => {
+      const h = wrapRef.current?.offsetHeight;
+      document.body.style.paddingTop = h ? `${h}px` : "5rem";
+    };
+    apply();
+    window.addEventListener("resize", apply);
     return () => {
+      window.removeEventListener("resize", apply);
       document.body.style.paddingTop = "";
     };
   }, [isAdmin, collapsed]);
@@ -397,7 +407,7 @@ export function RadioPlayer() {
                       : "border-border hover:border-primary/40 hover:bg-muted/40"
                   }`}
                 >
-                  <span className="text-lg leading-none">{m.e}</span>
+                  <m.Icon className={`h-5 w-5 shrink-0 ${m.hero ? "text-primary" : "text-muted-foreground"}`} />
                   <span className="min-w-0 flex-1">
                     <span className={`block truncate text-sm text-foreground ${m.hero ? "font-semibold tracking-wide" : ""}`}>{m.l}</span>
                     <span className="block truncate text-[11px] text-muted-foreground">{m.s}</span>
@@ -569,7 +579,8 @@ export function RadioPlayer() {
       ref={wrapRef}
       className="fixed inset-x-0 top-16 z-40 border-b border-primary/25 bg-gradient-to-r from-[#6366F1]/20 via-background/88 to-[#8B5CF6]/20 backdrop-blur-lg select-none"
     >
-      <div className="container relative flex h-9 items-center gap-2.5">
+      <div className="container relative">
+        <div className="flex h-9 items-center gap-2.5">
         {/* çal / durdur */}
         <button
           onClick={toggle}
@@ -606,6 +617,37 @@ export function RadioPlayer() {
         >
           <X className="h-3.5 w-3.5" />
         </button>
+        </div>
+
+        {/* mix şeridi — yatay kayar, tek tık çalar */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 pt-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {MIXES.map((m) => {
+            const busy = mixBusy === m.l;
+            const Icon = m.Icon;
+            return (
+              <button
+                key={m.l}
+                onClick={() => playMix(m)}
+                disabled={!!mixBusy}
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] transition disabled:opacity-60 ${
+                  m.hero
+                    ? "border-primary/50 bg-primary/15 font-medium text-primary"
+                    : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                }`}
+              >
+                {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Icon className="h-3.5 w-3.5" />}
+                {m.l}
+              </button>
+            );
+          })}
+          <button
+            onClick={() => { setOpen(true); setOpenCat("genre"); }}
+            className="inline-flex shrink-0 items-center gap-1 rounded-full border border-border px-3 py-1.5 text-[13px] text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+          >
+            <Music2 className="h-3.5 w-3.5" /> Türler
+            <ChevronDown className="h-3 w-3" />
+          </button>
+        </div>
 
         {/* panel */}
         {open && <div className="absolute right-0 top-full mt-1.5">{renderPanel("w-[min(25rem,calc(100vw-1rem))]")}</div>}
