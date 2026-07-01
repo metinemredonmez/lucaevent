@@ -14,6 +14,38 @@ const FAVORITES: Station[] = [
   { name: "Süper FM", tag: "türkçe pop", color: "#34D399", url: "https://playerservices.streamtheworld.com/api/livestream-redirect/SUPER_FM.mp3" },
 ];
 
+// dünya kategorileri (ülke) — radio-browser countrycode
+const COUNTRIES = [
+  { l: "🇹🇷 Türkiye", c: "TR" },
+  { l: "🇺🇸 ABD", c: "US" },
+  { l: "🇬🇧 İngiltere", c: "GB" },
+  { l: "🇩🇪 Almanya", c: "DE" },
+  { l: "🇫🇷 Fransa", c: "FR" },
+  { l: "🇮🇹 İtalya", c: "IT" },
+  { l: "🇪🇸 İspanya", c: "ES" },
+  { l: "🇳🇱 Hollanda", c: "NL" },
+];
+
+// birden çok radio-browser mirror'ı — biri düşerse diğerine geç (drive-tune yaklaşımı)
+const MIRRORS = [
+  "https://de1.api.radio-browser.info",
+  "https://de2.api.radio-browser.info",
+  "https://at1.api.radio-browser.info",
+  "https://nl1.api.radio-browser.info",
+  "https://fr1.api.radio-browser.info",
+];
+async function rbFetch(path: string): Promise<any[]> {
+  for (const base of MIRRORS) {
+    try {
+      const r = await fetch(base + path);
+      if (r.ok) return await r.json();
+    } catch {
+      /* sıradaki mirror */
+    }
+  }
+  return [];
+}
+
 export function RadioPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -38,43 +70,42 @@ export function RadioPlayer() {
 
   const [q, setQ] = useState("");
   const [tag, setTag] = useState(""); // tür filtresi (radio-browser tag)
+  const [country, setCountry] = useState(""); // ülke filtresi (countrycode)
   const [results, setResults] = useState<Station[]>([]);
   const [searching, setSearching] = useState(false);
 
-  // Debounced radio-browser arama/filtre (ücretsiz, anahtarsız; yalnız HTTPS stream'ler)
+  // Debounced radio-browser arama/filtre (ücretsiz, anahtarsız; çoklu mirror fallback)
   useEffect(() => {
     const query = q.trim();
     const byName = query.length >= 2;
-    if (!byName && !tag) { setResults([]); setSearching(false); return; }
+    if (!byName && !tag && !country) { setResults([]); setSearching(false); return; }
     setSearching(true);
     const t = setTimeout(async () => {
-      try {
-        const param = byName ? `name=${encodeURIComponent(query)}` : `tag=${encodeURIComponent(tag)}`;
-        const r = await fetch(
-          `https://de1.api.radio-browser.info/json/stations/search?${param}&limit=40&hidebroken=true&order=clickcount&reverse=true`,
-        );
-        const data: any[] = await r.json();
-        const seen = new Set<string>();
-        setResults(
-          data
-            .filter((s) => typeof s.url_resolved === "string" && s.url_resolved.startsWith("https"))
-            .filter((s) => { const k = s.url_resolved; if (seen.has(k)) return false; seen.add(k); return true; })
-            .slice(0, 16)
-            .map((s) => ({
-              name: (s.name || "—").trim().slice(0, 32),
-              tag: [s.countrycode, (s.tags || "").split(",")[0]].filter(Boolean).join(" · ").slice(0, 34),
-              color: "#8B5CF6",
-              url: s.url_resolved,
-            })),
-        );
-      } catch {
-        setResults([]);
-      } finally {
-        setSearching(false);
-      }
+      const param = byName
+        ? `name=${encodeURIComponent(query)}`
+        : tag
+          ? `tag=${encodeURIComponent(tag)}`
+          : `countrycode=${encodeURIComponent(country)}`;
+      const data = await rbFetch(
+        `/json/stations/search?${param}&limit=50&hidebroken=true&order=clickcount&reverse=true`,
+      );
+      const seen = new Set<string>();
+      setResults(
+        data
+          .filter((s) => typeof s.url_resolved === "string" && s.url_resolved.startsWith("https"))
+          .filter((s) => { const k = s.url_resolved; if (seen.has(k)) return false; seen.add(k); return true; })
+          .slice(0, 18)
+          .map((s) => ({
+            name: (s.name || "—").trim().slice(0, 32),
+            tag: [s.countrycode, (s.tags || "").split(",")[0]].filter(Boolean).join(" · ").slice(0, 34),
+            color: "#8B5CF6",
+            url: s.url_resolved,
+          })),
+      );
+      setSearching(false);
     }, 400);
     return () => clearTimeout(t);
-  }, [q, tag]);
+  }, [q, tag, country]);
 
   // dışarı tıklayınca paneli kapat
   useEffect(() => {
@@ -117,7 +148,7 @@ export function RadioPlayer() {
     }
   }
 
-  const list = q.trim().length >= 2 || tag ? results : FAVORITES;
+  const list = q.trim().length >= 2 || tag || country ? results : FAVORITES;
   const GENRES = [
     { l: "Türkçe", t: "turkish" },
     { l: "Pop", t: "pop" },
@@ -216,7 +247,7 @@ export function RadioPlayer() {
               <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
               <input
                 value={q}
-                onChange={(e) => { setQ(e.target.value); if (e.target.value) setTag(""); }}
+                onChange={(e) => { setQ(e.target.value); if (e.target.value) { setTag(""); setCountry(""); } }}
                 placeholder="İstasyon adı ara…"
                 className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none"
               />
@@ -233,9 +264,9 @@ export function RadioPlayer() {
                 return (
                   <button
                     key={g.t}
-                    onClick={() => { setQ(""); setTag(on ? "" : g.t); }}
+                    onClick={() => { setQ(""); setCountry(""); setTag(on ? "" : g.t); }}
                     className={`rounded-full px-2.5 py-1 text-[11px] transition ${
-                      on ? "bg-primary text-white" : "border border-border text-muted-foreground hover:text-foreground"
+                      on ? "bg-primary text-white" : "border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
                     }`}
                   >
                     {g.l}
@@ -243,9 +274,33 @@ export function RadioPlayer() {
                 );
               })}
             </div>
+            {/* dünya (ülke kategorileri) */}
+            <div className="flex flex-wrap items-center gap-1.5 border-b border-border px-3 py-2.5">
+              <span className="mr-0.5 text-[10px] uppercase tracking-wider text-muted-foreground/50">Dünya</span>
+              {COUNTRIES.map((c) => {
+                const on = country === c.c && !q.trim() && !tag;
+                return (
+                  <button
+                    key={c.c}
+                    onClick={() => { setQ(""); setTag(""); setCountry(on ? "" : c.c); }}
+                    className={`rounded-full px-2.5 py-1 text-[11px] transition ${
+                      on ? "bg-primary text-white" : "border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                    }`}
+                  >
+                    {c.l}
+                  </button>
+                );
+              })}
+            </div>
             <div className="max-h-80 overflow-y-auto p-1.5">
               <div className="px-2 pb-1 pt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground/60">
-                {q.trim().length >= 2 ? "Arama sonuçları" : tag ? GENRES.find((g) => g.t === tag)?.l : "Favoriler"}
+                {q.trim().length >= 2
+                  ? "Arama sonuçları"
+                  : tag
+                    ? GENRES.find((g) => g.t === tag)?.l
+                    : country
+                      ? COUNTRIES.find((c) => c.c === country)?.l
+                      : "Favoriler"}
               </div>
               {searching && (
                 <div className="flex items-center gap-2 px-3 py-3 text-xs text-muted-foreground">
@@ -255,22 +310,29 @@ export function RadioPlayer() {
               {!searching && list.length === 0 && (
                 <div className="px-3 py-3 text-xs text-muted-foreground">Sonuç yok.</div>
               )}
-              {list.map((s, i) => (
+              {list.map((s, i) => {
+                const active = current.url === s.url;
+                return (
                 <button
                   key={s.url + i}
                   onClick={() => play(s)}
-                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
-                    current.url === s.url ? "bg-muted" : "hover:bg-muted/50"
+                  className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-all ${
+                    active ? "bg-muted" : "hover:bg-muted/60"
                   }`}
                 >
-                  <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: s.color }} />
+                  <span className="size-2 shrink-0 rounded-full transition-transform group-hover:scale-125" style={{ background: s.color }} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm text-foreground">{s.name}</span>
                     <span className="block truncate text-[11px] text-muted-foreground">{s.tag || "radyo"}</span>
                   </span>
-                  {current.url === s.url && playing && <Eq />}
+                  {active && playing ? (
+                    <Eq />
+                  ) : (
+                    <Play className="size-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                  )}
                 </button>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
