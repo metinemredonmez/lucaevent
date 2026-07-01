@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Search, MapPin, CalendarDays, Loader2, X } from "lucide-react";
 import { CATEGORIES } from "@/lib/data";
 import { discoverEvents, type DiscoverEvent } from "@/lib/events";
@@ -239,10 +240,10 @@ export default function KesfetPage() {
                 </div>
               )}
               {events.map((e) => (
-                <button
+                <div
                   key={e.id}
                   onClick={() => focus(e)}
-                  className={`flex w-full items-center gap-4 rounded-2xl border bg-card p-3 text-left transition ${
+                  className={`flex w-full cursor-pointer items-center gap-4 rounded-2xl border bg-card p-3 text-left transition ${
                     active === e.id ? "border-primary/60 ring-1 ring-primary/30" : "border-border hover:border-primary/40"
                   }`}
                 >
@@ -269,8 +270,15 @@ export default function KesfetPage() {
                         </span>
                       )}
                     </div>
+                    <Link
+                      href={`/etkinlik/${e.slug}`}
+                      onClick={(ev) => ev.stopPropagation()}
+                      className="mt-1.5 inline-block text-xs text-primary hover:underline"
+                    >
+                      Detayı gör →
+                    </Link>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           </div>

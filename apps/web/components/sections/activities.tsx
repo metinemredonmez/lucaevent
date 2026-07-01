@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { Users, MapPin, Clock, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -222,10 +223,10 @@ function ActivityCard({ activity, index }: { activity: Activity; index: number }
         )}
 
         <Button asChild size="sm" className="w-full mt-5 group/btn">
-          <a href={`#rsvp-${activity.id}`}>
-            Katıl
+          <Link href={`/etkinlik/${activity.id}`}>
+            İncele
             <ArrowRight className="size-3.5 transition-transform group-hover/btn:translate-x-0.5" />
-          </a>
+          </Link>
         </Button>
       </div>
     </motion.article>

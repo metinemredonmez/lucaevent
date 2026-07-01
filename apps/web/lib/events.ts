@@ -50,6 +50,46 @@ export type DiscoverParams = {
   take?: number;
 };
 
+// ——— tek etkinlik detayı (public /events/:slug) ———
+export type EventDetail = {
+  id: string;
+  slug: string;
+  title: string;
+  tagline: string | null;
+  description: string | null;
+  coverUrl: string | null;
+  kind: string;
+  startsAt: string;
+  endsAt: string | null;
+  doorsAt: string | null;
+  campingAllowed: boolean;
+  travelInfo: string | null;
+  ageMin: number | null;
+  agenda: { time: string; title: string }[] | null;
+  included: string[] | null;
+  bringList: string[] | null;
+  venue: DiscoverVenue | null;
+  category: { id: string; slug: string; name: string; color: string | null } | null;
+  lineup: { id: string; isHeadline: boolean; artist: { id: string; name: string; slug: string } }[];
+  tickets: { id: string; name: string; priceMinor: number; capacity: number | null; sold: number }[];
+};
+
+export async function getEvent(slug: string): Promise<EventDetail | null> {
+  try {
+    const r = await fetch(`${BASE}/events/${encodeURIComponent(slug)}`, {
+      next: { revalidate: 30 },
+    });
+    return r.ok ? ((await r.json()) as EventDetail) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Tarayıcıdan açılacak .ics takvim linki. */
+export function eventIcsUrl(slug: string): string {
+  return `${BASE}/events/${encodeURIComponent(slug)}/calendar.ics`;
+}
+
 export async function discoverEvents(p: DiscoverParams = {}): Promise<DiscoverEvent[]> {
   const qs = new URLSearchParams();
   qs.set("take", String(p.take ?? 100));
