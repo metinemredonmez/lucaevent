@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { PageShell, Section } from "@/components/legal/page-shell";
+import { Markdown } from "@/components/markdown";
+import { getPage } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "KVKK Aydınlatma Metni · Luca",
@@ -7,7 +9,17 @@ export const metadata: Metadata = {
     "6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında Luca aydınlatma metni — hangi verileri, hangi amaçla ve hukuki sebeple işliyoruz.",
 };
 
-export default function KvkkPage() {
+export default async function KvkkPage() {
+  const page = await getPage("kvkk");
+
+  if (page) {
+    return (
+      <PageShell eyebrow="KVKK" title={page.title} lead={page.excerpt ?? undefined}>
+        <Markdown content={page.content} />
+      </PageShell>
+    );
+  }
+
   return (
     <PageShell
       eyebrow="Gizlilik"

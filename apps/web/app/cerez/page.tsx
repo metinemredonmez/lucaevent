@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { PageShell, Section } from "@/components/legal/page-shell";
+import { Markdown } from "@/components/markdown";
+import { getPage } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Çerez Politikası · Luca",
@@ -7,7 +9,17 @@ export const metadata: Metadata = {
     "lucaclub.com.tr'de kullanılan çerezler ve tercihlerinizi nasıl yönetebileceğinize dair bilgiler.",
 };
 
-export default function CerezPage() {
+export default async function CerezPage() {
+  const page = await getPage("cerez");
+
+  if (page) {
+    return (
+      <PageShell eyebrow="Çerezler" title={page.title} lead={page.excerpt ?? undefined}>
+        <Markdown content={page.content} />
+      </PageShell>
+    );
+  }
+
   return (
     <PageShell
       eyebrow="Çerez"

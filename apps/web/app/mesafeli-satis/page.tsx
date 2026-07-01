@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { PageShell, Section } from "@/components/legal/page-shell";
+import { Markdown } from "@/components/markdown";
 import { COMPANY_SELLER_LINE } from "@/lib/company";
+import { getPage } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Mesafeli Satış Sözleşmesi & Ön Bilgilendirme · Luca",
@@ -8,7 +10,17 @@ export const metadata: Metadata = {
     "Luca üzerinden bilet satışına ilişkin mesafeli satış sözleşmesi, ön bilgilendirme, cayma hakkı ve iptal/iade koşulları.",
 };
 
-export default function MesafeliSatisPage() {
+export default async function MesafeliSatisPage() {
+  const page = await getPage("mesafeli-satis");
+
+  if (page) {
+    return (
+      <PageShell eyebrow="Mesafeli Satış" title={page.title} lead={page.excerpt ?? undefined}>
+        <Markdown content={page.content} />
+      </PageShell>
+    );
+  }
+
   return (
     <PageShell
       eyebrow="Satış"

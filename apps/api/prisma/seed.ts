@@ -1,5 +1,7 @@
 import { EventKind, EventStatus, PrismaClient, Role } from '@prisma/client';
 import * as argon2 from 'argon2';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 const prisma = new PrismaClient();
 
@@ -491,6 +493,18 @@ Kişisel verilerini yalnızca hizmeti sunmak için, KVKK'ya uygun şekilde işle
       where: { slug: p.slug },
       update: { title: p.title, excerpt: p.excerpt, content: p.content },
       create: p,
+    });
+  }
+
+  // yasal sayfalar (kvkk/koşullar/çerez/mesafeli-satış) — CMS'ten yönetilsin
+  const legalPages = JSON.parse(
+    readFileSync(join(__dirname, 'legal-pages.json'), 'utf8'),
+  ) as Array<{ slug: string; title: string; excerpt: string; content: string }>;
+  for (const p of legalPages) {
+    await prisma.page.upsert({
+      where: { slug: p.slug },
+      update: { title: p.title, excerpt: p.excerpt, content: p.content },
+      create: { slug: p.slug, title: p.title, excerpt: p.excerpt, content: p.content },
     });
   }
 

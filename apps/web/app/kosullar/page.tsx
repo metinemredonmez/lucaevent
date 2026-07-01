@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { PageShell, Section } from "@/components/legal/page-shell";
+import { Markdown } from "@/components/markdown";
 import { COMPANY } from "@/lib/company";
+import { getPage } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Kullanım Koşulları · Luca",
@@ -8,7 +10,17 @@ export const metadata: Metadata = {
     "Luca platformunun üyelik, bilet, rezervasyon ve içerik kurallarını düzenleyen kullanım koşulları.",
 };
 
-export default function KosullarPage() {
+export default async function KosullarPage() {
+  const page = await getPage("kosullar");
+
+  if (page) {
+    return (
+      <PageShell eyebrow="Koşullar" title={page.title} lead={page.excerpt ?? undefined}>
+        <Markdown content={page.content} />
+      </PageShell>
+    );
+  }
+
   return (
     <PageShell
       eyebrow="Sözleşme"
