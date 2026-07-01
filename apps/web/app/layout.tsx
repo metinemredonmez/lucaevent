@@ -58,10 +58,8 @@ export const metadata: Metadata = {
     description: "Gece kendi ritmini bulur.",
     images: ["/img/og.jpg"],
   },
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-icon.png",
-  },
+  // favicon/ikonlar app/ dosya konvansiyonundan otomatik gelir:
+  // app/favicon.ico + app/icon.png + app/apple-icon.png (mor Luca kalkanı)
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
