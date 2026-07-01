@@ -614,9 +614,85 @@ Aynı şarkıya kapılan yabancılar gece bitmeden tanıdık olur. Luca geceleri
     });
   }
 
+  // ---------- demo topluluk aktivitesi (liderlik + skor + takvim dolsun) ----------
+  const demoMembers = [
+    { email: 'ayse@luca.test', name: 'Ayşe Kaya', city: 'İstanbul', interests: ['wellness', 'workshop'] },
+    { email: 'mehmet@luca.test', name: 'Mehmet Demir', city: 'İstanbul', interests: ['nightlife', 'social'] },
+    { email: 'zeynep@luca.test', name: 'Zeynep Arslan', city: 'İzmir', interests: ['workshop', 'food-drink'] },
+    { email: 'can@luca.test', name: 'Can Yılmaz', city: 'İstanbul', interests: ['outdoor-spor'] },
+    { email: 'elif@luca.test', name: 'Elif Şahin', city: 'Ankara', interests: ['gezi-seyahat'] },
+    { email: 'burak@luca.test', name: 'Burak Öztürk', city: 'İstanbul', interests: ['business'] },
+  ];
+  const memberId: Record<string, string> = {};
+  for (const m of demoMembers) {
+    const u = await prisma.user.upsert({
+      where: { email: m.email },
+      update: { name: m.name, city: m.city },
+      create: {
+        email: m.email, name: m.name, city: m.city, interests: m.interests,
+        role: Role.VIEWER, passwordHash, emailVerified: true,
+      },
+    });
+    memberId[m.email] = u.id;
+  }
+  const viewer = await prisma.user.findUnique({ where: { email: 'viewer@luca.test' } });
+  if (viewer) memberId['viewer@luca.test'] = viewer.id;
+
+  const allEvents = await prisma.event.findMany({ select: { id: true }, orderBy: { startsAt: 'asc' } });
+  const ev = (i: number) => allEvents[((i % allEvents.length) + allEvents.length) % allEvents.length]?.id;
+
+  // (email, sipariş, favori, yorum) — sıralı liderlik oluşturur
+  const activity = [
+    { email: 'ayse@luca.test', orders: 3, favs: 5, reviews: 2 },
+    { email: 'mehmet@luca.test', orders: 2, favs: 4, reviews: 2 },
+    { email: 'viewer@luca.test', orders: 2, favs: 4, reviews: 1 },
+    { email: 'zeynep@luca.test', orders: 2, favs: 3, reviews: 1 },
+    { email: 'can@luca.test', orders: 1, favs: 3, reviews: 1 },
+    { email: 'elif@luca.test', orders: 1, favs: 2, reviews: 0 },
+    { email: 'burak@luca.test', orders: 0, favs: 2, reviews: 1 },
+  ];
+
+  if (allEvents.length > 0) {
+    for (let pi = 0; pi < activity.length; pi++) {
+      const p = activity[pi];
+      const uid = memberId[p.email];
+      if (!uid) continue;
+      for (let i = 0; i < p.favs; i++) {
+        const eid = ev(pi * 3 + i);
+        if (eid)
+          await prisma.favorite.upsert({
+            where: { userId_eventId: { userId: uid, eventId: eid } }, update: {}, create: { userId: uid, eventId: eid },
+          });
+      }
+      for (let i = 0; i < p.reviews; i++) {
+        const eid = ev(pi * 2 + i + 1);
+        if (eid)
+          await prisma.review.upsert({
+            where: { userId_eventId: { userId: uid, eventId: eid } },
+            update: {},
+            create: { userId: uid, eventId: eid, rating: 4 + (i % 2), comment: 'Harikaydı, tekrar bekleriz!' },
+          });
+      }
+      for (let i = 0; i < p.orders; i++) {
+        const eid = ev(pi + i);
+        if (!eid) continue;
+        const code = `SEED-${pi}-${i}`;
+        await prisma.order.upsert({
+          where: { code },
+          update: {},
+          create: {
+            code, eventId: eid, userId: uid, email: p.email, fullName: p.email.split('@')[0],
+            totalMinor: 45000, currency: 'TRY', provider: 'seed', status: 'PAID', paidAt: new Date(),
+          },
+        });
+      }
+    }
+  }
+
   console.log('✅  Seed complete.');
   console.log(`   Categories: ${catData.length} · Events: ${events.length + 1}`);
   console.log(`   First upcoming: ${upcomingSlug}`);
+  console.log(`   Demo üyeler: ${demoMembers.length} (liderlik/skor/takvim dolu)`);
   console.log('   Login: admin@luca.test / password123');
 }
 
