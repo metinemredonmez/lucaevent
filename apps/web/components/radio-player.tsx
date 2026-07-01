@@ -71,6 +71,16 @@ export function RadioPlayer() {
     }
   }
 
+  // Üst şerit görünürken sayfa içeriğini aşağı it (fixed şerit hero'yu örtmesin).
+  // Admin (sağ-alt çalar) veya gizli durumda boşluk sıfırlanır.
+  useEffect(() => {
+    const stripVisible = !isAdmin && !collapsed;
+    document.body.style.paddingTop = stripVisible ? "2.25rem" : "";
+    return () => {
+      document.body.style.paddingTop = "";
+    };
+  }, [isAdmin, collapsed]);
+
   const [q, setQ] = useState("");
   const [tag, setTag] = useState(""); // tür filtresi (radio-browser tag)
   const [country, setCountry] = useState(""); // ülke filtresi (countrycode)
