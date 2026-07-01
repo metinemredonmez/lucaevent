@@ -64,7 +64,9 @@ export function Family() {
       if (n != null && n > 0) setCount(n);
     });
   }, []);
-  const display = count ?? FAMILY_COUNT;
+  // Gerçek sayı taban değeri (2.418) geçince onu göster; altındayken "1 kişilik" gibi
+  // saçma görünmesin diye taban kalır.
+  const display = count && count > FAMILY_COUNT ? count : FAMILY_COUNT;
 
   return (
     <section id="aile" className="relative py-20 md:py-28">

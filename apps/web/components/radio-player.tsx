@@ -143,7 +143,7 @@ export function RadioPlayer() {
   const [country, setCountry] = useState(""); // ülke filtresi (countrycode)
   const [results, setResults] = useState<Station[]>([]);
   const [searching, setSearching] = useState(false);
-  const [openCat, setOpenCat] = useState<"mix" | "genre" | "world" | null>("mix"); // açılır kategori
+  const [openCat, setOpenCat] = useState<"genre" | "world" | null>("genre"); // açılır kategori
   const [mixBusy, setMixBusy] = useState(""); // yükleniyor olan mix etiketi
 
   // Debounced radio-browser arama/filtre (ücretsiz, anahtarsız; çoklu mirror fallback)
@@ -377,53 +377,6 @@ export function RadioPlayer() {
           <button onClick={() => setQ("")} aria-label="Temizle">
             <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
           </button>
-        )}
-      </div>
-
-      {/* kategori: Mixler (kampta dinlemelik hazır — tek tık çalar) */}
-      <div className="border-b border-border">
-        <button
-          onClick={() => setOpenCat((c) => (c === "mix" ? null : "mix"))}
-          className="flex w-full items-center justify-between px-3 py-2.5 text-left transition-colors hover:bg-muted/40"
-        >
-          <span className="flex items-center gap-2 text-xs font-medium text-foreground">
-            <Flame className="h-3.5 w-3.5 text-primary" /> Mixler
-            <span className="rounded-full bg-primary/15 px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-primary">kamp</span>
-          </span>
-          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${openCat === "mix" ? "rotate-180" : ""}`} />
-        </button>
-        {openCat === "mix" && (
-          <div className="space-y-2 px-3 pb-3">
-            {MIXES.map((m) => {
-              const busy = mixBusy === m.l;
-              return (
-                <button
-                  key={m.l}
-                  onClick={() => playMix(m)}
-                  disabled={!!mixBusy}
-                  className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition disabled:opacity-60 ${
-                    m.hero
-                      ? "border-primary/40 bg-gradient-to-r from-[#6366F1]/20 to-[#8B5CF6]/20 hover:border-primary/60"
-                      : "border-border hover:border-primary/40 hover:bg-muted/40"
-                  }`}
-                >
-                  <m.Icon className={`h-5 w-5 shrink-0 ${m.hero ? "text-primary" : ""}`} style={m.hero ? undefined : { color: m.color }} />
-                  <span className="min-w-0 flex-1">
-                    <span className={`block truncate text-sm text-foreground ${m.hero ? "font-semibold tracking-wide" : ""}`}>{m.l}</span>
-                    <span className="block truncate text-[11px] text-muted-foreground">{m.s}</span>
-                  </span>
-                  {busy ? (
-                    <Loader2 className="h-4 w-4 shrink-0 animate-spin text-primary" />
-                  ) : (
-                    <Play className="h-4 w-4 shrink-0 text-muted-foreground" />
-                  )}
-                </button>
-              );
-            })}
-            <p className="px-1 pt-0.5 text-[10px] leading-snug text-muted-foreground/60">
-              Mix'ler o türü çalan canlı istasyona bağlanır (sabit şarkı listesi değil).
-            </p>
-          </div>
         )}
       </div>
 
