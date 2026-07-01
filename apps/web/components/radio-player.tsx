@@ -608,7 +608,11 @@ export function RadioPlayer() {
         </button>
 
         {/* panel */}
-        {open && <div className="absolute inset-x-0 top-full mt-1.5">{renderPanel("w-full", true)}</div>}
+        {open && (
+          <div className="absolute left-1/2 top-full mt-1.5 -translate-x-1/2">
+            {renderPanel("w-[min(38rem,calc(100vw-1.5rem))]")}
+          </div>
+        )}
       </div>
 
       {eqKeyframes}
