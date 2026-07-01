@@ -177,7 +177,7 @@ export function RadioPlayer() {
   // gizli: köşede minik çalar-baloncuk (aç butonuyla geri gelir)
   if (collapsed) {
     return (
-      <div className="fixed bottom-4 left-4 z-40 flex items-center gap-1 rounded-full border border-border bg-background/90 p-1 shadow-lg backdrop-blur">
+      <div className="fixed bottom-4 left-4 z-40 flex items-center gap-1 rounded-full border border-primary/30 bg-background/90 p-1 shadow-lg shadow-primary/15 backdrop-blur">
         <button
           onClick={toggle}
           aria-label={playing ? "Durdur" : "Çal"}
@@ -200,7 +200,7 @@ export function RadioPlayer() {
   return (
     <div
       ref={wrapRef}
-      className="fixed inset-x-0 top-16 z-40 border-b border-border/40 bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60 select-none"
+      className="fixed inset-x-0 top-16 z-40 border-b border-primary/25 bg-gradient-to-r from-[#6366F1]/20 via-background/88 to-[#8B5CF6]/20 backdrop-blur-lg select-none"
     >
       <div className="container relative flex h-9 items-center gap-2.5">
         {/* çal / durdur */}
