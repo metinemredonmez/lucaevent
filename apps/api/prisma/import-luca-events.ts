@@ -17,7 +17,8 @@ import { join } from 'path';
 (function loadDbUrl() {
   const valid = (v?: string) => !!v && /^postgres(ql)?:\/\//.test(v);
   if (valid(process.env.DATABASE_URL)) return;
-  const dirs = [join(__dirname, '..'), process.cwd()]; // apps/api + çalışma dizini
+  // apps/api + repo kökü (env dosyası kökte: /var/www/luca/.env.prod) + çalışma dizini
+  const dirs = [join(__dirname, '..'), join(__dirname, '..', '..'), process.cwd()];
   const files = ['.env.dev', '.env.prod', '.env']; // app ile aynı sıra (ilk geçerli kazanır)
   for (const d of dirs) {
     for (const f of files) {
