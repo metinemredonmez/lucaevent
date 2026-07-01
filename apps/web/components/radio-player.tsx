@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Play, Pause, Radio, Loader2, Search, X, ChevronDown } from "lucide-react";
+import { Play, Pause, Radio, Loader2, Search, X, ChevronDown, ChevronUp } from "lucide-react";
 
 type Station = { name: string; tag: string; color: string; url: string };
 
@@ -21,6 +21,20 @@ export function RadioPlayer() {
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    setCollapsed(localStorage.getItem("luca_radio_collapsed") === "1");
+  }, []);
+  function setCollapsedPersist(v: boolean) {
+    setCollapsed(v);
+    setOpen(false);
+    try {
+      localStorage.setItem("luca_radio_collapsed", v ? "1" : "0");
+    } catch {
+      /* yoksay */
+    }
+  }
 
   const [q, setQ] = useState("");
   const [tag, setTag] = useState(""); // tür filtresi (radio-browser tag)
@@ -129,6 +143,29 @@ export function RadioPlayer() {
     </span>
   );
 
+  // gizli: köşede minik çalar-baloncuk (aç butonuyla geri gelir)
+  if (collapsed) {
+    return (
+      <div className="fixed bottom-4 left-4 z-40 flex items-center gap-1 rounded-full border border-border bg-background/90 p-1 shadow-lg backdrop-blur">
+        <button
+          onClick={toggle}
+          aria-label={playing ? "Durdur" : "Çal"}
+          className="grid size-7 place-items-center rounded-full text-black transition-transform active:scale-95"
+          style={{ background: current.color }}
+        >
+          {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5 translate-x-[1px]" />}
+        </button>
+        <button
+          onClick={() => setCollapsedPersist(false)}
+          aria-label="Radyo şeridini aç"
+          className="grid size-6 place-items-center rounded-full text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ChevronUp className="h-4 w-4" />
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={wrapRef}
@@ -161,6 +198,15 @@ export function RadioPlayer() {
         >
           <Search className="h-3 w-3" /> Radyo
           <ChevronDown className={`h-3 w-3 transition-transform ${open ? "rotate-180" : ""}`} />
+        </button>
+
+        {/* gizle */}
+        <button
+          onClick={() => setCollapsedPersist(true)}
+          aria-label="Radyoyu gizle"
+          className="grid size-6 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <X className="h-3.5 w-3.5" />
         </button>
 
         {/* panel */}
