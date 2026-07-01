@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Nav } from "@/components/nav";
 import { Hero } from "@/components/sections/hero";
+import { NextEvent } from "@/components/sections/next-event";
 import { Categories } from "@/components/sections/categories";
 import { Activities } from "@/components/sections/activities";
 import { Showcase } from "@/components/sections/showcase";
@@ -19,6 +20,7 @@ export default function HomePage() {
       <Nav />
       <main className="pt-16">
         <Hero />
+        <NextEvent />
         <Categories active={filter} onSelect={setFilter} />
         <Activities filter={filter} />
         <Showcase />

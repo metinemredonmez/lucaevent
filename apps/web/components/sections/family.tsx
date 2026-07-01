@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
 import { FAMILY_SAMPLE, FAMILY_COUNT } from "@/lib/data";
+import { getCommunityCount } from "@/lib/events";
 import { ArrowRight, Heart, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -56,6 +57,15 @@ function FamilyAvatar({ src, index }: { src: string; index: number }) {
 }
 
 export function Family() {
+  // Gerçek üye sayısı (DB'den); gelmezse tasarım bozulmasın diye placeholder'a düşer.
+  const [count, setCount] = useState<number | null>(null);
+  useEffect(() => {
+    getCommunityCount().then((n) => {
+      if (n != null && n > 0) setCount(n);
+    });
+  }, []);
+  const display = count ?? FAMILY_COUNT;
+
   return (
     <section id="aile" className="relative py-20 md:py-28">
       <div className="container">
@@ -67,7 +77,7 @@ export function Family() {
             <h2 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight text-balance">
               Her hafta{" "}
               <AnimatedGradientText className="tabular-nums">
-                {FAMILY_COUNT.toLocaleString("tr-TR")}
+                {display.toLocaleString("tr-TR")}
               </AnimatedGradientText>{" "}
               kişilik bir topluluk.
             </h2>

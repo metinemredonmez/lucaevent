@@ -58,6 +58,14 @@ export class ScoreService {
     };
   }
 
+  /** Topluluk istatistiği — gerçek üye sayısı (demo/sistem @luca.test hariç). */
+  async communityStats() {
+    const members = await this.prisma.user.count({
+      where: { NOT: { email: { endsWith: '@luca.test' } } },
+    });
+    return { members };
+  }
+
   /**
    * Liderlik tablosu — "kim en aktif". Tüm üyelerin etkinlik aktivitesini
    * puanlayıp en yüksekten sıralar (sohbet yok; sadece aktiviteyle görünürlük).

@@ -13,6 +13,17 @@ export async function getLiveEvents(): Promise<LiveEvent[]> {
   }
 }
 
+export async function getCommunityCount(): Promise<number | null> {
+  try {
+    const r = await fetch(`${BASE}/community/stats`, { cache: "no-store" });
+    if (!r.ok) return null;
+    const d = await r.json();
+    return typeof d?.members === "number" ? d.members : null;
+  } catch {
+    return null;
+  }
+}
+
 export type TopMember = { rank: number; name: string; avatarUrl: string | null; score: number; badge: string; icon: string; level: number };
 export async function getTopMembers(take = 5): Promise<TopMember[]> {
   try {

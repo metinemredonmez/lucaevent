@@ -24,4 +24,11 @@ export class ScoreController {
     const n = Math.min(50, Math.max(1, Number(take) || 20));
     return this.score.leaderboard(n);
   }
+
+  // topluluk istatistiği — public (ana sayfa gerçek üye sayısı).
+  @Public()
+  @Get('community/stats')
+  stats() {
+    return this.score.communityStats();
+  }
 }
