@@ -82,12 +82,12 @@ async function rbFetch(path: string): Promise<any[]> {
 
 // Kampta dinlemelik hazır mix'ler — tek tık, en iyi eşleşen canlı istasyonu çalar.
 // (Canlı radyo widget'ı sabit şarkı listesi çalamaz; her mix o vibe'ı çalan istasyona bağlanır.)
-const MIXES: { l: string; s: string; q: string; by: "name" | "tag"; hero?: boolean; Icon: LucideIcon }[] = [
-  { l: "KAMP ÖZEL", s: "Türkçe rock · 25 yılın en iyileri", q: "eksen", by: "name", hero: true, Icon: Flame },
-  { l: "Türkçe Pop", s: "hit & yeni", q: "power türk", by: "name", Icon: Music2 },
-  { l: "Rock", s: "yabancı rock klasikleri", q: "rock", by: "tag", Icon: Guitar },
-  { l: "Slow · Akşam", s: "sakin, ateş başı", q: "slow türk", by: "name", Icon: Moon },
-  { l: "Nostalji", s: "90'lar / 2000'ler", q: "nostalji", by: "name", Icon: Disc3 },
+const MIXES: { l: string; s: string; q: string; by: "name" | "tag"; hero?: boolean; Icon: LucideIcon; color: string }[] = [
+  { l: "KAMP ÖZEL", s: "Türkçe rock · 25 yılın en iyileri", q: "eksen", by: "name", hero: true, Icon: Flame, color: "#A855F7" },
+  { l: "Türkçe Pop", s: "hit & yeni", q: "power türk", by: "name", Icon: Music2, color: "#EC4899" },
+  { l: "Rock", s: "yabancı rock klasikleri", q: "rock", by: "tag", Icon: Guitar, color: "#F97316" },
+  { l: "Slow · Akşam", s: "sakin, ateş başı", q: "slow türk", by: "name", Icon: Moon, color: "#60A5FA" },
+  { l: "Nostalji", s: "90'lar / 2000'ler", q: "nostalji", by: "name", Icon: Disc3, color: "#F59E0B" },
 ];
 
 export function RadioPlayer() {
@@ -407,7 +407,7 @@ export function RadioPlayer() {
                       : "border-border hover:border-primary/40 hover:bg-muted/40"
                   }`}
                 >
-                  <m.Icon className={`h-5 w-5 shrink-0 ${m.hero ? "text-primary" : "text-muted-foreground"}`} />
+                  <m.Icon className={`h-5 w-5 shrink-0 ${m.hero ? "text-primary" : ""}`} style={m.hero ? undefined : { color: m.color }} />
                   <span className="min-w-0 flex-1">
                     <span className={`block truncate text-sm text-foreground ${m.hero ? "font-semibold tracking-wide" : ""}`}>{m.l}</span>
                     <span className="block truncate text-[11px] text-muted-foreground">{m.s}</span>
@@ -635,7 +635,7 @@ export function RadioPlayer() {
                     : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
                 }`}
               >
-                {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Icon className="h-3.5 w-3.5" />}
+                {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Icon className="h-3.5 w-3.5" style={m.hero ? undefined : { color: m.color }} />}
                 {m.l}
               </button>
             );
