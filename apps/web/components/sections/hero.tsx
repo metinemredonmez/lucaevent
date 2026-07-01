@@ -61,17 +61,17 @@ export function Hero() {
 
         {/* sürüklenen ışık küreleri */}
         <motion.div
-          className="absolute -left-24 top-10 h-[28rem] w-[28rem] rounded-full bg-[#7C3AED]/30 blur-[120px]"
+          className="absolute -left-24 top-10 h-[28rem] w-[28rem] rounded-full bg-[#7C3AED]/12 blur-[120px]"
           animate={{ x: [0, 60, 0], y: [0, 40, 0], scale: [1, 1.15, 1] }}
           transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute right-[-6rem] bottom-[-4rem] h-[32rem] w-[32rem] rounded-full bg-[#A855F7]/25 blur-[130px]"
+          className="absolute right-[-6rem] bottom-[-4rem] h-[32rem] w-[32rem] rounded-full bg-[#A855F7]/10 blur-[130px]"
           animate={{ x: [0, -50, 0], y: [0, -30, 0], scale: [1.1, 1, 1.1] }}
           transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute left-1/2 top-1/3 h-72 w-72 rounded-full bg-[#3B82F6]/20 blur-[110px]"
+          className="absolute left-1/2 top-1/3 h-72 w-72 rounded-full bg-[#3B82F6]/10 blur-[110px]"
           animate={{ x: [0, 40, -30, 0], y: [0, -25, 25, 0] }}
           transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -84,7 +84,7 @@ export function Hero() {
             alt=""
             aria-hidden
             initial={false}
-            animate={{ opacity: i === slide ? 0.78 : 0 }}
+            animate={{ opacity: i === slide ? 0.95 : 0 }}
             transition={{ duration: 1.6, ease: "easeInOut" }}
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).style.display = "none";
@@ -96,7 +96,7 @@ export function Hero() {
         {/* okunabilirlik scrim'leri — görsel belirgin, sol yazı korumalı */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#070510]/30 via-[#070510]/35 to-[#050309]/90" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#070510] via-[#070510]/30 to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(168,85,247,0.09),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(168,85,247,0.03),transparent_55%)]" />
         {/* alt kenarı bir sonraki bölüme yumuşat */}
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
       </div>
