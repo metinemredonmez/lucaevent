@@ -10,6 +10,13 @@ import { CurrentUser, CurrentUserPayload } from '../common/decorators/current-us
 export class EventsController {
   constructor(private readonly events: EventsService) {}
 
+  // şu an canlı yayınlanan etkinlikler (public) — ':slug' route'undan ÖNCE olmalı
+  @Public()
+  @Get('live')
+  live() {
+    return this.events.liveList();
+  }
+
   // canlı yayın meta (public) — URL yalnız PUBLIC+canlıda döner
   @Public()
   @Get(':slug/stream')

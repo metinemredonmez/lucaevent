@@ -5,6 +5,7 @@ import { Nav } from "@/components/nav";
 import { Hero } from "@/components/sections/hero";
 import { Categories } from "@/components/sections/categories";
 import { Activities } from "@/components/sections/activities";
+import { Showcase } from "@/components/sections/showcase";
 import { Family } from "@/components/sections/family";
 import { Subscribe } from "@/components/sections/subscribe";
 import { Footer } from "@/components/sections/footer";
@@ -20,6 +21,7 @@ export default function HomePage() {
         <Hero />
         <Categories active={filter} onSelect={setFilter} />
         <Activities filter={filter} />
+        <Showcase />
         <Family />
         <Subscribe />
       </main>

@@ -260,6 +260,16 @@ export class EventsService {
 
   // ------- canlı yayın (livestream) -------
 
+  /** Şu an canlı yayınlanan yayınlı etkinlikler (public — ana sayfa vitrini). */
+  liveList() {
+    return this.prisma.event.findMany({
+      where: { status: EventStatus.PUBLISHED, liveStatus: 'LIVE', streamUrl: { not: null } },
+      select: { slug: true, title: true, coverUrl: true, liveStartedAt: true },
+      orderBy: { liveStartedAt: 'desc' },
+      take: 5,
+    });
+  }
+
   /** Organizatör: yayını başlat/bitir. */
   async setLive(id: string, live: boolean) {
     return this.prisma.event.update({

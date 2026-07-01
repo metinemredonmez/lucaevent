@@ -2,6 +2,27 @@
 const BASE =
   (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001") + "/api/v1";
 
+// ——— ana sayfa vitrini (public) ———
+export type LiveEvent = { slug: string; title: string; coverUrl: string | null; liveStartedAt: string | null };
+export async function getLiveEvents(): Promise<LiveEvent[]> {
+  try {
+    const r = await fetch(`${BASE}/events/live`, { cache: "no-store" });
+    return r.ok ? await r.json() : [];
+  } catch {
+    return [];
+  }
+}
+
+export type TopMember = { rank: number; name: string; avatarUrl: string | null; score: number; badge: string; icon: string; level: number };
+export async function getTopMembers(take = 5): Promise<TopMember[]> {
+  try {
+    const r = await fetch(`${BASE}/community/leaderboard?take=${take}`);
+    return r.ok ? await r.json() : [];
+  } catch {
+    return [];
+  }
+}
+
 export type DiscoverVenue = {
   id: string;
   name: string;
