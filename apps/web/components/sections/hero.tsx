@@ -128,10 +128,10 @@ export function Hero() {
 
           {/* headline — umbrella */}
           <h1 className="text-balance font-serif text-[clamp(2.25rem,5.5vw,4.25rem)] font-semibold leading-[1.02] tracking-tight">
-            Gündüz keşfet,
+            Şehrini yaşa.
             <br />
             <AnimatedGradientText className="italic">
-              gece parla.
+              Gündüz keşfet, gece parla.
             </AnimatedGradientText>
           </h1>
 
