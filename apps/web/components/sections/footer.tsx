@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Instagram, Youtube, Lock, Apple, Play, type LucideIcon } from "lucide-react";
+import { Instagram, Youtube, Lock } from "lucide-react";
 import { COMPANY } from "@/lib/company";
 
 type FLink = { label: string; href: string };
@@ -84,20 +84,6 @@ export function Footer() {
                 </a>
               ))}
             </div>
-
-            {/* mobil uygulama — çok yakında */}
-            <div className="mt-7">
-              <div className="mb-2.5 flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
-                Mobil uygulama
-                <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] normal-case tracking-normal text-primary">
-                  çok yakında
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-2.5">
-                <StoreBadge Icon={Apple} bottom="App Store" />
-                <StoreBadge Icon={Play} bottom="Google Play" />
-              </div>
-            </div>
           </div>
 
           {/* link kolonları */}
@@ -132,21 +118,6 @@ export function Footer() {
         </div>
       </div>
     </footer>
-  );
-}
-
-function StoreBadge({ Icon, bottom }: { Icon: LucideIcon; bottom: string }) {
-  return (
-    <span
-      title="Mobil uygulama çok yakında"
-      className="inline-flex cursor-default select-none items-center gap-2.5 rounded-xl border border-border bg-card px-3.5 py-2 opacity-90"
-    >
-      <Icon className="size-6 shrink-0 text-foreground" />
-      <span className="leading-tight">
-        <span className="block text-[10px] uppercase tracking-wider text-muted-foreground">Yakında</span>
-        <span className="block text-sm font-semibold text-foreground">{bottom}</span>
-      </span>
-    </span>
   );
 }
 
