@@ -1,14 +1,42 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Home, MapPin, CalendarDays, User } from "lucide-react";
 
-/** Resmî store logo path'leri (tek renk beyaz — minimalist rozet). */
-const APPLE_PATH =
-  "M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z";
-const PLAY_PATH =
-  "M22.018 13.298l-3.919 2.218-3.515-3.493 3.543-3.521 3.891 2.202a1.49 1.49 0 0 1 0 2.594zM1.337.924a1.486 1.486 0 0 0-.112.568v21.017c0 .217.045.419.124.6l11.155-11.087L1.337.924zm12.207 10.065l3.258-3.238L3.45.195a1.466 1.466 0 0 0-.946-.155l11.04 10.949zm0 2.02l-11 10.933c.298.036.612-.016.906-.183l13.324-7.54-3.23-3.21z";
+/** Resmî Apple logosu (tek renk beyaz — marka gereği monokrom). */
+function AppleLogo() {
+  return (
+    <svg width="20" height="24" viewBox="0 0 384 512" fill="#fff" aria-hidden>
+      <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
+    </svg>
+  );
+}
+
+/** Resmî Google Play logosu (4 renkli üçgen — marka renkleri). */
+function GooglePlayLogo() {
+  return (
+    <svg width="20" height="22" viewBox="0 0 256 283" aria-hidden>
+      <path
+        fill="#EA4335"
+        d="M119.553141,134.916362 L1.0599006,259.060547 C3.75619448,268.616998 10.7182836,276.3906 19.9208658,280.119977 C29.1234481,283.849353 39.5331235,283.115716 48.121672,278.132484 L181.448642,202.197919 L119.553141,134.916362 Z"
+      />
+      <path
+        fill="#FBBC04"
+        d="M239.370822,113.813616 L181.71353,80.7909097 L116.815965,137.741834 L181.978418,202.021326 L239.19423,169.351804 C249.525723,163.942452 256,153.24465 256,141.58271 C256,129.92077 249.525723,119.222968 239.19423,113.813616 L239.370822,113.813616 Z"
+      />
+      <path
+        fill="#4285F4"
+        d="M1.0599006,23.4868015 C0.343633396,26.134699 -0.0127538816,28.8670014 0,31.6100341 L0,250.937314 C0.00751268399,253.679042 0.363556675,256.408712 1.0599006,259.060547 L123.614758,138.095018 L1.0599006,23.4868015 Z"
+      />
+      <path
+        fill="#34A853"
+        d="M120.436101,141.273674 L181.71353,80.7909097 L48.5631521,4.50316009 C43.5539929,1.56944036 37.8568091,0.0156629668 32.0517989,0 C17.6444261,-0.0284873284 4.97836875,9.53420553 1.0599006,23.3985055 L120.436101,141.273674 Z"
+      />
+    </svg>
+  );
+}
 
 export function MobileApp() {
   return (
@@ -38,8 +66,8 @@ export function MobileApp() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <StoreBadge path={APPLE_PATH} vb="0 0 384 512" w={20} h={24} top="İndir" name="App Store" />
-              <StoreBadge path={PLAY_PATH} vb="0 0 24 24" w={20} h={22} top="Yükle" name="Google Play" />
+              <StoreBadge icon={<AppleLogo />} top="İndir" name="App Store" />
+              <StoreBadge icon={<GooglePlayLogo />} top="Yükle" name="Google Play" />
             </div>
           </div>
 
@@ -53,29 +81,13 @@ export function MobileApp() {
   );
 }
 
-function StoreBadge({
-  path,
-  vb,
-  w,
-  h,
-  top,
-  name,
-}: {
-  path: string;
-  vb: string;
-  w: number;
-  h: number;
-  top: string;
-  name: string;
-}) {
+function StoreBadge({ icon, top, name }: { icon: ReactNode; top: string; name: string }) {
   return (
     <span
       title="Mobil uygulama çok yakında"
       className="inline-flex cursor-default select-none items-center gap-2.5 rounded-xl border border-white/15 bg-black px-4 py-2.5 opacity-90 transition-opacity hover:opacity-100"
     >
-      <svg width={w} height={h} viewBox={vb} fill="#fff" aria-hidden>
-        <path d={path} />
-      </svg>
+      {icon}
       <span className="text-left leading-none">
         <span className="mb-1 block text-[11px] text-white/60">{top}</span>
         <span className="block text-[15px] font-semibold text-white">{name}</span>
