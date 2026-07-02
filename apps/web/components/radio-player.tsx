@@ -97,6 +97,7 @@ export function RadioPlayer() {
   const curRef = useRef<Station>(FAVORITES[0]); // aktif istasyon (event closure'ları için)
   const retryRef = useRef(0); // ardışık yeniden bağlanma denemesi
   const reconnectRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stallRef = useRef<ReturnType<typeof setTimeout> | null>(null); // geçici duraksama nöbetçisi
   const pathname = usePathname();
   const isAdmin = !!pathname && pathname.startsWith("/admin");
   const [current, setCurrent] = useState<Station>(FAVORITES[0]);
@@ -188,8 +189,14 @@ export function RadioPlayer() {
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  // reconnect timer'ını unmount'ta temizle
-  useEffect(() => () => { if (reconnectRef.current) clearTimeout(reconnectRef.current); }, []);
+  // reconnect + stall timer'larını unmount'ta temizle
+  useEffect(
+    () => () => {
+      if (reconnectRef.current) clearTimeout(reconnectRef.current);
+      if (stallRef.current) clearTimeout(stallRef.current);
+    },
+    [],
+  );
 
   // sekme/uygulama arka plandan dönünce, çalması isteniyorsa ama duraksadıysa devam ettir
   useEffect(() => {
@@ -204,11 +211,25 @@ export function RadioPlayer() {
     return () => document.removeEventListener("visibilitychange", onVis);
   }, []);
 
+  function clearStall() {
+    if (stallRef.current) { clearTimeout(stallRef.current); stallRef.current = null; }
+  }
+  // Geçici duraksama (waiting/stalled): hemen kesme — 6 sn kendi düzelmezse yeniden bağlan.
+  // (Anlık internet dalgalanmasında boşuna gap yaratmaz; sadece gerçek kopmada müdahale eder.)
+  function armStall() {
+    if (stallRef.current || !wantRef.current) return;
+    setLoading(true);
+    stallRef.current = setTimeout(() => {
+      stallRef.current = null;
+      scheduleReconnect();
+    }, 6000);
+  }
+
   // Yayın koparsa (ücretsiz radyolar sık koparır) istek varsa üssel backoff'la yeniden bağlan.
   function scheduleReconnect() {
     if (!wantRef.current) { setLoading(false); setPlaying(false); return; }
     if (reconnectRef.current) return; // zaten planlı
-    if (retryRef.current >= 6) { // ~1 dk boyunca gelmiyorsa vazgeç
+    if (retryRef.current >= 6) { // uzun süre gelmiyorsa vazgeç
       wantRef.current = false;
       setLoading(false);
       setPlaying(false);
@@ -216,7 +237,7 @@ export function RadioPlayer() {
     }
     setPlaying(false);
     setLoading(true);
-    const delay = Math.min(1500 * 2 ** retryRef.current, 15000); // 1.5s → 15s
+    const delay = Math.min(600 * 2 ** retryRef.current, 10000); // 0.6s → 10s (ilk deneme hızlı → kısa gap)
     reconnectRef.current = setTimeout(() => {
       reconnectRef.current = null;
       const a = audioRef.current;
@@ -236,12 +257,13 @@ export function RadioPlayer() {
       const a = new Audio();
       a.preload = "none";
       a.volume = 0.6;
-      a.onplaying = () => { setPlaying(true); setLoading(false); retryRef.current = 0; };
+      a.onplaying = () => { setPlaying(true); setLoading(false); retryRef.current = 0; clearStall(); };
+      a.ontimeupdate = () => clearStall(); // ses akıyor → duraksama nöbetçisini iptal
       a.onpause = () => { if (!wantRef.current) setPlaying(false); };
-      a.onwaiting = () => setLoading(true);
-      a.onstalled = () => scheduleReconnect();
-      a.onended = () => scheduleReconnect();
-      a.onerror = () => scheduleReconnect();
+      a.onwaiting = () => armStall(); // geçici → 6 sn bekle
+      a.onstalled = () => armStall();
+      a.onended = () => { clearStall(); scheduleReconnect(); }; // yayın bitti → gerçek kopma
+      a.onerror = () => { clearStall(); scheduleReconnect(); };
       audioRef.current = a;
     }
     return audioRef.current;
@@ -254,6 +276,7 @@ export function RadioPlayer() {
     wantRef.current = true;
     retryRef.current = 0;
     if (reconnectRef.current) { clearTimeout(reconnectRef.current); reconnectRef.current = null; }
+    clearStall();
     setLoading(true);
     a.src = s.url;
     a.play().catch(() => scheduleReconnect());
@@ -268,6 +291,7 @@ export function RadioPlayer() {
       // kullanıcı durdurdu → reconnect'i iptal et
       wantRef.current = false;
       if (reconnectRef.current) { clearTimeout(reconnectRef.current); reconnectRef.current = null; }
+      clearStall();
       audioRef.current?.pause();
       setPlaying(false);
       setLoading(false);
