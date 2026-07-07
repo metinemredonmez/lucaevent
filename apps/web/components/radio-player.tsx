@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Play, Pause, Radio, Loader2, Search, X, ChevronDown, ChevronUp, Globe2, Music2, Flame, Moon, Guitar, Disc3, type LucideIcon } from "lucide-react";
+import { Play, Pause, Radio, Loader2, Search, X, ChevronDown, ChevronUp, Globe2, Music2, Sparkles, Moon, Guitar, Disc3, type LucideIcon } from "lucide-react";
 
 type Station = { name: string; tag: string; color: string; url: string };
 
@@ -83,7 +83,7 @@ async function rbFetch(path: string): Promise<any[]> {
 // Kampta dinlemelik hazır mix'ler — tek tık, en iyi eşleşen canlı istasyonu çalar.
 // (Canlı radyo widget'ı sabit şarkı listesi çalamaz; her mix o vibe'ı çalan istasyona bağlanır.)
 const MIXES: { l: string; s: string; q: string; by: "name" | "tag"; hero?: boolean; Icon: LucideIcon; color: string }[] = [
-  { l: "KAMP ÖZEL", s: "Türkçe rock · 25 yılın en iyileri", q: "eksen", by: "name", hero: true, Icon: Flame, color: "#A855F7" },
+  { l: "BUGÜNE ÖZEL", s: "günün seçkisi · Türkçe rock", q: "eksen", by: "name", hero: true, Icon: Sparkles, color: "#A855F7" },
   { l: "Türkçe Pop", s: "hit & yeni", q: "power türk", by: "name", Icon: Music2, color: "#EC4899" },
   { l: "Rock", s: "yabancı rock klasikleri", q: "rock", by: "tag", Icon: Guitar, color: "#F97316" },
   { l: "Slow · Akşam", s: "sakin, ateş başı", q: "slow türk", by: "name", Icon: Moon, color: "#60A5FA" },
