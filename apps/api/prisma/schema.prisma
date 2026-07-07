@@ -564,6 +564,32 @@ model Submission {
   @@index([type, status, createdAt])
 }
 
+// WhatsApp grubundan gelen ham mesajlar — parse edilip DRAFT etkinliğe dönüşür.
+// Admin panelinde kuyruk olarak görünür; onaylanan mesaj Event(status=DRAFT) yaratır.
+enum WaInboundStatus {
+  NEW        // geldi, henüz parse edilmedi
+  PARSED     // Claude/regex ile ayrıştırıldı, admin onayı bekliyor
+  CONVERTED  // DRAFT etkinliğe dönüştürüldü
+  IGNORED    // admin yok saydı (spam / alakasız)
+  FAILED     // parse edilemedi
+}
+
+model WhatsappInbound {
+  id          String          @id @default(cuid())
+  waMessageId String          @unique          // wa-listener'dan; tekrar gelirse idempotent
+  groupName   String?
+  sender      String?                            // gönderen adı/numarası (varsa)
+  rawText     String                             // mesajın ham metni
+  mediaUrls   String[]        @default([])       // R2'ye yüklenmiş görseller
+  parsed      Json?                              // { title, startsAt, venue, categorySlug, description, confidence }
+  parseError  String?
+  status      WaInboundStatus @default(NEW)
+  eventId     String?                            // dönüştürülen DRAFT event
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  @@index([status, createdAt])
+}
+
 enum PostStatus {
   DRAFT
   PUBLISHED

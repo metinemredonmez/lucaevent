@@ -34,6 +34,7 @@ import { UploadsModule } from './uploads/uploads.module';
 import { SubmissionsModule } from './submissions/submissions.module';
 import { ContentModule } from './content/content.module';
 import { SmsModule } from './sms/sms.module';
+import { WhatsappModule } from './whatsapp/whatsapp.module';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { SmsModule } from './sms/sms.module';
     SubmissionsModule,
     ContentModule,
     SmsModule,
+    WhatsappModule,
   ],
   controllers: [HealthController],
   providers: [

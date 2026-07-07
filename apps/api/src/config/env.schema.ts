@@ -56,6 +56,11 @@ const schema = z.object({
   MUX_TOKEN_ID: z.string().optional().default(''),
   MUX_TOKEN_SECRET: z.string().optional().default(''),
 
+  // WhatsApp → etkinlik ingest. ANTHROPIC_API_KEY boşsa parse regex fallback'e düşer.
+  ANTHROPIC_API_KEY: z.string().optional().default(''),
+  ANTHROPIC_MODEL: z.string().optional().default('claude-haiku-4-5-20251001'),
+  WA_WEBHOOK_SECRET: z.string().optional().default(''),
+
   SENTRY_DSN: z.string().optional().default(''),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
   CORS_ORIGINS: z.string().default('http://localhost:3000'),
