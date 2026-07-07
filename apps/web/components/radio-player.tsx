@@ -503,7 +503,7 @@ export function RadioPlayer() {
     </div>
   );
 
-  const eqKeyframes = <style>{`@keyframes lucaEq{from{transform:scaleY(.4)}to{transform:scaleY(1)}}`}</style>;
+  const eqKeyframes = <style>{`@keyframes lucaEq{from{transform:scaleY(.4)}to{transform:scaleY(1)}}@keyframes lucaChipIn{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:none}}`}</style>;
 
   // ADMIN: sağ-altta kompakt çalar (üst şerit değil — içeriği örtmez)
   if (isAdmin) {
@@ -598,7 +598,7 @@ export function RadioPlayer() {
 
         {/* mix şeridi — yatay kayar, tek tık çalar (üstte ayraç çizgi) */}
         <div className="flex items-center gap-1.5 overflow-x-auto border-t border-primary/15 pb-1.5 pt-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {MIXES.map((m) => {
+          {MIXES.map((m, i) => {
             const busy = mixBusy === m.l;
             const Icon = m.Icon;
             return (
@@ -606,6 +606,7 @@ export function RadioPlayer() {
                 key={m.l}
                 onClick={() => playMix(m)}
                 disabled={!!mixBusy}
+                style={{ animation: `lucaChipIn .32s ease-out both`, animationDelay: `${i * 45}ms` }}
                 className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition disabled:opacity-60 ${
                   m.hero
                     ? "border-primary/50 bg-primary/15 font-medium text-primary"
@@ -619,6 +620,7 @@ export function RadioPlayer() {
           })}
           <button
             onClick={() => { setOpen(true); setOpenCat("genre"); }}
+            style={{ animation: `lucaChipIn .32s ease-out both`, animationDelay: `${MIXES.length * 45}ms` }}
             className="inline-flex shrink-0 items-center gap-1 rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
           >
             <Music2 className="h-3.5 w-3.5" /> Türler
