@@ -503,7 +503,24 @@ export function RadioPlayer() {
     </div>
   );
 
-  const eqKeyframes = <style>{`@keyframes lucaEq{from{transform:scaleY(.4)}to{transform:scaleY(1)}}@keyframes lucaChipIn{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:none}}`}</style>;
+  const eqKeyframes = <style>{`@keyframes lucaEq{from{transform:scaleY(.4)}to{transform:scaleY(1)}}@keyframes lucaChipIn{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:none}}@keyframes lucaWave{from{transform:scaleY(.15)}to{transform:scaleY(1)}}`}</style>;
+
+  // Çalarken çubuğun altına yapışan ince tam-genişlik ses dalgası (ekolayzer şeridi).
+  const WaveStrip = () => (
+    <div className="flex h-2.5 items-end gap-px overflow-hidden pb-0.5" aria-hidden>
+      {Array.from({ length: 64 }).map((_, i) => (
+        <span
+          key={i}
+          className="flex-1 rounded-full"
+          style={{
+            background: current.color,
+            transformOrigin: "bottom",
+            animation: `lucaWave ${0.55 + (i % 5) * 0.09}s ${(i % 7) * 0.08}s ease-in-out infinite alternate`,
+          }}
+        />
+      ))}
+    </div>
+  );
 
   // ADMIN: sağ-altta kompakt çalar (üst şerit değil — içeriği örtmez)
   if (isAdmin) {
@@ -595,6 +612,9 @@ export function RadioPlayer() {
           <X className="h-3.5 w-3.5" />
         </button>
         </div>
+
+        {/* çalarken: ince ses dalgası şeridi (çubuğun altına yapışık) */}
+        {playing && <WaveStrip />}
 
         {/* mix şeridi — yatay kayar, tek tık çalar (üstte ayraç çizgi) */}
         <div className="flex items-center gap-1.5 overflow-x-auto border-t border-primary/15 pb-1.5 pt-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
