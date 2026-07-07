@@ -1,0 +1,3 @@
+# Baileys auth state — WhatsApp oturum kimliği. ASLA commit etme.
+session/
+*.log

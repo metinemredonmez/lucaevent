@@ -1,0 +1,16 @@
+{
+  "name": "@luca/wa-listener",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Luca — WhatsApp grup dinleyici (Baileys). Etkinlik mesajlarını API webhook'una iletir.",
+  "type": "module",
+  "scripts": {
+    "start": "node index.mjs",
+    "dev": "node index.mjs"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.9",
+    "pino": "^9.5.0",
+    "qrcode-terminal": "^0.12.0"
+  }
+}
