@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, MapPin, Building2, Users, Radio, CalendarClock } from "lucide-react";
+import { Search, MapPin, Building2, Users, Radio, CalendarClock, Clock } from "lucide-react";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/sections/footer";
 import { formatDateTR } from "@/lib/utils";
@@ -36,6 +36,12 @@ const STATUS_FILTERS = [
   { v: "all", l: "Tümü" },
   { v: "live", l: "Canlı" },
   { v: "upcoming", l: "Yaklaşan" },
+];
+const CAP_FILTERS = [
+  { v: 0, l: "Kapasite" },
+  { v: 50, l: "50+" },
+  { v: 100, l: "100+" },
+  { v: 200, l: "200+" },
 ];
 
 function ensurePinStyle() {
@@ -106,6 +112,7 @@ export default function MekanlarPage() {
   const [q, setQ] = useState("");
   const [cityFilter, setCityFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [capMin, setCapMin] = useState(0);
   const [active, setActive] = useState<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState(false);
@@ -170,10 +177,13 @@ export default function MekanlarPage() {
     return rows.filter((v) => {
       if (cityFilter !== "all" && v.city?.trim() !== cityFilter) return false;
       if (statusFilter !== "all" && (v.status ?? "idle") !== statusFilter) return false;
+      if (capMin > 0 && (v.capacity ?? 0) < capMin) return false;
       if (!term) return true;
       return v.name.toLowerCase().includes(term) || v.city?.toLowerCase().includes(term) || v.address?.toLowerCase().includes(term);
     });
-  }, [rows, q, cityFilter, statusFilter]);
+  }, [rows, q, cityFilter, statusFilter, capMin]);
+
+  const activeFilters = (statusFilter !== "all" ? 1 : 0) + (cityFilter !== "all" ? 1 : 0) + (capMin > 0 ? 1 : 0);
 
   useEffect(() => {
     const gl = glRef.current;
@@ -222,6 +232,16 @@ export default function MekanlarPage() {
   }
 
   const tl = (n: number) => new Intl.NumberFormat("tr-TR").format(n || 0);
+  const chipCls = (on: boolean) =>
+    `rounded-full px-3 py-1 text-xs transition ${on ? "bg-primary text-white" : "border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"}`;
+  const segCls = (on: boolean) =>
+    `inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition ${on ? "bg-primary text-white shadow-sm" : "text-muted-foreground hover:text-foreground"}`;
+  function clearFilters() {
+    setStatusFilter("all");
+    setCityFilter("all");
+    setCapMin(0);
+    setQ("");
+  }
 
   return (
     <>
@@ -232,44 +252,52 @@ export default function MekanlarPage() {
           <h1 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight">Luca haritada</h1>
           <p className="mt-2 text-muted-foreground">Etkinliğin geçtiği mekanlar — canlı olanları haritada gör.</p>
 
-          {/* filtreler */}
-          <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-center">
-            <div className="relative lg:max-w-xs lg:flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Mekan, şehir, adres ara…"
-                className="w-full rounded-lg border border-border bg-card py-2 pl-9 pr-3 text-sm outline-none focus:border-primary/50"
-              />
+          {/* filtreler — modern */}
+          <div className="mt-6 rounded-2xl border border-border bg-card/60 p-3 backdrop-blur sm:p-4">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+              <div className="relative lg:max-w-sm lg:flex-1">
+                <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  placeholder="Mekan, şehir, adres ara…"
+                  className="w-full rounded-xl border border-border bg-background py-2.5 pl-10 pr-3 text-sm outline-none transition focus:border-primary/50"
+                />
+              </div>
+              {/* durum */}
+              <div className="flex items-center gap-1 rounded-xl border border-border bg-background p-1">
+                {STATUS_FILTERS.map((f) => (
+                  <button key={f.v} onClick={() => setStatusFilter(f.v)} className={segCls(statusFilter === f.v)}>
+                    {f.v === "live" && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />}
+                    {f.l}
+                  </button>
+                ))}
+              </div>
+              {/* kapasite */}
+              <div className="flex items-center gap-1 rounded-xl border border-border bg-background p-1">
+                {CAP_FILTERS.map((c) => (
+                  <button key={c.v} onClick={() => setCapMin(c.v)} className={segCls(capMin === c.v)}>
+                    {c.v === 0 && <Users className="h-3 w-3" />}
+                    {c.l}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap items-center gap-1.5">
-              {STATUS_FILTERS.map((f) => (
-                <button
-                  key={f.v}
-                  onClick={() => setStatusFilter(f.v)}
-                  className={`rounded-full px-3 py-1 text-xs transition ${statusFilter === f.v ? "bg-primary text-white" : "border border-border text-muted-foreground hover:text-foreground"}`}
-                >
-                  {f.l}
-                </button>
-              ))}
-              {cityChips.length > 0 && <span className="mx-1 h-4 w-px bg-border" />}
-              <button
-                onClick={() => setCityFilter("all")}
-                className={`rounded-full px-3 py-1 text-xs transition ${cityFilter === "all" ? "bg-primary text-white" : "border border-border text-muted-foreground hover:text-foreground"}`}
-              >
-                Tümü
-              </button>
-              {cityChips.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => setCityFilter(c)}
-                  className={`rounded-full px-3 py-1 text-xs transition ${cityFilter === c ? "bg-primary text-white" : "border border-border text-muted-foreground hover:text-foreground"}`}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
+            {/* şehir + temizle */}
+            {cityChips.length > 0 && (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-border/60 pt-3">
+                <span className="mr-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Şehir</span>
+                <button onClick={() => setCityFilter("all")} className={chipCls(cityFilter === "all")}>Tümü</button>
+                {cityChips.map((c) => (
+                  <button key={c} onClick={() => setCityFilter(c)} className={chipCls(cityFilter === c)}>{c}</button>
+                ))}
+                {(activeFilters > 0 || q) && (
+                  <button onClick={clearFilters} className="ml-auto text-[11px] text-muted-foreground underline-offset-2 hover:text-foreground hover:underline">
+                    Temizle{activeFilters > 0 ? ` (${activeFilters})` : ""}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {/* harita + liste */}
@@ -291,71 +319,76 @@ export default function MekanlarPage() {
             </div>
 
             <div className="order-1 lg:order-2">
-              <div className="mb-2 text-sm text-muted-foreground">{loading ? "Yükleniyor…" : `${list.length} mekan`}</div>
-              <div className="overflow-hidden rounded-xl border border-border bg-card">
-                {loading && <div className="px-4 py-10 text-center text-sm text-muted-foreground">Yükleniyor…</div>}
-                {!loading && list.length === 0 && (
-                  <div className="px-4 py-12 text-center text-sm text-muted-foreground">Mekan bulunamadı.</div>
-                )}
-                {!loading && list.length > 0 && (
-                  <div className="max-h-[560px] divide-y divide-border overflow-y-auto">
-                    {list.map((v) => {
-                      const st = STATUS[v.status ?? "idle"] ?? STATUS.idle;
-                      return (
-                        <button
-                          key={v.id}
-                          onClick={() => focus(v)}
-                          className={`flex w-full items-center gap-3 px-3 py-3 text-left transition-colors sm:px-4 ${active === v.id ? "bg-primary/5" : "hover:bg-muted/30"}`}
-                        >
-                          <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-muted sm:size-14">
-                            {v.coverUrl ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img src={v.coverUrl} alt={v.name} className="h-full w-full object-cover" />
-                            ) : (
-                              <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-white/80">
-                                <MapPin className="h-5 w-5" />
-                              </div>
-                            )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className="truncate text-sm font-medium text-foreground">{v.name}</span>
-                              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] ${st.chip}`}>
-                                {v.status === "live" && (
-                                  <span className="relative flex h-1.5 w-1.5">
-                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                                  </span>
-                                )}
-                                {st.label}
-                              </span>
+              <div className="mb-3 text-sm text-muted-foreground">{loading ? "Yükleniyor…" : `${list.length} mekan`}</div>
+              {loading ? (
+                <div className="rounded-2xl border border-border bg-card px-4 py-12 text-center text-sm text-muted-foreground">Yükleniyor…</div>
+              ) : list.length === 0 ? (
+                <div className="rounded-2xl border border-border bg-card px-4 py-12 text-center text-sm text-muted-foreground">
+                  Mekan bulunamadı. Filtreleri değiştirmeyi dene.
+                </div>
+              ) : (
+                <div className="max-h-[560px] space-y-3 overflow-y-auto pr-1 [scrollbar-width:thin]">
+                  {list.map((v) => {
+                    const st = STATUS[v.status ?? "idle"] ?? STATUS.idle;
+                    const on = active === v.id;
+                    return (
+                      <button
+                        key={v.id}
+                        onClick={() => focus(v)}
+                        className={`group block w-full overflow-hidden rounded-2xl border bg-card text-left transition ${on ? "border-primary/60 ring-1 ring-primary/30" : "border-border hover:border-primary/40"}`}
+                      >
+                        {/* kapak */}
+                        <div className="relative h-28 w-full overflow-hidden bg-muted">
+                          {v.coverUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={v.coverUrl} alt={v.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                          ) : (
+                            <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-white/70">
+                              <MapPin className="h-6 w-6" />
                             </div>
-                            <div className="mt-0.5 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-xs text-muted-foreground">
-                              {v.city && (<span className="inline-flex items-center gap-1"><Building2 className="h-3 w-3" /> {v.city}</span>)}
-                              {v.address && (<span className="inline-flex items-center gap-1 truncate"><MapPin className="h-3 w-3 shrink-0" /> {v.address}</span>)}
-                            </div>
-                            {v.liveEvent ? (
-                              <div className="mt-1 inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400">
-                                <Radio className="h-3 w-3" /> Şu an: {v.liveEvent.title}
-                              </div>
-                            ) : v.nextEvent ? (
-                              <div className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground">
-                                <CalendarClock className="h-3 w-3" /> Sıradaki: {v.nextEvent.title} · {formatDateTR(v.nextEvent.startsAt)}
-                              </div>
-                            ) : null}
-                          </div>
-                          {(v.capacity ?? 0) > 0 && (
-                            <span className="hidden shrink-0 items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground sm:inline-flex">
-                              <Users className="h-3 w-3" />
-                              <span className="tabular-nums">{tl(v.capacity || 0)}</span>
-                            </span>
                           )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+                          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/65 to-transparent" />
+                          <span className={`absolute right-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${st.chip}`}>
+                            {v.status === "live" && (
+                              <span className="relative flex h-1.5 w-1.5">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                              </span>
+                            )}
+                            {st.label}
+                          </span>
+                          <div className="absolute bottom-2 left-3 right-3 truncate text-sm font-semibold text-white drop-shadow">{v.name}</div>
+                        </div>
+                        {/* gövde */}
+                        <div className="p-3">
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                            {v.city && (<span className="inline-flex items-center gap-1"><Building2 className="h-3 w-3" /> {v.city}</span>)}
+                            {(v.capacity ?? 0) > 0 && (<span className="inline-flex items-center gap-1"><Users className="h-3 w-3" /> {tl(v.capacity || 0)}</span>)}
+                          </div>
+                          {v.address && (
+                            <div className="mt-1 flex items-start gap-1 text-xs text-muted-foreground">
+                              <MapPin className="mt-0.5 h-3 w-3 shrink-0" /> <span className="line-clamp-1">{v.address}</span>
+                            </div>
+                          )}
+                          {v.liveEvent ? (
+                            <div className="mt-2 inline-flex items-center gap-1 rounded-lg bg-emerald-500/10 px-2 py-1 text-xs text-emerald-600 dark:text-emerald-400">
+                              <Radio className="h-3 w-3" /> Şu an: {v.liveEvent.title}
+                            </div>
+                          ) : v.nextEvent ? (
+                            <div className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground">
+                              <CalendarClock className="h-3 w-3" /> Sıradaki: {v.nextEvent.title} · {formatDateTR(v.nextEvent.startsAt)}
+                            </div>
+                          ) : (
+                            <div className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground/70">
+                              <Clock className="h-3 w-3" /> Şu an etkinlik yok
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>
