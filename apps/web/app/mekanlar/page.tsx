@@ -22,9 +22,15 @@ type GooglePlace = {
   ratingCount?: number;
   website?: string;
   mapsUri?: string;
+  photoName?: string;
   weekdayText?: string[];
   periods?: { open: ClockPart; close?: ClockPart }[];
 };
+
+// Google foto → API proxy URL (key gizli). Yüklenmiş kapak yoksa kullanılır.
+function placePhotoUrl(name?: string): string | null {
+  return name ? `${BASE}/venues/place-photo?ref=${encodeURIComponent(name)}` : null;
+}
 type Venue = {
   id: string;
   slug: string;
@@ -122,8 +128,9 @@ const STATUS_GRAD: Record<string, string> = {
 function popupHtml(v: Venue): string {
   const status = v.status ?? "idle";
   const st = STATUS[status] ?? STATUS.idle;
-  const hero = v.coverUrl
-    ? `<div class="hero" style="background-image:url('${escapeHtml(v.coverUrl)}')"><div class="heroScrim"></div></div>`
+  const cover = v.coverUrl || placePhotoUrl(v.google?.photoName);
+  const hero = cover
+    ? `<div class="hero" style="background-image:url('${escapeHtml(cover)}')"><div class="heroScrim"></div></div>`
     : `<div class="hero" style="background:${STATUS_GRAD[status]}"><div class="heroScrim"></div></div>`;
   const sub = [v.city, v.address].filter(Boolean).join(" · ");
   const ev = v.liveEvent
@@ -395,6 +402,7 @@ export default function MekanlarPage() {
                   {list.map((v) => {
                     const st = STATUS[v.status ?? "idle"] ?? STATUS.idle;
                     const on = active === v.id;
+                    const cover = v.coverUrl || placePhotoUrl(v.google?.photoName);
                     return (
                       <button
                         key={v.id}
@@ -403,9 +411,9 @@ export default function MekanlarPage() {
                       >
                         {/* kapak */}
                         <div className="relative h-28 w-full overflow-hidden bg-muted">
-                          {v.coverUrl ? (
+                          {cover ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={v.coverUrl} alt={v.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                            <img src={cover} alt={v.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                           ) : (
                             <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-white/70">
                               <MapPin className="h-6 w-6" />

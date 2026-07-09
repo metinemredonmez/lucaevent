@@ -1,8 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
+import type { Response } from 'express';
 
 import { VenuesService } from './venues.service';
+import { PlacesService } from './places.service';
 import { VenueCreateDto, VenueUpdateDto } from './dto/venue.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -12,7 +14,10 @@ import { Roles } from '../common/decorators/roles.decorator';
 @ApiTags('venues')
 @Controller()
 export class VenuesController {
-  constructor(private readonly venues: VenuesService) {}
+  constructor(
+    private readonly venues: VenuesService,
+    private readonly places: PlacesService,
+  ) {}
 
   // public
   @Public()
@@ -33,6 +38,20 @@ export class VenuesController {
   @Get('venues/map')
   map() {
     return this.venues.mapVenues();
+  }
+
+  // Google foto proxy (key gizli) — ':slug'tan ÖNCE olmalı
+  @Public()
+  @Get('venues/place-photo')
+  async placePhoto(@Query('ref') ref: string, @Res() res: Response) {
+    const img = ref ? await this.places.fetchPhoto(ref).catch(() => null) : null;
+    if (!img) {
+      res.status(404).end();
+      return;
+    }
+    res.set('Content-Type', img.contentType);
+    res.set('Cache-Control', 'public, max-age=604800, immutable');
+    res.end(Buffer.from(img.body));
   }
 
   @Public()

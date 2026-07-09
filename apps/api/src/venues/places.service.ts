@@ -13,6 +13,7 @@ export interface PlaceData {
   ratingCount?: number;
   website?: string;
   mapsUri?: string;
+  photoName?: string; // Google foto kaynağı (places/.../photos/...) — proxy ile servis edilir
   weekdayText?: string[];
   periods?: Array<{
     open: { day: number; hour: number; minute: number };
@@ -22,7 +23,7 @@ export interface PlaceData {
 
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 gün — koordinat/saat sık değişmez
 const DETAILS_FIELDS =
-  'id,location,internationalPhoneNumber,rating,userRatingCount,websiteUri,googleMapsUri,regularOpeningHours';
+  'id,location,internationalPhoneNumber,rating,userRatingCount,websiteUri,googleMapsUri,regularOpeningHours,photos';
 
 type VenueLike = {
   id: string;
@@ -111,8 +112,19 @@ export class PlacesService {
       ratingCount: typeof p.userRatingCount === 'number' ? p.userRatingCount : undefined,
       website: p.websiteUri || undefined,
       mapsUri: p.googleMapsUri || undefined,
+      photoName: p.photos?.[0]?.name || undefined,
       weekdayText: p.regularOpeningHours?.weekdayDescriptions || undefined,
       periods: p.regularOpeningHours?.periods || undefined,
     };
+  }
+
+  /** Google foto medyasını sunucudan getir (key gizli). ref = places/.../photos/... */
+  async fetchPhoto(ref: string, maxH = 400): Promise<{ body: ArrayBuffer; contentType: string } | null> {
+    const key = this.key();
+    if (!key || !ref.startsWith('places/')) return null;
+    const url = `https://places.googleapis.com/v1/${ref}/media?maxHeightPx=${maxH}&key=${key}`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    return { body: await res.arrayBuffer(), contentType: res.headers.get('content-type') || 'image/jpeg' };
   }
 }
