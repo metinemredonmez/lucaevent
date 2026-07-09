@@ -121,9 +121,16 @@ async function main() {
     if (connection === 'open') log.info('✓ WhatsApp bağlandı. Grup mesajları dinleniyor…');
     if (connection === 'close') {
       const code = lastDisconnect?.error?.output?.statusCode;
-      const loggedOut = code === DisconnectReason.loggedOut;
-      log.warn(`bağlantı kapandı (code ${code}). ${loggedOut ? 'Çıkış yapıldı — QR yeniden gerekli.' : 'Yeniden bağlanılıyor…'}`);
-      if (!loggedOut) main().catch((e) => log.error(e));
+      const registered = sock.authState.creds.registered;
+      // Eşleştirme tamamlanmadan kapandıysa (kod girilmedi / süre doldu) döngüye girme.
+      if (!registered || code === DisconnectReason.loggedOut) {
+        log.warn(`bağlantı kapandı (code ${code}). Eşleştirme tamamlanmadı.`);
+        log.warn('→ Kodu 2 dk icinde girmediysen: session klasorunu silip komutu TEKRAR calistir (arkadas hazirken).');
+        log.warn('   rm -rf ' + SESSION_DIR);
+        process.exit(1);
+      }
+      log.warn(`bağlantı kapandı (code ${code}). Yeniden bağlanılıyor…`);
+      main().catch((e) => log.error(e));
     }
   });
 
