@@ -61,6 +61,9 @@ const schema = z.object({
   ANTHROPIC_MODEL: z.string().optional().default('claude-haiku-4-5-20251001'),
   WA_WEBHOOK_SECRET: z.string().optional().default(''),
 
+  // Google Places (New) — mekan detay + koordinat + çalışma saati.
+  GOOGLE_PLACES_API_KEY: z.string().optional().default(''),
+
   SENTRY_DSN: z.string().optional().default(''),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
   CORS_ORIGINS: z.string().default('http://localhost:3000'),

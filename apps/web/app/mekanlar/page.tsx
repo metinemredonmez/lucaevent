@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, MapPin, Building2, Users, Radio, CalendarClock, Clock } from "lucide-react";
+import { Search, MapPin, Building2, Users, Radio, CalendarClock, Clock, Star, Phone } from "lucide-react";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/sections/footer";
 import { formatDateTR } from "@/lib/utils";
@@ -12,6 +12,19 @@ const MAP_STYLE = "mapbox://styles/mapbox/dark-v11";
 const ISTANBUL: [number, number] = [28.9784, 41.0082]; // Mapbox: [lng, lat]
 
 type EventRef = { id: string; title: string; slug: string; startsAt: string; endsAt?: string | null };
+type ClockPart = { day: number; hour: number; minute: number };
+type GooglePlace = {
+  placeId: string;
+  lat: number;
+  lng: number;
+  phone?: string;
+  rating?: number;
+  ratingCount?: number;
+  website?: string;
+  mapsUri?: string;
+  weekdayText?: string[];
+  periods?: { open: ClockPart; close?: ClockPart }[];
+};
 type Venue = {
   id: string;
   slug: string;
@@ -25,7 +38,33 @@ type Venue = {
   status?: "live" | "upcoming" | "idle";
   liveEvent?: EventRef | null;
   nextEvent?: EventRef | null;
+  google?: GooglePlace | null;
 };
+
+// Google çalışma saatlerinden şu an açık mı — istemcide canlı hesaplanır (cache bayatlamaz).
+// Google periods: day 0=Pazar…6=Cumartesi (JS getDay ile aynı).
+function isOpenNow(periods?: { open: ClockPart; close?: ClockPart }[]): boolean | null {
+  if (!periods || periods.length === 0) return null;
+  const now = new Date();
+  const d = now.getDay();
+  const mins = now.getHours() * 60 + now.getMinutes();
+  for (const p of periods) {
+    if (!p.open) continue;
+    const oMin = p.open.hour * 60 + p.open.minute;
+    if (!p.close) {
+      if (d === p.open.day) return true; // 24 saat açık
+      continue;
+    }
+    const cMin = p.close.hour * 60 + p.close.minute;
+    if (p.open.day === p.close.day) {
+      if (d === p.open.day && mins >= oMin && mins < cMin) return true;
+    } else {
+      if (d === p.open.day && mins >= oMin) return true; // gece aşan
+      if (d === p.close.day && mins < cMin) return true;
+    }
+  }
+  return false;
+}
 
 const STATUS: Record<string, { label: string; chip: string; pin: string }> = {
   live: { label: "Canlı", chip: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400", pin: "#10b981" },
@@ -98,11 +137,25 @@ function popupHtml(v: Venue): string {
       ? `<a class="watch" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)" href="/etkinlik/${encodeURIComponent(v.nextEvent.slug)}">Detayı gör →</a>`
       : "";
   const dot = v.status === "live" ? `<span style="width:6px;height:6px;border-radius:50%;background:#fff"></span>` : "";
+  const g = v.google;
+  const openState = isOpenNow(g?.periods);
+  const openChip =
+    openState === null
+      ? ""
+      : `<span class="chip" style="background:${openState ? "#10b98126;color:#34d399" : "#ef444426;color:#f87171"}">${openState ? "● Açık" : "● Kapalı"}</span>`;
+  const gInfo =
+    g && (g.rating || g.phone)
+      ? `<div class="sub">${g.rating ? `★ ${g.rating.toFixed(1)}${g.ratingCount ? ` (${g.ratingCount})` : ""}` : ""}${g.rating && g.phone ? " · " : ""}${g.phone ? escapeHtml(g.phone) : ""}</div>`
+      : "";
+  const gLinks =
+    g && (g.mapsUri || g.phone)
+      ? `<div style="display:flex;gap:8px;margin-top:10px">${g.mapsUri ? `<a class="watch" style="background:#1a73e8;flex:1" href="${escapeHtml(g.mapsUri)}" target="_blank" rel="noopener">Google'da aç →</a>` : ""}${g.phone ? `<a class="watch" style="background:#334155;flex:1" href="tel:${escapeHtml(g.phone.replace(/\s/g, ""))}">Ara</a>` : ""}</div>`
+      : "";
   return (
     `<div class="luca-pop">${hero}<div class="pad">` +
     `<div class="ttl">${escapeHtml(v.name)}</div>` +
-    `<span class="chip" style="background:${st.pin}26;color:${st.pin}">${dot}${st.label}</span>` +
-    `${sub ? `<div class="sub">${escapeHtml(sub)}</div>` : ""}${ev}${watch}</div></div>`
+    `<span class="chip" style="background:${st.pin}26;color:${st.pin}">${dot}${st.label}</span>${openChip}` +
+    `${sub ? `<div class="sub">${escapeHtml(sub)}</div>` : ""}${gInfo}${ev}${watch}${gLinks}</div></div>`
   );
 }
 
@@ -113,6 +166,7 @@ export default function MekanlarPage() {
   const [cityFilter, setCityFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [capMin, setCapMin] = useState(0);
+  const [openOnly, setOpenOnly] = useState(false);
   const [active, setActive] = useState<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [mapError, setMapError] = useState(false);
@@ -178,12 +232,14 @@ export default function MekanlarPage() {
       if (cityFilter !== "all" && v.city?.trim() !== cityFilter) return false;
       if (statusFilter !== "all" && (v.status ?? "idle") !== statusFilter) return false;
       if (capMin > 0 && (v.capacity ?? 0) < capMin) return false;
+      if (openOnly && isOpenNow(v.google?.periods) !== true) return false;
       if (!term) return true;
       return v.name.toLowerCase().includes(term) || v.city?.toLowerCase().includes(term) || v.address?.toLowerCase().includes(term);
     });
-  }, [rows, q, cityFilter, statusFilter, capMin]);
+  }, [rows, q, cityFilter, statusFilter, capMin, openOnly]);
 
-  const activeFilters = (statusFilter !== "all" ? 1 : 0) + (cityFilter !== "all" ? 1 : 0) + (capMin > 0 ? 1 : 0);
+  const activeFilters =
+    (statusFilter !== "all" ? 1 : 0) + (cityFilter !== "all" ? 1 : 0) + (capMin > 0 ? 1 : 0) + (openOnly ? 1 : 0);
 
   useEffect(() => {
     const gl = glRef.current;
@@ -240,6 +296,7 @@ export default function MekanlarPage() {
     setStatusFilter("all");
     setCityFilter("all");
     setCapMin(0);
+    setOpenOnly(false);
     setQ("");
   }
 
@@ -264,6 +321,13 @@ export default function MekanlarPage() {
                   className="w-full rounded-xl border border-border bg-background py-2.5 pl-10 pr-3 text-sm outline-none transition focus:border-primary/50"
                 />
               </div>
+              {/* açık şimdi */}
+              <button
+                onClick={() => setOpenOnly((o) => !o)}
+                className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium transition ${openOnly ? "border-emerald-500/50 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" : "border-border text-muted-foreground hover:text-foreground"}`}
+              >
+                <Clock className="h-3.5 w-3.5" /> Açık şimdi
+              </button>
               {/* durum */}
               <div className="flex items-center gap-1 rounded-xl border border-border bg-background p-1">
                 {STATUS_FILTERS.map((f) => (
@@ -348,6 +412,15 @@ export default function MekanlarPage() {
                             </div>
                           )}
                           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/65 to-transparent" />
+                          {(() => {
+                            const open = isOpenNow(v.google?.periods);
+                            if (open === null) return null;
+                            return (
+                              <span className={`absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium text-white ${open ? "bg-emerald-600/90" : "bg-red-600/90"}`}>
+                                ● {open ? "Açık" : "Kapalı"}
+                              </span>
+                            );
+                          })()}
                           <span className={`absolute right-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${st.chip}`}>
                             {v.status === "live" && (
                               <span className="relative flex h-1.5 w-1.5">
@@ -368,6 +441,19 @@ export default function MekanlarPage() {
                           {v.address && (
                             <div className="mt-1 flex items-start gap-1 text-xs text-muted-foreground">
                               <MapPin className="mt-0.5 h-3 w-3 shrink-0" /> <span className="line-clamp-1">{v.address}</span>
+                            </div>
+                          )}
+                          {v.google && (typeof v.google.rating === "number" || v.google.phone) && (
+                            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                              {typeof v.google.rating === "number" && (
+                                <span className="inline-flex items-center gap-1">
+                                  <Star className="h-3 w-3 text-amber-500" /> {v.google.rating.toFixed(1)}
+                                  {v.google.ratingCount ? ` (${tl(v.google.ratingCount)})` : ""}
+                                </span>
+                              )}
+                              {v.google.phone && (
+                                <span className="inline-flex items-center gap-1"><Phone className="h-3 w-3" /> {v.google.phone}</span>
+                              )}
                             </div>
                           )}
                           {v.liveEvent ? (

@@ -335,6 +335,13 @@ model Venue {
   capacity Int?
   mapStyle String? // mapbox style URL
   coverUrl String?
+
+  // Google Places — admin googlePlaceId girer ya da isim+şehirden otomatik eşleşir.
+  // placeCache: normalize edilmiş Google verisi (koordinat/saat/telefon/puan/foto), cache.
+  googlePlaceId String?
+  placeCache    Json?
+  placeCachedAt DateTime?
+
   events       Event[]
   reservations Reservation[]
   series       EventSeries[]

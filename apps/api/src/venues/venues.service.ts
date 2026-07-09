@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SettingsService } from '../settings/settings.service';
+import { PlacesService } from './places.service';
 import { VenueCreateDto, VenueUpdateDto } from './dto/venue.dto';
 
 @Injectable()
@@ -8,6 +9,7 @@ export class VenuesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly settings: SettingsService,
+    private readonly places: PlacesService,
   ) {}
 
   /** Public harita yapılandırması — Mapbox public token (gizli değil; admin'den yönetilir). */
@@ -73,10 +75,28 @@ export class VenuesService {
     });
   }
 
-  /** Public harita — yalnız konumlu mekanlar + o anki durum (live/upcoming/idle). */
+  /**
+   * Public harita — mekanlar + o anki durum + Google Places verisi.
+   * Google koordinatı varsa DB'deki (çoğu zaman yanlış) lat/lng'yi ezer → pin
+   * denizde kalmaz. Detay (telefon/saat/puan) `google` alanında döner; açık/kapalı
+   * frontend'de saatlerden canlı hesaplanır. Key yoksa DB verisiyle çalışır.
+   */
   async mapVenues() {
     const all = await this.listAdmin();
-    return all.filter((v) => v.lat != null && v.lng != null);
+    const enriched = await Promise.all(
+      all.map(async (v) => {
+        const g = await this.places.enrich(v).catch(() => null);
+        // ham cache alanlarını dışarı verme
+        const { placeCache, placeCachedAt, ...rest } = v as Record<string, unknown>;
+        return {
+          ...rest,
+          lat: g?.lat ?? (v.lat as number | null),
+          lng: g?.lng ?? (v.lng as number | null),
+          google: g ?? null,
+        };
+      }),
+    );
+    return enriched.filter((v) => v.lat != null && v.lng != null);
   }
 
   async bySlug(slug: string) {
