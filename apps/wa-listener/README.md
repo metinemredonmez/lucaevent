@@ -16,7 +16,15 @@ WA_WEBHOOK_SECRET=<API ile aynı secret>
 WA_GROUP_NAME=<dinlenecek grubun tam adı>     # boşsa: sadece grup adlarını loglar
 WA_SESSION_DIR=/var/www/luca/apps/wa-listener/session
 # WA_ALLOW_ALL=1                               # tüm gruplardan iletmek istersen
+# WA_PAIR_NUMBER=905321234567                  # uzaktaki telefon: QR yerine eşleştirme kodu
 ```
+
+## Uzaktaki telefon — eşleştirme kodu (QR yerine)
+
+Telefon sende değil, arkadaşındaysa: `WA_PAIR_NUMBER`'a o numarayı ver
+(uluslararası, sembolsüz — `905321234567`). Listener QR yerine **8 haneli kod**
+basar. Kodu arkadaşına ilet; o telefonunda *WhatsApp → Bağlı Cihazlar →
+Cihaz Ekle → "Telefon numarasıyla bağla"* deyip kodu girer.
 
 ## Kurulum (sunucuda, tek seferlik)
 

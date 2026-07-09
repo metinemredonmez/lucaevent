@@ -25,6 +25,9 @@ const SECRET = process.env.WA_WEBHOOK_SECRET || '';
 const GROUP_NAME = (process.env.WA_GROUP_NAME || '').trim();
 const SESSION_DIR = process.env.WA_SESSION_DIR || './session';
 const ALLOW_ALL = process.env.WA_ALLOW_ALL === '1';
+// Uzaktaki telefon için: numara verilirse QR yerine 8 haneli eşleştirme kodu üretir.
+// Uluslararası format, sembolsüz: örn. 905321234567
+const PAIR_NUMBER = (process.env.WA_PAIR_NUMBER || '').replace(/[^0-9]/g, '');
 
 const log = pino({ level: process.env.LOG_LEVEL || 'info' });
 
@@ -92,9 +95,26 @@ async function main() {
 
   sock.ev.on('creds.update', saveCreds);
 
+  // Uzaktaki telefon: numara verildiyse QR yerine eşleştirme kodu iste.
+  if (PAIR_NUMBER && !sock.authState.creds.registered) {
+    setTimeout(async () => {
+      try {
+        const code = await sock.requestPairingCode(PAIR_NUMBER);
+        log.info('════════════════════════════════════════════');
+        log.info(`  EŞLEŞTİRME KODU:  ${code}`);
+        log.info('  Bu kodu telefon sahibine ilet. Telefonda:');
+        log.info('  WhatsApp → Ayarlar → Bağlı Cihazlar → Cihaz Ekle');
+        log.info('  → "Telefon numarasıyla bağla" → kodu gir.');
+        log.info('════════════════════════════════════════════');
+      } catch (e) {
+        log.error(`eşleştirme kodu alınamadı: ${e.message}`);
+      }
+    }, 3000);
+  }
+
   sock.ev.on('connection.update', (u) => {
     const { connection, lastDisconnect, qr } = u;
-    if (qr) {
+    if (qr && !PAIR_NUMBER) {
       log.info('QR kodu — telefondan: Ayarlar → Bağlı Cihazlar → Cihaz Ekle ile okut:');
       qrcode.generate(qr, { small: true });
     }
