@@ -7,6 +7,8 @@ import { Search, MapPin, CalendarDays, Loader2, X } from "lucide-react";
 import { CATEGORIES } from "@/lib/data";
 import { discoverEvents, type DiscoverEvent } from "@/lib/events";
 import { formatDateTR } from "@/lib/utils";
+import { Nav } from "@/components/nav";
+import { Footer } from "@/components/sections/footer";
 
 const RANGES = [
   { v: "upcoming", l: "Yaklaşan" },
@@ -161,7 +163,9 @@ export default function KesfetPage() {
   }
 
   return (
-    <main className="pt-24 md:pt-28 pb-16">
+    <>
+      <Nav />
+      <main className="pt-24 md:pt-28 pb-16">
       <div className="container">
         <div className="mb-2 text-[11px] font-mono uppercase tracking-[0.22em] text-primary/70">Keşfet</div>
         <h1 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight">Şehirde ne var?</h1>
@@ -301,6 +305,8 @@ export default function KesfetPage() {
           </div>
         </div>
       </div>
-    </main>
+      </main>
+      <Footer />
+    </>
   );
 }
