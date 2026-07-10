@@ -19,6 +19,14 @@ const RANGES = [
 ] as const;
 type Range = (typeof RANGES)[number]["v"];
 
+// API kategori slug'ı → web taksonomisi (chip'ler web slug kullanıyor).
+const API_ALIAS: Record<string, string> = {
+  "outdoor-spor": "outdoor",
+  "gezi-seyahat": "gezi",
+  "food-drink": "food",
+};
+const webCat = (slug?: string | null) => (slug ? API_ALIAS[slug] ?? slug : "");
+
 const ISTANBUL: [number, number] = [41.0082, 28.9784];
 
 function loadLeaflet(): Promise<any> {
@@ -52,6 +60,13 @@ export default function KesfetPage() {
   const [active, setActive] = useState<string | null>(null);
   const [mapError, setMapError] = useState(false);
 
+  // Ana sayfadan gelen ?kategori=<webslug> → kategoriyi ön-seç (useSearchParams yerine
+  // window ile: statik route'u dinamiğe zorlamaz, Suspense gerektirmez).
+  useEffect(() => {
+    const k = new URLSearchParams(window.location.search).get("kategori");
+    if (k && CATEGORIES.some((c) => c.slug === k)) setCat(k);
+  }, []);
+
   const mapEl = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<any>(null);
   const markersRef = useRef<Map<string, any>>(new Map());
@@ -73,7 +88,7 @@ export default function KesfetPage() {
   const events = useMemo(() => {
     const term = q.trim().toLowerCase();
     return all.filter((e) => {
-      if (cat && e.category?.slug !== cat) return false;
+      if (cat && webCat(e.category?.slug) !== cat) return false;
       if (!term) return true;
       return (
         e.title.toLowerCase().includes(term) ||

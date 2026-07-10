@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, ArrowUpRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { CATEGORIES, UPCOMING_ACTIVITIES, type CategorySlug, type Category } from "@/lib/data";
+import { discoverEvents } from "@/lib/events";
 import { PosterFallback } from "@/components/poster-fallback";
 import { AnimatedGradientText } from "@/components/ui/animated-gradient-text";
 
@@ -15,7 +16,35 @@ interface Props {
   onSelect?: (slug: CategorySlug | "all") => void;
 }
 
+// API kategori slug'ı → web taksonomisi (activities.tsx ile aynı eşleme).
+const API_ALIAS: Record<string, CategorySlug> = {
+  "outdoor-spor": "outdoor",
+  "gezi-seyahat": "gezi",
+  "food-drink": "food",
+};
+type CatStat = { count: number; next?: { title: string; date: string } };
+
 export function Categories({ active = "all", onSelect }: Props) {
+  // Kategori başına yaklaşan etkinlik sayısı + sıradaki (canlı veriden).
+  const [stats, setStats] = useState<Partial<Record<CategorySlug, CatStat>>>({});
+  useEffect(() => {
+    discoverEvents({ range: "upcoming", take: 100 })
+      .then((evs) => {
+        const m: Partial<Record<CategorySlug, CatStat>> = {};
+        for (const e of evs) {
+          const api = e.category?.slug ?? "";
+          const web = (API_ALIAS[api] ?? api) as CategorySlug;
+          if (!CATEGORIES.some((c) => c.slug === web)) continue;
+          const cur = m[web] ?? { count: 0 };
+          cur.count += 1;
+          if (!cur.next) cur.next = { title: e.title, date: e.startsAt };
+          m[web] = cur;
+        }
+        setStats(m);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <section id="kategoriler" className="relative py-20 md:py-28">
       <div className="container">
@@ -43,6 +72,7 @@ export function Categories({ active = "all", onSelect }: Props) {
               cat={cat}
               index={i}
               isActive={active === cat.slug}
+              stat={stats[cat.slug]}
               onClick={() => onSelect?.(cat.slug)}
             />
           ))}
@@ -52,6 +82,17 @@ export function Categories({ active = "all", onSelect }: Props) {
 
         {/* kategori seçilince o kategorinin etkinlikleri inline, animasyonlu açılır */}
         <CategoryEvents active={active} />
+
+        {/* tümünü keşfet CTA */}
+        <div className="mt-10 flex justify-center">
+          <Link
+            href={active === "all" ? "/kesfet" : `/kesfet?kategori=${active}`}
+            className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-6 py-3 text-sm font-medium text-white shadow-lg shadow-[#6366F1]/20 transition hover:opacity-90"
+          >
+            {active === "all" ? "Tümünü keşfet" : `${CATEGORIES.find((c) => c.slug === active)?.name} etkinliklerini gör`}
+            <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -100,6 +141,12 @@ function CategoryEvents({ active }: { active: CategorySlug | "all" }) {
               <span className="h-2 w-2 rounded-full" style={{ background: cat.accent }} />
               <span className="font-medium text-foreground">{cat.name}</span>
               <span>· {events.length} etkinlik</span>
+              <Link
+                href={`/kesfet?kategori=${active}`}
+                className="ml-auto inline-flex items-center gap-1 text-xs text-primary transition hover:gap-1.5"
+              >
+                Keşfet'te aç <ArrowUpRight className="size-3.5" />
+              </Link>
             </div>
 
             {events.length ? (
@@ -331,11 +378,13 @@ function CategoryCard({
   cat,
   index,
   isActive,
+  stat,
   onClick,
 }: {
   cat: Category;
   index: number;
   isActive: boolean;
+  stat?: CatStat;
   onClick: () => void;
 }) {
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -379,6 +428,13 @@ function CategoryCard({
       {/* legibility overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
 
+      {/* etkinlik sayısı rozeti (sağ üst) */}
+      {stat && stat.count > 0 && (
+        <div className="absolute right-2.5 top-2.5 rounded-full bg-black/45 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+          {stat.count} etkinlik
+        </div>
+      )}
+
       {/* Text anchored bottom-left */}
       <div className="absolute inset-0 p-5 flex flex-col justify-end">
         <div className="font-serif text-white text-2xl leading-none font-semibold tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]">
@@ -387,6 +443,12 @@ function CategoryCard({
         <div className="text-[10px] uppercase tracking-[0.2em] text-white/60 font-mono mt-2">
           {cat.tagline}
         </div>
+        {/* hover'da sıradaki etkinlik */}
+        {stat?.next && (
+          <div className="mt-2 max-h-0 overflow-hidden text-[11px] text-white/85 opacity-0 transition-all duration-300 group-hover:mt-2 group-hover:max-h-12 group-hover:opacity-100">
+            <span className="text-primary-foreground/70">Sıradaki:</span> {stat.next.title}
+          </div>
+        )}
       </div>
     </motion.button>
   );
