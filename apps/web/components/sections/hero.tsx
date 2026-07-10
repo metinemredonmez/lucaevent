@@ -11,9 +11,9 @@ import { discoverEvents } from "@/lib/events";
 /** Hero arka planında crossfade ile geçen atmosferik kareler (gerçek etkinlik görselleri).
  *  Dosya yoksa (onError) gizlenir, alttaki canlı mor gradyan görünür. */
 const SLIDES = [
-  "/img/events/sile-kampi.jpg",
-  "/img/events/yaza-merhaba-burgazada.jpg",
-  "/img/events/parfum-workshopu.jpg",
+  "/img/hero/istanbul-dusk.jpg", // Boğaz gün batımı — gündüz keşfet
+  "/img/hero/concert.jpg", // konser enerjisi — etkinlik
+  "/img/hero/bosphorus-night.jpg", // köprü gece ışıkları — gece parla
 ];
 
 // kategori → emoji (API slug'ları) — "Bu hafta:" tickerında etkinlik başına ikon

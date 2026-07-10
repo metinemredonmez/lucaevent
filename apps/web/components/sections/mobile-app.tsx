@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Home, MapPin, CalendarDays, User } from "lucide-react";
+import { Home, MapPin, CalendarDays, User, Radio, Users, Ticket, Play } from "lucide-react";
 
 /** Resmî Apple logosu (tek renk beyaz — marka gereği monokrom). */
 function AppleLogo() {
@@ -48,8 +48,8 @@ export function MobileApp() {
       </div>
 
       <div className="container">
-        <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_.95fr] lg:gap-8">
-          {/* sol: metin + rozetler */}
+        <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-8">
+          {/* sol: metin + özellikler + rozetler */}
           <div>
             <div className="mb-4 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
               Mobil uygulama
@@ -65,19 +65,165 @@ export function MobileApp() {
               Lansmanda ilk sen haberdar ol.
             </p>
 
+            {/* özellik çipleri */}
+            <div className="mt-7 grid max-w-md grid-cols-2 gap-3">
+              {[
+                { icon: Ticket, t: "Etkinlik & bilet", d: "Tek dokunuşla katıl" },
+                { icon: Radio, t: "Canlı yayın", d: "Kaçırdığını izle" },
+                { icon: MapPin, t: "Harita", d: "Yakınındaki mekanlar" },
+                { icon: Users, t: "Topluluk", d: "Yeni insanlar" },
+              ].map((f) => (
+                <div key={f.t} className="flex items-start gap-2.5 rounded-xl border border-border bg-card/60 p-3">
+                  <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary/12 text-primary">
+                    <f.icon className="size-4" />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium leading-tight">{f.t}</div>
+                    <div className="text-xs text-muted-foreground">{f.d}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
             <div className="mt-8 flex flex-wrap gap-3">
               <StoreBadge icon={<AppleLogo />} top="İndir" name="App Store" />
               <StoreBadge icon={<GooglePlayLogo />} top="Yükle" name="Google Play" />
             </div>
           </div>
 
-          {/* sağ: açılı telefon — ana sayfa 1. ekran */}
-          <div className="flex justify-center lg:justify-end">
-            <PhoneMock />
-          </div>
+          {/* sağ: telefon kümesi (2 ekran + yüzen kartlar) */}
+          <PhoneCluster />
         </div>
       </div>
     </section>
+  );
+}
+
+/** İki açılı telefon (ana ekran + harita ekranı) + yüzen özellik kartları. */
+function PhoneCluster() {
+  return (
+    <div className="relative mx-auto flex min-h-[440px] w-full max-w-[440px] items-center justify-center">
+      {/* arka telefon — harita ekranı (mobilde gizli) */}
+      <motion.div
+        initial={{ opacity: 0, y: 30, rotate: 4 }}
+        whileInView={{ opacity: 1, y: 0, rotate: 8 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
+        className="absolute left-2 top-2 hidden sm:block"
+      >
+        <PhoneFrame scale="scale-90">
+          <MapScreen />
+        </PhoneFrame>
+      </motion.div>
+
+      {/* ön telefon — ana ekran */}
+      <motion.div
+        initial={{ opacity: 0, y: 30, rotate: -4 }}
+        whileInView={{ opacity: 1, y: 0, rotate: -8 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.7, delay: 0.1, ease: [0.2, 0.8, 0.2, 1] }}
+        className="relative z-20 sm:translate-x-16"
+      >
+        <PhoneFrame>
+          <HomeScreen />
+        </PhoneFrame>
+      </motion.div>
+
+      {/* yüzen özellik kartları */}
+      <FloatCard className="left-0 top-10 z-30 hidden md:flex" icon={<Radio className="size-3.5 text-red-400" />} label="● Canlı yayında" />
+      <FloatCard className="bottom-12 right-0 z-30 hidden md:flex" icon={<Users className="size-3.5 text-primary" />} label="2.400+ topluluk" />
+    </div>
+  );
+}
+
+function FloatCard({ className, icon, label }: { className?: string; icon: ReactNode; label: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: 0.4 }}
+      className={`absolute inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-[#0b0614]/90 px-3 py-1.5 text-[11px] font-medium text-white shadow-xl backdrop-blur ${className ?? ""}`}
+    >
+      {icon}
+      {label}
+    </motion.div>
+  );
+}
+
+function PhoneFrame({ children, scale }: { children: ReactNode; scale?: string }) {
+  return (
+    <div className={`relative h-[420px] w-[206px] rounded-[2.4rem] border-2 border-white/15 bg-[#050308] p-2 shadow-2xl shadow-primary/20 ${scale ?? ""}`}>
+      <div className="relative h-full w-full overflow-hidden rounded-[2rem] bg-gradient-to-b from-[#2E1A63] via-[#140b30] to-[#070510]">
+        {/* dynamic island */}
+        <div className="absolute left-1/2 top-2.5 z-10 h-4 w-14 -translate-x-1/2 rounded-full bg-black" />
+        {children}
+        {/* alt menü */}
+        <div className="absolute inset-x-0 bottom-0 flex h-12 items-center justify-around border-t border-white/10 bg-[#0a0614]/80 text-white/55 backdrop-blur">
+          <Home className="size-[18px] text-[#C4A6FF]" />
+          <MapPin className="size-[18px]" />
+          <CalendarDays className="size-[18px]" />
+          <User className="size-[18px]" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Ana ekran — vitrin + yaklaşan etkinlik kartları. */
+function HomeScreen() {
+  return (
+    <>
+      <Image src="/img/hero/istanbul-dusk.jpg" alt="Luca" fill sizes="220px" className="scale-105 object-cover opacity-60" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0b0620]/55 via-[#0b0620]/25 to-[#070510]" />
+      <div className="relative px-4 pt-9">
+        <div className="font-mono text-[11px] tracking-widest text-white/60">LUCA · İSTANBUL</div>
+        <div className="mt-2 font-serif text-xl font-semibold leading-tight text-white">Şehrini yaşa.</div>
+        <div className="font-serif text-[13px] italic text-[#C4A6FF]">Gündüz keşfet, gece parla.</div>
+        <div className="mt-4 space-y-2">
+          <ScreenCard title="Şile Kampı" meta="Cts · 2 gün" from="#3B2A6E" to="#5b3aa0" />
+          <ScreenCard title="Yaza Merhaba" meta="Burgazada" from="#243b5e" to="#2f6ea0" />
+        </div>
+      </div>
+    </>
+  );
+}
+
+/** Harita ekranı — pinli mini harita + mekan kartı. */
+function MapScreen() {
+  return (
+    <>
+      <div className="absolute inset-0 bg-[#0e0a1f]" />
+      {/* faux harita ızgarası */}
+      <div
+        className="absolute inset-0 opacity-40"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(124,58,237,0.18) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,0.18) 1px,transparent 1px)",
+          backgroundSize: "28px 28px",
+        }}
+      />
+      {/* pinler */}
+      <span className="absolute left-[26%] top-[34%] size-2.5 rounded-full bg-[#22D3EE] ring-4 ring-[#22D3EE]/25" />
+      <span className="absolute left-[58%] top-[46%] size-2.5 rounded-full bg-primary ring-4 ring-primary/25" />
+      <span className="absolute left-[42%] top-[62%] size-2.5 rounded-full bg-emerald-400 ring-4 ring-emerald-400/25" />
+      <div className="relative px-4 pt-9">
+        <div className="font-mono text-[11px] tracking-widest text-white/60">KEŞFET · HARİTA</div>
+        <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-[11px] text-white/80">
+          <MapPin className="size-3" /> Yakınımdaki 15 mekan
+        </div>
+      </div>
+      {/* alttaki mekan kartı */}
+      <div className="absolute inset-x-3 bottom-14 rounded-xl border border-white/10 bg-[#0b0614]/85 p-2.5 backdrop-blur">
+        <div className="flex items-center gap-2">
+          <span className="grid size-8 place-items-center rounded-lg bg-primary/20 text-primary"><Play className="size-3.5" /></span>
+          <div className="min-w-0">
+            <div className="truncate text-[12px] font-medium text-white">Kalpazankaya · Burgazada</div>
+            <div className="text-[10px] text-emerald-400">● Açık · şu an canlı</div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -93,57 +239,6 @@ function StoreBadge({ icon, top, name }: { icon: ReactNode; top: string; name: s
         <span className="block text-[15px] font-semibold text-white">{name}</span>
       </span>
     </span>
-  );
-}
-
-function PhoneMock() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30, rotate: -3 }}
-      whileInView={{ opacity: 1, y: 0, rotate: -9 }}
-      viewport={{ once: true, amount: 0.4 }}
-      transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
-      className="relative my-6"
-    >
-      {/* çerçeve */}
-      <div className="relative h-[420px] w-[206px] rounded-[2.4rem] border-2 border-white/15 bg-[#050308] p-2 shadow-2xl shadow-primary/20">
-        {/* ekran */}
-        <div className="relative h-full w-full overflow-hidden rounded-[2rem] bg-gradient-to-b from-[#2E1A63] via-[#140b30] to-[#070510]">
-          {/* fotoğraf (gerçek hero görseli) */}
-          <Image
-            src="/img/events/sile-kampi.jpg"
-            alt="Luca uygulaması"
-            fill
-            sizes="220px"
-            className="scale-105 object-cover opacity-60"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0b0620]/55 via-[#0b0620]/25 to-[#070510]" />
-
-          {/* dynamic island */}
-          <div className="absolute left-1/2 top-2.5 z-10 h-4 w-14 -translate-x-1/2 rounded-full bg-black" />
-
-          {/* içerik */}
-          <div className="relative px-4 pt-9">
-            <div className="font-mono text-[11px] tracking-widest text-white/60">LUCA · İSTANBUL</div>
-            <div className="mt-2 font-serif text-xl font-semibold leading-tight text-white">Şehrini yaşa.</div>
-            <div className="font-serif text-[13px] italic text-[#C4A6FF]">Gündüz keşfet, gece parla.</div>
-
-            <div className="mt-4 space-y-2">
-              <ScreenCard title="Şile Kampı" meta="Cts · 2 gün" from="#3B2A6E" to="#5b3aa0" />
-              <ScreenCard title="Yaza Merhaba" meta="Burgazada" from="#243b5e" to="#2f6ea0" />
-            </div>
-          </div>
-
-          {/* alt menü */}
-          <div className="absolute inset-x-0 bottom-0 flex h-12 items-center justify-around border-t border-white/10 bg-[#0a0614]/80 text-white/55 backdrop-blur">
-            <Home className="size-[18px] text-[#C4A6FF]" />
-            <MapPin className="size-[18px]" />
-            <CalendarDays className="size-[18px]" />
-            <User className="size-[18px]" />
-          </div>
-        </div>
-      </div>
-    </motion.div>
   );
 }
 
