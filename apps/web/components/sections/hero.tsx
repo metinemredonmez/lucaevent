@@ -56,8 +56,8 @@ export function Hero() {
     <section className="relative isolate flex min-h-[92vh] items-center overflow-hidden text-white dark">
       {/* ── Arka plan: canlı mor/void taban + crossfade fotoğraflar ── */}
       <div className="absolute inset-0 -z-10">
-        {/* taban gradyan — fotoğraf olmasa bile dolu durur */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1A0E3D] via-[#0E0922] to-[#070510]" />
+        {/* taban gradyan — nötr koyu (fotoğraf olmasa bile dolu durur, mor değil) */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0c0c0e] via-[#0a0a0b] to-[#050505]" />
 
         {/* sürüklenen ışık küreleri */}
         <motion.div
@@ -84,7 +84,7 @@ export function Hero() {
             alt=""
             aria-hidden
             initial={false}
-            animate={{ opacity: i === slide ? 0.95 : 0 }}
+            animate={{ opacity: i === slide ? 1 : 0 }}
             transition={{ duration: 1.6, ease: "easeInOut" }}
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).style.display = "none";
@@ -93,10 +93,9 @@ export function Hero() {
           />
         ))}
 
-        {/* okunabilirlik scrim'leri — görsel belirgin, sol yazı korumalı */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#070510]/30 via-[#070510]/35 to-[#050309]/90" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#070510] via-[#070510]/30 to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(168,85,247,0.03),transparent_55%)]" />
+        {/* okunabilirlik scrim'leri — nötr siyah, görsel belirgin, sol yazı korumalı */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-[#050505]/85" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/20 to-transparent" />
         {/* alt kenarı bir sonraki bölüme yumuşat */}
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
       </div>
