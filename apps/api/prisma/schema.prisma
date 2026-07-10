@@ -259,6 +259,11 @@ model Event {
   travelInfo     String?
   faq            Json?
 
+  // radyo — etkinliğe özel müzik (boşsa kategoriye göre otomatik eşleşir).
+  // musicQuery: radio-browser'da aranacak tür/istasyon (örn. "italian", "jazz").
+  musicQuery String?
+  musicLabel String? // radyo çipinde görünecek etiket (örn. "İtalyan Akşamı")
+
   lineup       Lineup[]
   tickets      TicketTier[]
   media        Media[]      @relation("EventMedia")

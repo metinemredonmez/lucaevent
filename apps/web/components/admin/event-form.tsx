@@ -68,6 +68,8 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
     included: (initial?.included ?? []).join("\n"),
     bringList: (initial?.bringList ?? []).join("\n"),
     travelInfo: initial?.travelInfo ?? "",
+    musicLabel: (initial as { musicLabel?: string })?.musicLabel ?? "",
+    musicQuery: (initial as { musicQuery?: string })?.musicQuery ?? "",
     campingAllowed: initial?.campingAllowed ?? false,
     status: initial?.status ?? "DRAFT",
     // canlı yayın
@@ -107,6 +109,8 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
       coverUrl: f.coverUrl || undefined,
       categoryId: f.categoryId || undefined,
       travelInfo: f.travelInfo || undefined,
+      musicLabel: f.musicLabel || undefined,
+      musicQuery: f.musicQuery || undefined,
       campingAllowed: f.campingAllowed || undefined,
       ageMin: f.ageMin !== "" ? Number(f.ageMin) : undefined,
       included: lines(f.included),
@@ -246,6 +250,16 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
             <div>
               <label className={LABEL}>Ulaşım / seyahat bilgisi</label>
               <textarea className={FIELD} rows={2} value={f.travelInfo} onChange={(e) => set("travelInfo", e.target.value)} />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className={LABEL}>Radyo müziği — etiket</label>
+                <input className={FIELD} value={f.musicLabel} onChange={(e) => set("musicLabel", e.target.value)} placeholder="İtalyan Akşamı" />
+              </div>
+              <div>
+                <label className={LABEL}>Radyo müziği — tür/sorgu</label>
+                <input className={FIELD} value={f.musicQuery} onChange={(e) => set("musicQuery", e.target.value)} placeholder="italian · boşsa kategoriye göre" />
+              </div>
             </div>
             <label className="flex items-center gap-2 text-sm text-foreground">
               <input type="checkbox" className="h-4 w-4 accent-[#8B5CF6]" checked={f.campingAllowed} onChange={(e) => set("campingAllowed", e.target.checked)} />

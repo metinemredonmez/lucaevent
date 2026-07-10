@@ -91,6 +91,16 @@ export class EventCreateDto {
   @IsString()
   travelInfo?: string;
 
+  @ApiPropertyOptional({ description: 'Radyo müziği sorgusu (örn. "italian"); boşsa kategoriye göre otomatik' })
+  @IsOptional()
+  @IsString()
+  musicQuery?: string;
+
+  @ApiPropertyOptional({ description: 'Radyo çip etiketi (örn. "İtalyan Akşamı")' })
+  @IsOptional()
+  @IsString()
+  musicLabel?: string;
+
   @ApiPropertyOptional({ description: 'Category id (one of the 8 verticals)' })
   @IsOptional()
   @IsString()

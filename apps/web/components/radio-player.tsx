@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Play, Pause, Radio, Loader2, Search, X, ChevronDown, ChevronUp, Globe2, Music2, Sparkles, Moon, Guitar, Disc3, type LucideIcon } from "lucide-react";
+import { getEvent, discoverEvents } from "@/lib/events";
 
 type Station = { name: string; tag: string; color: string; url: string };
 
@@ -82,13 +83,40 @@ async function rbFetch(path: string): Promise<any[]> {
 
 // Kampta dinlemelik hazır mix'ler — tek tık, en iyi eşleşen canlı istasyonu çalar.
 // (Canlı radyo widget'ı sabit şarkı listesi çalamaz; her mix o vibe'ı çalan istasyona bağlanır.)
-const MIXES: { l: string; s: string; q: string; by: "name" | "tag"; hero?: boolean; Icon: LucideIcon; color: string }[] = [
+type Mix = { l: string; s: string; q: string; by: "name" | "tag"; hero?: boolean; Icon: LucideIcon; color: string };
+const MIXES: Mix[] = [
   { l: "BUGÜNE ÖZEL", s: "günün seçkisi · Türkçe rock", q: "eksen", by: "name", hero: true, Icon: Sparkles, color: "#A855F7" },
   { l: "Türkçe Pop", s: "hit & yeni", q: "power türk", by: "name", Icon: Music2, color: "#EC4899" },
   { l: "Rock", s: "yabancı rock klasikleri", q: "rock", by: "tag", Icon: Guitar, color: "#F97316" },
   { l: "Slow · Akşam", s: "sakin, ateş başı", q: "slow türk", by: "name", Icon: Moon, color: "#60A5FA" },
   { l: "Nostalji", s: "90'lar / 2000'ler", q: "nostalji", by: "name", Icon: Disc3, color: "#F59E0B" },
 ];
+
+// Kategori → varsayılan müzik (API slug'ları). Etkinliğin kendi musicQuery'si varsa o ezer.
+const CATEGORY_MUSIC: Record<string, { label: string; q: string; by: "name" | "tag" }> = {
+  wellness: { label: "Sakin · Wellness", q: "ambient", by: "tag" },
+  "outdoor-spor": { label: "Doğa · Chill", q: "chillout", by: "tag" },
+  "gezi-seyahat": { label: "Yolculuk", q: "world music", by: "tag" },
+  workshop: { label: "Odak", q: "jazz", by: "tag" },
+  social: { label: "Lounge", q: "lounge", by: "tag" },
+  "food-drink": { label: "Akşam · Lounge", q: "lounge", by: "tag" },
+  business: { label: "Odak · Jazz", q: "jazz", by: "tag" },
+  nightlife: { label: "Dans", q: "dance", by: "tag" },
+};
+
+// Etkinlikten hero mix üret: override (musicQuery/Label) > kategori varsayılanı.
+// keepLabel true ise çip etiketi "BUGÜNE ÖZEL" kalır (ana sayfa), yoksa etkinliğe göre.
+function eventMix(
+  ev: { musicQuery?: string | null; musicLabel?: string | null; category?: { slug?: string } | null },
+  keepLabel: boolean,
+): Mix | null {
+  const q = ev.musicQuery?.trim();
+  const cat = ev.category?.slug ? CATEGORY_MUSIC[ev.category.slug] : null;
+  const label = ev.musicLabel?.trim() || (keepLabel ? "BUGÜNE ÖZEL" : cat?.label || "BU ETKİNLİĞE ÖZEL");
+  if (q) return { l: label.toUpperCase(), s: "etkinlik müziği", q, by: "tag", hero: true, Icon: Sparkles, color: "#A855F7" };
+  if (cat) return { l: label.toUpperCase(), s: "etkinliğe göre", q: cat.q, by: cat.by, hero: true, Icon: Sparkles, color: "#A855F7" };
+  return null;
+}
 
 export function RadioPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -149,6 +177,31 @@ export function RadioPlayer() {
   const [searching, setSearching] = useState(false);
   const [openCat, setOpenCat] = useState<"genre" | "world" | null>("genre"); // açılır kategori
   const [mixBusy, setMixBusy] = useState(""); // yükleniyor olan mix etiketi
+  const [heroMix, setHeroMix] = useState<Mix | null>(null); // etkinliğe/güne göre dinamik hero mix
+
+  // Etkinlik sayfasında o etkinliğin müziği; ana sayfada bugünün öne çıkan etkinliği.
+  useEffect(() => {
+    let alive = true;
+    const p = pathname || "";
+    if (hidden) { setHeroMix(null); return; }
+    const m = p.match(/^\/etkinlik\/([^/?#]+)/);
+    if (m) {
+      getEvent(decodeURIComponent(m[1]))
+        .then((ev) => alive && setHeroMix(ev ? eventMix(ev, false) : null))
+        .catch(() => alive && setHeroMix(null));
+    } else if (p === "/") {
+      discoverEvents({ range: "upcoming", take: 1 })
+        .then((r) => {
+          const first = r[0];
+          if (!first) return alive && setHeroMix(null);
+          return getEvent(first.slug).then((ev) => alive && setHeroMix(ev ? eventMix(ev, true) : null));
+        })
+        .catch(() => alive && setHeroMix(null));
+    } else {
+      setHeroMix(null);
+    }
+    return () => { alive = false; };
+  }, [pathname, hidden]);
 
   // Debounced radio-browser arama/filtre (ücretsiz, anahtarsız; çoklu mirror fallback)
   useEffect(() => {
@@ -599,9 +652,10 @@ export function RadioPlayer() {
         {/* çalarken: ince ses dalgası şeridi (çubuğun altına yapışık) */}
         {playing && <WaveStrip />}
 
-        {/* mix şeridi — yatay kayar, tek tık çalar (üstte ayraç çizgi) */}
+        {/* mix şeridi — yatay kayar, tek tık çalar (üstte ayraç çizgi).
+            hero mix etkinliğe/güne göre dinamik (heroMix), yoksa varsayılan BUGÜNE ÖZEL. */}
         <div className="flex items-center gap-1.5 overflow-x-auto border-t border-primary/15 pb-1.5 pt-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {MIXES.map((m, i) => {
+          {(heroMix ? [heroMix, ...MIXES.slice(1)] : MIXES).map((m, i) => {
             const busy = mixBusy === m.l;
             const Icon = m.Icon;
             return (

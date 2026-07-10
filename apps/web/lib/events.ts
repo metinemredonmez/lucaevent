@@ -76,6 +76,8 @@ export type EventDetail = {
   campingAllowed: boolean;
   travelInfo: string | null;
   ageMin: number | null;
+  musicQuery: string | null;
+  musicLabel: string | null;
   agenda: { time: string; title: string }[] | null;
   included: string[] | null;
   bringList: string[] | null;
