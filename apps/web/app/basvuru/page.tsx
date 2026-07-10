@@ -29,6 +29,7 @@ export default function BasvuruPage() {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [interests, setInterests] = useState<string[]>([]);
+  const [kvkk, setKvkk] = useState(false);
   const [err, setErr] = useState("");
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,6 +43,7 @@ export default function BasvuruPage() {
     setErr("");
     if (!name.trim()) return setErr("Adını gir.");
     if (!email.trim()) return setErr("E-posta gir.");
+    if (!kvkk) return setErr("Devam etmek için KVKK ve gizlilik metnini onayla.");
     const body: SubmissionBody = { type: tab, name: name.trim(), email: email.trim() };
     if (phone) body.phone = phone.trim();
     if (subject) body.subject = subject.trim();
@@ -214,11 +216,27 @@ export default function BasvuruPage() {
                   </motion.div>
                 </AnimatePresence>
 
+                {/* KVKK + gizlilik onayı (zorunlu) */}
+                <label className="flex cursor-pointer items-start gap-2.5 text-xs leading-relaxed text-[#A39DC9]">
+                  <input
+                    type="checkbox"
+                    checked={kvkk}
+                    onChange={(e) => setKvkk(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-[#8B5CF6]"
+                  />
+                  <span>
+                    <a href="/kvkk" target="_blank" className="text-[#C4B5FD] underline underline-offset-2 hover:text-white">KVKK Aydınlatma Metni</a>
+                    {" "}ve{" "}
+                    <a href="/kosullar" target="_blank" className="text-[#C4B5FD] underline underline-offset-2 hover:text-white">Kullanım Koşulları</a>
+                    {"'nı okudum; kişisel verilerimin bu başvuru kapsamında işlenmesine onay veriyorum."}
+                  </span>
+                </label>
+
                 {err && <p className="text-sm text-[#FB7185]">{err}</p>}
 
                 <Button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !kvkk}
                   className="w-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white shadow-lg shadow-[#6366F1]/20 hover:opacity-90"
                 >
                   {loading ? "Gönderiliyor…" : "Gönder"}
