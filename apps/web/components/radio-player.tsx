@@ -100,6 +100,9 @@ export function RadioPlayer() {
   const stallRef = useRef<ReturnType<typeof setTimeout> | null>(null); // geçici duraksama nöbetçisi
   const pathname = usePathname();
   const isAdmin = !!pathname && pathname.startsWith("/admin");
+  // Radyo yalnız public sitede: giriş/kayıt ve admin sayfalarında görünmez.
+  const isAuth = !!pathname && /^\/(giris|kayit|sifremi-unuttum|sifre-sifirla|dogrula)(\/|$)/.test(pathname);
+  const hidden = isAdmin || isAuth;
   const [current, setCurrent] = useState<Station>(FAVORITES[0]);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -522,28 +525,8 @@ export function RadioPlayer() {
     </div>
   );
 
-  // ADMIN: sağ-altta kompakt çalar (üst şerit değil — içeriği örtmez)
-  if (isAdmin) {
-    return (
-      <div ref={wrapRef} className="fixed bottom-5 right-5 z-40 select-none">
-        {open && <div className="absolute bottom-full right-0 mb-2">{renderPanel("w-[min(25rem,calc(100vw-1rem))]")}</div>}
-        <div className="flex items-center gap-2 rounded-full border border-primary/30 bg-background/95 py-1.5 pl-1.5 pr-3 shadow-lg shadow-primary/10 backdrop-blur">
-          <button onClick={toggle} aria-label={playing ? "Durdur" : "Çal"}
-            className="grid size-8 shrink-0 place-items-center rounded-full text-black transition-transform active:scale-95" style={{ background: current.color }}>
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 translate-x-[1px]" />}
-          </button>
-          <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-2 text-left">
-            <span className="leading-tight">
-              <span className="block max-w-[120px] truncate text-xs font-medium text-foreground">{current.name}</span>
-              <span className="block text-[10px] uppercase tracking-wider text-muted-foreground">{playing ? "● canlı" : "radyo"}</span>
-            </span>
-            <ChevronUp className={`h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
-          </button>
-        </div>
-        {eqKeyframes}
-      </div>
-    );
-  }
+  // Giriş/kayıt ve admin sayfalarında radyo hiç görünmez (sadece public site).
+  if (hidden) return null;
 
   // gizli: köşede minik çalar-baloncuk (aç butonuyla geri gelir)
   if (collapsed) {

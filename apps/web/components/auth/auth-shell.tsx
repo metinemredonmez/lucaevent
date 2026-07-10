@@ -39,9 +39,9 @@ export function AuthShell({
   features?: string[];
 }) {
   return (
-    <div className="min-h-screen grid lg:grid-cols-2 bg-[#0C0920]">
-      {/* LEFT — vibrant blue/purple, animated */}
-      <div className="relative hidden lg:flex flex-col justify-between overflow-hidden p-12 text-white bg-gradient-to-br from-[#4318A8] via-[#2A1A6B] to-[#140F3A]">
+    <div className="min-h-screen grid lg:grid-cols-2 bg-[#0a0a0b]">
+      {/* LEFT — nötr koyu (mor değil), fotoğraf + hafif accent */}
+      <div className="relative hidden lg:flex flex-col justify-between overflow-hidden p-12 text-white bg-gradient-to-br from-[#16161a] via-[#101012] to-[#0a0a0b]">
         {/* blurred event photo (opsiyonel — /img/auth-bg.jpg bırak; yoksa gradyan kalır) */}
         <img
           src="/img/auth-bg.jpg"
@@ -53,21 +53,21 @@ export function AuthShell({
           }}
         />
         {/* okunabilirlik için koyulaştırıcı katman */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#2A1A6B]/40 via-transparent to-[#140F3A]/70" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black/30 via-transparent to-black/70" />
 
         {/* drifting orbs */}
         <motion.div
-          className="pointer-events-none absolute -left-20 top-6 h-72 w-72 rounded-full bg-[#6366F1]/40 blur-3xl"
+          className="pointer-events-none absolute -left-20 top-6 h-72 w-72 rounded-full bg-[#6366F1]/12 blur-3xl"
           animate={{ x: [0, 40, 0], y: [0, 30, 0], scale: [1, 1.2, 1] }}
           transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="pointer-events-none absolute right-6 bottom-20 h-80 w-80 rounded-full bg-[#A855F7]/35 blur-3xl"
+          className="pointer-events-none absolute right-6 bottom-20 h-80 w-80 rounded-full bg-[#A855F7]/10 blur-3xl"
           animate={{ x: [0, -30, 0], y: [0, -40, 0], scale: [1.1, 1, 1.1] }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="pointer-events-none absolute left-1/3 top-1/2 h-64 w-64 rounded-full bg-[#3B82F6]/30 blur-3xl"
+          className="pointer-events-none absolute left-1/3 top-1/2 h-64 w-64 rounded-full bg-[#3B82F6]/10 blur-3xl"
           animate={{ x: [0, 30, -20, 0], y: [0, -20, 20, 0] }}
           transition={{ duration: 24, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -138,9 +138,9 @@ export function AuthShell({
       </div>
 
       {/* RIGHT — dark panel (no white) */}
-      <div className="relative flex items-center justify-center overflow-hidden px-4 py-10 bg-[#0C0920]">
-        <div className="pointer-events-none absolute right-[-6rem] top-[-6rem] h-72 w-72 rounded-full bg-[#7C3AED]/20 blur-3xl" />
-        <div className="pointer-events-none absolute left-[-4rem] bottom-[-4rem] h-64 w-64 rounded-full bg-[#4F46E5]/15 blur-3xl" />
+      <div className="relative flex items-center justify-center overflow-hidden px-4 py-10 bg-[#0a0a0b]">
+        <div className="pointer-events-none absolute right-[-6rem] top-[-6rem] h-72 w-72 rounded-full bg-[#7C3AED]/8 blur-3xl" />
+        <div className="pointer-events-none absolute left-[-4rem] bottom-[-4rem] h-64 w-64 rounded-full bg-[#4F46E5]/6 blur-3xl" />
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
