@@ -37,8 +37,8 @@ export default function ToplulukPage() {
 
           {/* benim durumum */}
           {me && (
-            <div className="mt-6 flex items-center gap-4 rounded-2xl border border-border bg-gradient-to-br from-[#6366F1]/15 via-card to-card p-4">
-              <div className="grid size-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-xl">
+            <div className="mt-6 flex items-center gap-4 rounded-2xl border border-border bg-gradient-to-br from-[#0e9a8c]/15 via-card to-card p-4">
+              <div className="grid size-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#0e9a8c] to-[#22c9b8] text-xl">
                 <span aria-hidden>{me.icon}</span>
               </div>
               <div className="min-w-0 flex-1">
@@ -51,7 +51,7 @@ export default function ToplulukPage() {
               {me.nextBadge && (
                 <div className="hidden w-24 sm:block">
                   <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-                    <div className="h-full rounded-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]" style={{ width: `${me.progress}%` }} />
+                    <div className="h-full rounded-full bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8]" style={{ width: `${me.progress}%` }} />
                   </div>
                 </div>
               )}
@@ -92,7 +92,7 @@ export default function ToplulukPage() {
                       {u.avatarUrl ? (
                         <Image src={u.avatarUrl} alt={u.name} fill sizes="40px" className="object-cover" />
                       ) : (
-                        <div className="grid h-full w-full place-items-center bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-sm font-semibold text-white">
+                        <div className="grid h-full w-full place-items-center bg-gradient-to-br from-[#0e9a8c] to-[#22c9b8] text-sm font-semibold text-white">
                           {u.name[0]?.toUpperCase()}
                         </div>
                       )}

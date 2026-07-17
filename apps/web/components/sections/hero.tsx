@@ -61,12 +61,12 @@ export function Hero() {
 
         {/* sürüklenen ışık küreleri */}
         <motion.div
-          className="absolute -left-24 top-10 h-[28rem] w-[28rem] rounded-full bg-[#7C3AED]/12 blur-[120px]"
+          className="absolute -left-24 top-10 h-[28rem] w-[28rem] rounded-full bg-[#0e9a8c]/12 blur-[120px]"
           animate={{ x: [0, 60, 0], y: [0, 40, 0], scale: [1, 1.15, 1] }}
           transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute right-[-6rem] bottom-[-4rem] h-[32rem] w-[32rem] rounded-full bg-[#A855F7]/10 blur-[130px]"
+          className="absolute right-[-6rem] bottom-[-4rem] h-[32rem] w-[32rem] rounded-full bg-[#22c9b8]/10 blur-[130px]"
           animate={{ x: [0, -50, 0], y: [0, -30, 0], scale: [1.1, 1, 1.1] }}
           transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -101,7 +101,7 @@ export function Hero() {
       </div>
 
       {/* Aceternity tek efekt — yukarıdan düşen ışık huzmesi */}
-      <Spotlight className="-top-40 left-0 md:-top-24 md:left-52" fill="#A855F7" />
+      <Spotlight className="-top-40 left-0 md:-top-24 md:left-52" fill="#22c9b8" />
 
       <div className="container relative z-10 py-24 md:py-32">
         <motion.div
@@ -189,7 +189,7 @@ export function Hero() {
             className="h-1.5 rounded-full transition-all"
             style={{
               width: i === slide ? 22 : 6,
-              backgroundColor: i === slide ? "#A855F7" : "rgba(255,255,255,0.25)",
+              backgroundColor: i === slide ? "#22c9b8" : "rgba(255,255,255,0.25)",
             }}
           />
         ))}

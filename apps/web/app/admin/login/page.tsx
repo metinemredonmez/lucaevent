@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const INP =
-  "bg-[#171336] border-[#352E6B] text-white placeholder:text-[#6E6796] focus-visible:ring-[#8B5CF6]";
+  "bg-[#171336] border-[#352E6B] text-white placeholder:text-[#6E6796] focus-visible:ring-[#22c9b8]";
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -94,13 +94,13 @@ export default function AdminLogin() {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] hover:opacity-90 text-white shadow-lg shadow-[#6366F1]/20"
+          className="w-full bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] hover:opacity-90 text-white shadow-lg shadow-[#0e9a8c]/20"
         >
           {loading ? "Giriş yapılıyor…" : "Giriş yap"}
         </Button>
       </form>
       <p className="mt-4 text-center text-sm">
-        <Link href="/sifremi-unuttum" className="text-[#A78BFA] hover:underline">
+        <Link href="/sifremi-unuttum" className="text-[#22c9b8] hover:underline">
           Şifremi unuttum
         </Link>
       </p>

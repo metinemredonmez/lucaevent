@@ -80,7 +80,7 @@ export default async function BlogPage() {
                       className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                     />
                   ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] opacity-90" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#0e9a8c] to-[#22c9b8] opacity-90" />
                   )}
                   <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-card/90 to-transparent pointer-events-none" />
                 </div>

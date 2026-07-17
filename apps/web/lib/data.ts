@@ -43,7 +43,7 @@ export const CATEGORIES: Category[] = [
     emoji: "🧘",
     tagline: "Nefes al, dengele",
     icon: Flower2,
-    accent: "#A78BFA",
+    accent: "#22c9b8",
     // kategori kapağı temsilci etkinlik görselinden gelir (ayrı indirme gerekmez)
     cover: "/img/events/sunset-yoga-sound-healing.jpg",
   },
@@ -53,7 +53,7 @@ export const CATEGORIES: Category[] = [
     emoji: "🏃",
     tagline: "Şehrin dışına çık",
     icon: Mountain,
-    accent: "#6366F1",
+    accent: "#0e9a8c",
     cover: "/img/events/belgrad-sabah-kosusu.jpg",
   },
   {
@@ -62,7 +62,7 @@ export const CATEGORIES: Category[] = [
     emoji: "⛵",
     tagline: "Yola düş",
     icon: Compass,
-    accent: "#8B5CF6",
+    accent: "#22c9b8",
     cover: "/img/events/bogaz-gun-batimi-tekne.jpg",
   },
   {
@@ -98,7 +98,7 @@ export const CATEGORIES: Category[] = [
     emoji: "💼",
     tagline: "Bağlantı kur",
     icon: Briefcase,
-    accent: "#7C3AED",
+    accent: "#0e9a8c",
     cover: "/img/events/founders-breakfast.jpg",
   },
   {
@@ -107,7 +107,7 @@ export const CATEGORIES: Category[] = [
     emoji: "🎶",
     tagline: "Gece kendi ritmini bulur",
     icon: Disc3,
-    accent: "#A855F7",
+    accent: "#22c9b8",
     cover: "/img/events/luca-006-kadikoy.jpg",
   },
 ];

@@ -11,7 +11,7 @@
     --card-foreground: 255 8% 9%;
     --popover: 0 0% 100%;
     --popover-foreground: 255 8% 9%;
-    --primary: 271 91% 65%;            /* #A855F7 — tek accent */
+    --primary: 174 83% 33%;            /* #0e9a8c — teal accent */
     --primary-foreground: 0 0% 100%;
     --secondary: 255 6% 95%;
     --secondary-foreground: 255 8% 9%;
@@ -25,7 +25,7 @@
     --warn: 25 90% 37%;
     --border: 255 6% 89%;
     --input: 255 6% 89%;
-    --ring: 271 91% 65%;
+    --ring: 174 83% 33%;
     --radius: 0.5rem;
   }
 
@@ -37,7 +37,7 @@
     --card-foreground: 240 8% 97%;
     --popover: 255 6% 9%;
     --popover-foreground: 240 8% 97%;
-    --primary: 271 91% 65%;            /* #A855F7 — tek accent */
+    --primary: 174 71% 46%;            /* #22c9b8 — teal accent (koyu) */
     --primary-foreground: 0 0% 100%;
     --secondary: 255 6% 14%;
     --secondary-foreground: 240 8% 97%;
@@ -51,7 +51,7 @@
     --warn: 35 90% 55%;
     --border: 255 6% 19%;
     --input: 255 6% 19%;
-    --ring: 271 91% 65%;
+    --ring: 174 71% 46%;
   }
 }
 

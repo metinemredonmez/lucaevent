@@ -81,7 +81,7 @@ export default function PagesAdmin() {
         actions={
           <Link
             href="/admin/pages/new"
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-3.5 text-[13px] font-medium text-white shadow-sm transition hover:opacity-90"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-3.5 text-[13px] font-medium text-white shadow-sm transition hover:opacity-90"
           >
             <Plus className="h-4 w-4" /> Yeni sayfa
           </Link>

@@ -118,11 +118,11 @@ export function MeterBar({
 
 /* ————————————————————— category donut ————————————————————— */
 const VIOLET_RAMP = [
-  "#C4B5FD",
-  "#A78BFA",
-  "#8B5CF6",
-  "#7C3AED",
-  "#6D28D9",
+  "#7fe6da",
+  "#22c9b8",
+  "#22c9b8",
+  "#0e9a8c",
+  "#0a6f65",
   "#5B21B6",
   "#4C1D95",
   "#3B0764",

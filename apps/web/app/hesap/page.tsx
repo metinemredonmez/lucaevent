@@ -109,7 +109,7 @@ export default function HesapPage() {
       <div className="container max-w-4xl">
         {/* başlık */}
         <div className="mb-8 flex items-center gap-4">
-          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-xl font-semibold text-white">
+          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#0e9a8c] to-[#22c9b8] text-xl font-semibold text-white">
             {initials}
           </div>
           <div className="min-w-0">
@@ -148,7 +148,7 @@ export default function HesapPage() {
                 {on && (
                   <motion.span
                     layoutId="hesap-tab"
-                    className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#8B5CF6]"
+                    className="absolute inset-0 rounded-lg bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8]"
                     transition={{ type: "spring", stiffness: 400, damping: 32 }}
                   />
                 )}
@@ -190,9 +190,9 @@ function ScoreCard() {
   }, []);
   if (!s) return null;
   return (
-    <div className="mb-6 overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-[#6366F1]/15 via-card to-card p-5">
+    <div className="mb-6 overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-[#0e9a8c]/15 via-card to-card p-5">
       <div className="flex flex-wrap items-center gap-4">
-        <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-2xl shadow-lg">
+        <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#0e9a8c] to-[#22c9b8] text-2xl shadow-lg">
           <span aria-hidden>{s.icon}</span>
         </div>
         <div className="min-w-0">
@@ -225,7 +225,7 @@ function ScoreCard() {
             <span className="tabular-nums">{s.score}/{s.nextAt}</span>
           </div>
           <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-            <div className="h-full rounded-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] transition-all" style={{ width: `${s.progress}%` }} />
+            <div className="h-full rounded-full bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] transition-all" style={{ width: `${s.progress}%` }} />
           </div>
         </div>
       )}
@@ -347,7 +347,7 @@ function ProfilTab({ profile, onSaved }: { profile: Profile; onSaved: (p: Profil
       <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-border bg-card p-4 text-sm">
         <input
           type="checkbox"
-          className="mt-0.5 h-4 w-4 accent-[#8B5CF6]"
+          className="mt-0.5 h-4 w-4 accent-[#22c9b8]"
           checked={f.marketingOptIn}
           onChange={(e) => setF({ ...f, marketingOptIn: e.target.checked })}
         />
@@ -362,7 +362,7 @@ function ProfilTab({ profile, onSaved }: { profile: Profile; onSaved: (p: Profil
         <button
           type="submit"
           disabled={saving}
-          className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:opacity-90 disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:opacity-90 disabled:opacity-60"
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : ok ? <Check className="h-4 w-4" /> : null}
           {saving ? "Kaydediliyor…" : ok ? "Kaydedildi" : "Değişiklikleri kaydet"}
@@ -586,7 +586,7 @@ function GuvenlikTab({ profile, onLogout }: { profile: Profile; onLogout: () => 
         <button
           type="submit"
           disabled={saving}
-          className="mt-5 inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-60"
+          className="mt-5 inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-60"
         >
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : ok ? <Check className="h-4 w-4" /> : null}
           {saving ? "Kaydediliyor…" : ok ? "Güncellendi" : profile.hasPassword ? "Şifreyi güncelle" : "Şifreyi belirle"}
@@ -668,7 +668,7 @@ function Empty({
       <p className="mt-1 max-w-xs text-sm text-muted-foreground">{desc}</p>
       <Link
         href={cta.href}
-        className="mt-5 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
+        className="mt-5 rounded-lg bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
       >
         {cta.label}
       </Link>

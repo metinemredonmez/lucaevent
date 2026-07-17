@@ -47,7 +47,7 @@ export function Subscribe() {
       id="rezervasyon"
       className="relative py-24 md:py-32 overflow-hidden"
     >
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.18),transparent_60%)]" />
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_center,rgba(34,201,184,0.18),transparent_60%)]" />
 
       <div className="container">
         <motion.div

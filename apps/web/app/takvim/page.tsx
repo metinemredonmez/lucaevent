@@ -204,7 +204,7 @@ function EventRow({ e }: { e: CalEvent }) {
         {e.coverUrl ? (
           <Image src={e.coverUrl} alt={e.title} fill sizes="48px" className="object-cover" />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-[#6366F1] to-[#8B5CF6]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0e9a8c] to-[#22c9b8]" />
         )}
       </div>
       <div className="min-w-0 flex-1">

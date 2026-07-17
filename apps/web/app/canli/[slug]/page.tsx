@@ -153,7 +153,7 @@ export default function CanliPage() {
                             <LogIn className="h-4 w-4" /> Giriş yap
                           </Link>
                         )}
-                        <Link href="/kesfet" className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-4 py-2 text-sm font-medium">
+                        <Link href="/kesfet" className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-4 py-2 text-sm font-medium">
                           <Ticket className="h-4 w-4" /> Bilet al
                         </Link>
                       </div>
@@ -163,7 +163,7 @@ export default function CanliPage() {
                       <Lock className="mx-auto mb-3 h-8 w-8 text-white/50" />
                       <p className="text-lg font-medium">Üyelere özel canlı yayın</p>
                       <p className="mt-1 text-sm text-white/60">İzlemek için Luca hesabınla giriş yap.</p>
-                      <Link href="/giris" className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-4 py-2 text-sm font-medium">
+                      <Link href="/giris" className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-4 py-2 text-sm font-medium">
                         <LogIn className="h-4 w-4" /> Giriş yap
                       </Link>
                     </div>

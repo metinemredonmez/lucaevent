@@ -259,7 +259,7 @@ function QueueRow({
 }
 
 const ACT_ICON = { reservation: CalendarCheck, submission: Inbox, event: CalendarPlus };
-const ACT_COLOR = { reservation: "#22D3EE", submission: "#A855F7", event: "#34D399" };
+const ACT_COLOR = { reservation: "#22D3EE", submission: "#22c9b8", event: "#34D399" };
 function ActivityRow({ a }: { a: Extras["activity"][number] }) {
   const Icon = ACT_ICON[a.type] ?? Inbox;
   return (
@@ -678,7 +678,7 @@ export default function Dashboard() {
               <div className="flex flex-col items-center gap-5 p-5 sm:flex-row sm:items-center">
                 <OccupancyRing value={s.occupancyRate} />
                 <div className="w-full flex-1 space-y-4">
-                  <MeterBar value={publishRate} label="Yayın oranı" right={pct(publishRate)} color="#8B5CF6" />
+                  <MeterBar value={publishRate} label="Yayın oranı" right={pct(publishRate)} color="#22c9b8" />
                   {totalOrders > 0 ? (
                     <>
                       <MeterBar value={conv} label="Ödeme dönüşümü" right={pct(conv)} color="#34D399" />
@@ -714,9 +714,9 @@ export default function Dashboard() {
                   className="absolute inset-0 bg-cover bg-center opacity-25"
                   style={spotlight.coverUrl ? { backgroundImage: `url(${spotlight.coverUrl})` } : undefined}
                 />
-                <div className="absolute inset-0 bg-gradient-to-br from-[#6366F1]/30 to-[#8B5CF6]/20" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0e9a8c]/30 to-[#22c9b8]/20" />
                 <div className="relative">
-                  <div className="flex items-center gap-2 text-xs text-[#4C1D95] dark:text-[#C4B5FD]">
+                  <div className="flex items-center gap-2 text-xs text-[#4C1D95] dark:text-[#7fe6da]">
                     <Trophy className="h-4 w-4" /> {spotlightIsTop ? "En popüler etkinlik" : "Sıradaki etkinlik"}
                   </div>
                   <div className="mt-2 line-clamp-2 text-sm font-semibold text-foreground">{spotlight.title}</div>

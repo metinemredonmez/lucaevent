@@ -139,7 +139,7 @@ export default function KesfetPage() {
     const icon = (on: boolean) =>
       L.divIcon({
         className: "",
-        html: `<span style="display:block;width:${on ? 22 : 16}px;height:${on ? 22 : 16}px;border-radius:50%;background:#8B5CF6;border:2px solid #fff;box-shadow:0 0 0 3px rgba(139,92,246,${on ? 0.5 : 0.25})"></span>`,
+        html: `<span style="display:block;width:${on ? 22 : 16}px;height:${on ? 22 : 16}px;border-radius:50%;background:#22c9b8;border:2px solid #fff;box-shadow:0 0 0 3px rgba(34,201,184,${on ? 0.5 : 0.25})"></span>`,
         iconSize: [on ? 22 : 16, on ? 22 : 16],
         iconAnchor: [on ? 11 : 8, on ? 11 : 8],
       });
@@ -154,7 +154,7 @@ export default function KesfetPage() {
         .bindPopup(
           `<strong>${e.title}</strong><br/>${e.venue?.name ?? ""}${
             e.venue?.city ? " · " + e.venue.city : ""
-          }<br/><span style="color:#8B5CF6">${formatDateTR(e.startsAt)}</span>`,
+          }<br/><span style="color:#22c9b8">${formatDateTR(e.startsAt)}</span>`,
         );
       m.on("click", () => setActive(e.id));
       markersRef.current.set(e.id, m);
@@ -270,7 +270,7 @@ export default function KesfetPage() {
                     {e.coverUrl ? (
                       <Image src={e.coverUrl} alt={e.title} fill sizes="80px" className="object-cover" />
                     ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#6366F1] to-[#8B5CF6]" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#0e9a8c] to-[#22c9b8]" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">

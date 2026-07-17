@@ -68,7 +68,7 @@ export function AdminPageHeader({
   }
 
   return (
-    <div className="relative mb-5 overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-[#6366F1]/20 via-card to-card p-5 dark:from-[#6366F1]/14">
+    <div className="relative mb-5 overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-[#0e9a8c]/20 via-card to-card p-5 dark:from-[#0e9a8c]/14">
       <div className="bg-noise pointer-events-none absolute inset-0 opacity-60" />
       <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
       <div className="relative">

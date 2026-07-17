@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
  */
 export function Spotlight({
   className,
-  fill = "#A855F7",
+  fill = "#22c9b8",
 }: {
   className?: string;
   fill?: string;

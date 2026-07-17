@@ -59,7 +59,7 @@ export function Showcase() {
             </div>
           </Link>
         ) : (
-          <Link href="/kesfet" className="group flex items-center justify-between rounded-2xl border border-border bg-gradient-to-br from-[#6366F1]/12 via-card to-card p-6">
+          <Link href="/kesfet" className="group flex items-center justify-between rounded-2xl border border-border bg-gradient-to-br from-[#0e9a8c]/12 via-card to-card p-6">
             <div>
               <div className="font-serif text-lg font-semibold">Şehirde ne var?</div>
               <p className="mt-1 text-sm text-muted-foreground">Haritada gez, sana yakın anı bul.</p>
@@ -84,7 +84,7 @@ export function Showcase() {
               {top.slice(0, 5).map((u) => (
                 <div key={u.rank} className="flex items-center gap-3">
                   <span className="w-4 text-center text-xs font-semibold tabular-nums text-muted-foreground">{u.rank}</span>
-                  <span className="grid size-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-xs font-semibold text-white">
+                  <span className="grid size-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#0e9a8c] to-[#22c9b8] text-xs font-semibold text-white">
                     {u.name[0]?.toUpperCase()}
                   </span>
                   <span className="min-w-0 flex-1 truncate text-sm text-foreground">{u.name}</span>

@@ -74,7 +74,7 @@ export default async function EventDetailPage({
                 priority
               />
             ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-[#6366F1] via-[#7C3AED] to-[#8B5CF6]" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#0e9a8c] via-[#0e9a8c] to-[#22c9b8]" />
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute left-4 top-4 flex items-center gap-2">
@@ -130,7 +130,7 @@ export default async function EventDetailPage({
             {!past && (
               <Link
                 href="/basvuru"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:opacity-90"
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:opacity-90"
               >
                 Katıl / Bilgi al
               </Link>

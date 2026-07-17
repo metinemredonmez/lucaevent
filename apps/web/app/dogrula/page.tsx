@@ -36,8 +36,8 @@ function VerifyInner() {
       <div className="text-center">
         {state === "loading" && (
           <>
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#8B5CF6]/15">
-              <Loader2 className="h-6 w-6 animate-spin text-[#A78BFA]" />
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#22c9b8]/15">
+              <Loader2 className="h-6 w-6 animate-spin text-[#22c9b8]" />
             </div>
             <h1 className="text-2xl text-white" style={{ fontFamily: "Georgia, serif" }}>
               Doğrulanıyor…
@@ -55,7 +55,7 @@ function VerifyInner() {
               E-posta doğrulandı 🎉
             </h1>
             <p className="mt-2 text-sm text-[#A39DC9]">Hesabın hazır. Artık her şeyi kullanabilirsin.</p>
-            <Button asChild className="mt-6 w-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] hover:opacity-90 text-white">
+            <Button asChild className="mt-6 w-full bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] hover:opacity-90 text-white">
               <Link href="/">Etkinlikleri keşfet</Link>
             </Button>
           </>
@@ -73,7 +73,7 @@ function VerifyInner() {
               Bağlantı geçersiz ya da süresi dolmuş olabilir. Giriş yapıp yeni bir doğrulama
               e-postası isteyebilirsin.
             </p>
-            <Button asChild className="mt-6 w-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] hover:opacity-90 text-white">
+            <Button asChild className="mt-6 w-full bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] hover:opacity-90 text-white">
               <Link href="/giris">Giriş yap</Link>
             </Button>
           </>

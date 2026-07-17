@@ -43,14 +43,14 @@ export default async function OdemeSonuc({
           {ok ? (
             <Link
               href="/hesap"
-              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
             >
               Biletlerim <ArrowRight className="h-4 w-4" />
             </Link>
           ) : (
             <Link
               href="/"
-              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
             >
               Etkinliklere dön <ArrowRight className="h-4 w-4" />
             </Link>

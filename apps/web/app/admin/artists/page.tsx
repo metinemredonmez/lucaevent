@@ -298,7 +298,7 @@ export default function ArtistsAdmin() {
               className="flex items-center gap-3 px-3 py-3 transition-colors hover:bg-muted/30 sm:px-4"
             >
               {/* avatar / baş harf */}
-              <div className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-sm font-semibold text-white sm:size-14">
+              <div className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-[#0e9a8c] to-[#22c9b8] text-sm font-semibold text-white sm:size-14">
                 {initials(a.name) || <Music2 className="h-5 w-5" />}
               </div>
 

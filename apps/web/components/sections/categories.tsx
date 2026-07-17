@@ -87,7 +87,7 @@ export function Categories({ active = "all", onSelect }: Props) {
         <div className="mt-10 flex justify-center">
           <Link
             href={active === "all" ? "/kesfet" : `/kesfet?kategori=${active}`}
-            className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-6 py-3 text-sm font-medium text-white shadow-lg shadow-[#6366F1]/20 transition hover:opacity-90"
+            className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-6 py-3 text-sm font-medium text-white shadow-lg shadow-[#0e9a8c]/20 transition hover:opacity-90"
           >
             {active === "all" ? "Tümünü keşfet" : `${CATEGORIES.find((c) => c.slug === active)?.name} etkinliklerini gör`}
             <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -257,7 +257,7 @@ function AllCard({ isActive, onClick }: { isActive: boolean; onClick: () => void
       className={cn(
         "group relative aspect-[5/4] rounded-xl overflow-hidden border transition-all text-left",
         isActive
-          ? "border-primary ring-2 ring-primary/50 shadow-[0_10px_30px_-10px_rgba(168,85,247,0.6)]"
+          ? "border-primary ring-2 ring-primary/50 shadow-[0_10px_30px_-10px_rgba(34,201,184,0.6)]"
           : "border-border hover:border-border/80"
       )}
     >
@@ -281,7 +281,7 @@ function AllCard({ isActive, onClick }: { isActive: boolean; onClick: () => void
                 scale: isMoving ? [1, 1.15, 1] : 1,
                 zIndex: isMoving ? 2 : 1,
                 boxShadow: isMoving
-                  ? "0 12px 28px -6px rgba(0,0,0,0.9), 0 0 0 1px rgba(168,85,247,0.6)"
+                  ? "0 12px 28px -6px rgba(0,0,0,0.9), 0 0 0 1px rgba(34,201,184,0.6)"
                   : "0 0 0 0 transparent",
               }}
               className={cn(
@@ -337,7 +337,7 @@ function AllCard({ isActive, onClick }: { isActive: boolean; onClick: () => void
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         style={{
           background:
-            "radial-gradient(70% 55% at 50% 50%, rgba(168,85,247,0.45) 0%, transparent 70%)",
+            "radial-gradient(70% 55% at 50% 50%, rgba(34,201,184,0.45) 0%, transparent 70%)",
         }}
       />
 

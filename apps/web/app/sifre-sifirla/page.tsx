@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const INP =
-  "bg-[#171336] border-[#352E6B] text-white placeholder:text-[#6E6796] focus-visible:ring-[#8B5CF6]";
+  "bg-[#171336] border-[#352E6B] text-white placeholder:text-[#6E6796] focus-visible:ring-[#22c9b8]";
 const STRENGTH = ["Çok zayıf", "Zayıf", "Orta", "İyi", "Güçlü"];
 const STRENGTH_COLOR = ["#FB7185", "#FB7185", "#FBBF24", "#A3E635", "#34D399"];
 
@@ -60,7 +60,7 @@ function ResetInner() {
           <p className="mt-2 text-sm text-[#A39DC9]">
             Bu sıfırlama bağlantısı eksik ya da hatalı. Yeni bir bağlantı iste.
           </p>
-          <Link href="/sifremi-unuttum" className="mt-6 inline-block text-sm text-[#A78BFA] hover:underline">
+          <Link href="/sifremi-unuttum" className="mt-6 inline-block text-sm text-[#22c9b8] hover:underline">
             Yeni bağlantı iste
           </Link>
         </div>
@@ -75,7 +75,7 @@ function ResetInner() {
           <p className="mt-2 text-sm text-[#A39DC9]">Artık yeni şifrenle giriş yapabilirsin.</p>
           <Button
             asChild
-            className="mt-6 w-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] hover:opacity-90 text-white"
+            className="mt-6 w-full bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] hover:opacity-90 text-white"
           >
             <Link href="/giris">Giriş yap</Link>
           </Button>
@@ -127,7 +127,7 @@ function ResetInner() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] hover:opacity-90 text-white shadow-lg shadow-[#6366F1]/20"
+              className="w-full bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] hover:opacity-90 text-white shadow-lg shadow-[#0e9a8c]/20"
             >
               {loading ? "Güncelleniyor…" : "Şifreyi güncelle"}
             </Button>

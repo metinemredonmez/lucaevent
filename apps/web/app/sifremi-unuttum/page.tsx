@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const INP =
-  "bg-[#171336] border-[#352E6B] text-white placeholder:text-[#6E6796] focus-visible:ring-[#8B5CF6]";
+  "bg-[#171336] border-[#352E6B] text-white placeholder:text-[#6E6796] focus-visible:ring-[#22c9b8]";
 
 const RESET_FEATURES = [
   "E-postana güvenli sıfırlama bağlantısı",
@@ -48,8 +48,8 @@ export default function SifremiUnuttum() {
     >
       {done ? (
         <div className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#8B5CF6]/15">
-            <MailCheck className="h-6 w-6 text-[#A78BFA]" />
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#22c9b8]/15">
+            <MailCheck className="h-6 w-6 text-[#22c9b8]" />
           </div>
           <h1 className="text-2xl text-white" style={{ fontFamily: "Georgia, serif" }}>
             Bağlantıyı gönderdik
@@ -63,7 +63,7 @@ export default function SifremiUnuttum() {
               type="button"
               disabled={resent || loading}
               onClick={async () => { await send(); setResent(true); }}
-              className="text-sm text-[#A78BFA] hover:underline disabled:opacity-50"
+              className="text-sm text-[#22c9b8] hover:underline disabled:opacity-50"
             >
               {resent ? "Tekrar gönderildi ✓" : "E-posta gelmedi mi? Tekrar gönder"}
             </button>
@@ -98,13 +98,13 @@ export default function SifremiUnuttum() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] hover:opacity-90 text-white shadow-lg shadow-[#6366F1]/20"
+              className="w-full bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] hover:opacity-90 text-white shadow-lg shadow-[#0e9a8c]/20"
             >
               {loading ? "Gönderiliyor…" : "Sıfırlama bağlantısı gönder"}
             </Button>
           </form>
           <p className="mt-6 text-sm">
-            <Link href="/giris" className="text-[#A78BFA] hover:underline">← Girişe dön</Link>
+            <Link href="/giris" className="text-[#22c9b8] hover:underline">← Girişe dön</Link>
           </p>
         </>
       )}

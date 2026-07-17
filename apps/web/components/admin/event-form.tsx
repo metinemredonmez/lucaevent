@@ -19,7 +19,7 @@ type Cat = { id: string; name: string; slug: string };
 type Mode = "create" | "edit";
 
 const FIELD =
-  "w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/40 focus:border-[#8B5CF6]/50";
+  "w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#22c9b8]/40 focus:border-[#22c9b8]/50";
 const LABEL = "block text-xs font-medium text-muted-foreground mb-1";
 
 function slugify(s: string): string {
@@ -176,11 +176,11 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
                   key={c.id}
                   type="button"
                   onClick={() => set("categoryId", on ? "" : c.id)}
-                  className="rounded-full border px-3 py-1.5 text-xs transition-all hover:border-[#8B5CF6]/60 active:scale-95"
+                  className="rounded-full border px-3 py-1.5 text-xs transition-all hover:border-[#22c9b8]/60 active:scale-95"
                   style={{
-                    borderColor: on ? "#8B5CF6" : "#E3DED5",
-                    background: on ? "rgba(139,92,246,0.12)" : "#fff",
-                    color: on ? "#6D28D9" : "#6F6F6F",
+                    borderColor: on ? "#22c9b8" : "#E3DED5",
+                    background: on ? "rgba(34,201,184,0.12)" : "#fff",
+                    color: on ? "#0a6f65" : "#6F6F6F",
                   }}
                 >
                   {c.name}
@@ -262,7 +262,7 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
               </div>
             </div>
             <label className="flex items-center gap-2 text-sm text-foreground">
-              <input type="checkbox" className="h-4 w-4 accent-[#8B5CF6]" checked={f.campingAllowed} onChange={(e) => set("campingAllowed", e.target.checked)} />
+              <input type="checkbox" className="h-4 w-4 accent-[#22c9b8]" checked={f.campingAllowed} onChange={(e) => set("campingAllowed", e.target.checked)} />
               Konaklama / kamp var
             </label>
           </div>
@@ -359,7 +359,7 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
         <button
           type="submit"
           disabled={saving}
-          className="rounded-md bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
+          className="rounded-md bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:opacity-90 disabled:opacity-60"
         >
           {saving ? "Kaydediliyor…" : mode === "create" ? "Etkinliği oluştur" : "Değişiklikleri kaydet"}
         </button>

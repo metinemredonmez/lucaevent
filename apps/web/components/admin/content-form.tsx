@@ -9,7 +9,7 @@ type Kind = "post" | "page";
 type Mode = "create" | "edit";
 
 const FIELD =
-  "w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/40 focus:border-[#8B5CF6]/50";
+  "w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#22c9b8]/40 focus:border-[#22c9b8]/50";
 const LABEL = "block text-xs font-medium text-muted-foreground mb-1";
 
 const POST_STATUSES = [
@@ -175,7 +175,7 @@ export function ContentForm({
           <label className="flex items-center gap-2 text-sm text-foreground">
             <input
               type="checkbox"
-              className="h-4 w-4 accent-[#8B5CF6]"
+              className="h-4 w-4 accent-[#22c9b8]"
               checked={f.isPublished}
               onChange={(e) => set("isPublished", e.target.checked)}
             />
@@ -190,7 +190,7 @@ export function ContentForm({
         <button
           type="submit"
           disabled={saving}
-          className="rounded-md bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:opacity-90 disabled:opacity-60"
+          className="rounded-md bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:opacity-90 disabled:opacity-60"
         >
           {saving ? "Kaydediliyor…" : mode === "create" ? "Oluştur" : "Değişiklikleri kaydet"}
         </button>

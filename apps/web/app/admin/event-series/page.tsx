@@ -130,7 +130,7 @@ export default function EventSeriesAdmin() {
       />
 
       {/* bilgilendirme kartı */}
-      <div className="mb-4 flex items-start gap-3 rounded-xl border border-border bg-gradient-to-br from-[#6366F1]/10 via-card to-card p-4 dark:from-[#6366F1]/14">
+      <div className="mb-4 flex items-start gap-3 rounded-xl border border-border bg-gradient-to-br from-[#0e9a8c]/10 via-card to-card p-4 dark:from-[#0e9a8c]/14">
         <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary/15 text-primary">
           <Info className="h-4.5 w-4.5" />
         </div>
@@ -226,7 +226,7 @@ export default function EventSeriesAdmin() {
                 className="flex items-center gap-3 px-3 py-3 transition-colors hover:bg-muted/30 sm:px-4"
               >
                 {/* ikon */}
-                <div className="grid size-12 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-white/90 sm:size-14">
+                <div className="grid size-12 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-[#0e9a8c] to-[#22c9b8] text-white/90 sm:size-14">
                   <Repeat className="h-5 w-5" />
                 </div>
 

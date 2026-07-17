@@ -44,7 +44,7 @@ export function MobileApp() {
       {/* hafif mor ışık bandı — bölüme özel his */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute right-[8%] top-1/2 h-[26rem] w-[26rem] -translate-y-1/2 rounded-full bg-primary/10 blur-[120px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_80%_20%,rgba(124,58,237,0.10),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_80%_20%,rgba(14,154,140,0.10),transparent_55%)]" />
       </div>
 
       <div className="container">
@@ -160,7 +160,7 @@ function PhoneFrame({ children, scale }: { children: ReactNode; scale?: string }
         {children}
         {/* alt menü */}
         <div className="absolute inset-x-0 bottom-0 flex h-12 items-center justify-around border-t border-white/10 bg-[#0a0614]/80 text-white/55 backdrop-blur">
-          <Home className="size-[18px] text-[#C4A6FF]" />
+          <Home className="size-[18px] text-[#7fe6da]" />
           <MapPin className="size-[18px]" />
           <CalendarDays className="size-[18px]" />
           <User className="size-[18px]" />
@@ -179,9 +179,9 @@ function HomeScreen() {
       <div className="relative px-4 pt-9">
         <div className="font-mono text-[11px] tracking-widest text-white/60">LUCA · İSTANBUL</div>
         <div className="mt-2 font-serif text-xl font-semibold leading-tight text-white">Şehrini yaşa.</div>
-        <div className="font-serif text-[13px] italic text-[#C4A6FF]">Gündüz keşfet, gece parla.</div>
+        <div className="font-serif text-[13px] italic text-[#7fe6da]">Gündüz keşfet, gece parla.</div>
         <div className="mt-4 space-y-2">
-          <ScreenCard title="Şile Kampı" meta="Cts · 2 gün" from="#3B2A6E" to="#5b3aa0" />
+          <ScreenCard title="Şile Kampı" meta="Cts · 2 gün" from="#3B2A6E" to="#17897c" />
           <ScreenCard title="Yaza Merhaba" meta="Burgazada" from="#243b5e" to="#2f6ea0" />
         </div>
       </div>
@@ -199,7 +199,7 @@ function MapScreen() {
         className="absolute inset-0 opacity-40"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(124,58,237,0.18) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,0.18) 1px,transparent 1px)",
+            "linear-gradient(rgba(14,154,140,0.18) 1px,transparent 1px),linear-gradient(90deg,rgba(14,154,140,0.18) 1px,transparent 1px)",
           backgroundSize: "28px 28px",
         }}
       />

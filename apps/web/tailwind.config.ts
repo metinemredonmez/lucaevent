@@ -48,13 +48,13 @@ export default {
           coal: "#160A29",        // Card zemini
           smoke: "#1F1238",       // Yüzey 2
           slate: "#2D1B4E",       // Border / divider
-          violet: "#A855F7",      // Ana vurgu — neon menekşe
+          violet: "#22c9b8",      // Ana vurgu — neon menekşe
           glow: "#C026D3",        // Vivid pink-violet glow
           deep: "#5B21B6",        // Koyu mor
           lavender: "#E9D5FF",    // Ana metin (lavanta beyaz)
           ash: "#9B8FB5",         // İkincil metin
         },
-        signal: "#A855F7",
+        signal: "#22c9b8",
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],

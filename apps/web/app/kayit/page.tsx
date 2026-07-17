@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { CATEGORIES } from "@/lib/data";
 
 const INP =
-  "bg-[#171336] border-[#352E6B] text-white placeholder:text-[#6E6796] focus-visible:ring-[#8B5CF6]";
+  "bg-[#171336] border-[#352E6B] text-white placeholder:text-[#6E6796] focus-visible:ring-[#22c9b8]";
 const STRENGTH = ["Çok zayıf", "Zayıf", "Orta", "İyi", "Güçlü"];
 const STRENGTH_COLOR = ["#FB7185", "#FB7185", "#FBBF24", "#A3E635", "#34D399"];
 const STEPS = ["Hesap", "Profil", "İlgi alanları"];
@@ -118,11 +118,11 @@ export default function Kayit() {
           <div className="mt-6 flex flex-col gap-2">
             <Button
               onClick={() => router.replace("/")}
-              className="w-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] hover:opacity-90 text-white"
+              className="w-full bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] hover:opacity-90 text-white"
             >
               Etkinlikleri keşfet
             </Button>
-            <Link href="/giris" className="text-sm text-[#A78BFA] hover:underline">
+            <Link href="/giris" className="text-sm text-[#22c9b8] hover:underline">
               Giriş sayfasına dön
             </Link>
           </div>
@@ -150,11 +150,11 @@ export default function Kayit() {
           <div key={label} className="flex flex-1 flex-col gap-1.5">
             <div
               className="h-1 rounded-full transition-colors"
-              style={{ background: i <= step ? "#8B5CF6" : "#2E2856" }}
+              style={{ background: i <= step ? "#22c9b8" : "#2E2856" }}
             />
             <span
               className="text-[10px] font-medium uppercase tracking-wider transition-colors"
-              style={{ color: i === step ? "#C4B5FD" : "#6E6796" }}
+              style={{ color: i === step ? "#7fe6da" : "#6E6796" }}
             >
               {i + 1}. {label}
             </span>
@@ -265,8 +265,8 @@ export default function Kayit() {
                           onClick={() => toggleInterest(c.slug)}
                           className="rounded-full border px-3 py-1.5 text-xs transition-colors"
                           style={{
-                            borderColor: on ? "#8B5CF6" : "#352E6B",
-                            background: on ? "rgba(139,92,246,0.18)" : "transparent",
+                            borderColor: on ? "#22c9b8" : "#352E6B",
+                            background: on ? "rgba(34,201,184,0.18)" : "transparent",
                             color: on ? "#E9E5FF" : "#A39DC9",
                           }}
                         >
@@ -279,11 +279,11 @@ export default function Kayit() {
 
                 <div className="space-y-2 border-t border-[#2E2856] pt-4">
                   <Consent checked={kvkk} onChange={setKvkk}>
-                    <Link href="/kvkk" target="_blank" className="text-[#A78BFA] hover:underline">KVKK aydınlatma metnini</Link>{" "}
+                    <Link href="/kvkk" target="_blank" className="text-[#22c9b8] hover:underline">KVKK aydınlatma metnini</Link>{" "}
                     okudum, onaylıyorum. <span className="text-[#FB7185]">*</span>
                   </Consent>
                   <Consent checked={terms} onChange={setTerms}>
-                    <Link href="/kosullar" target="_blank" className="text-[#A78BFA] hover:underline">Kullanım koşullarını</Link>{" "}
+                    <Link href="/kosullar" target="_blank" className="text-[#22c9b8] hover:underline">Kullanım koşullarını</Link>{" "}
                     kabul ediyorum. <span className="text-[#FB7185]">*</span>
                   </Consent>
                   <Consent checked={marketing} onChange={setMarketing}>
@@ -311,7 +311,7 @@ export default function Kayit() {
           <Button
             type="submit"
             disabled={loading}
-            className="flex-[2] bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] hover:opacity-90 text-white shadow-lg shadow-[#6366F1]/20"
+            className="flex-[2] bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] hover:opacity-90 text-white shadow-lg shadow-[#0e9a8c]/20"
           >
             {loading
               ? "Kayıt olunuyor…"
@@ -334,7 +334,7 @@ export default function Kayit() {
 
       <p className="mt-5 text-center text-sm text-[#A39DC9]">
         Zaten hesabın var mı?{" "}
-        <Link href="/giris" className="text-[#A78BFA] hover:underline">Giriş yap</Link>
+        <Link href="/giris" className="text-[#22c9b8] hover:underline">Giriş yap</Link>
       </p>
     </AuthShell>
   );
@@ -364,7 +364,7 @@ function Consent({
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-0.5 h-4 w-4 accent-[#8B5CF6]"
+        className="mt-0.5 h-4 w-4 accent-[#22c9b8]"
       />
       <span>{children}</span>
     </label>

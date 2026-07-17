@@ -18,7 +18,7 @@ const TABS: { type: Tab; label: string; icon: typeof Mail; desc: string }[] = [
 ];
 
 const INP =
-  "bg-[#171336] border-[#352E6B] text-white placeholder:text-[#6E6796] focus-visible:ring-[#8B5CF6]";
+  "bg-[#171336] border-[#352E6B] text-white placeholder:text-[#6E6796] focus-visible:ring-[#22c9b8]";
 const LBL = "block text-xs text-[#A39DC9] mb-1";
 
 export default function BasvuruPage() {
@@ -67,12 +67,12 @@ export default function BasvuruPage() {
       <Nav />
       <main className="relative min-h-screen overflow-hidden bg-[#0C0920] pt-[6.5rem]">
         {/* atmosfer */}
-        <div className="pointer-events-none absolute -left-24 top-10 h-80 w-80 rounded-full bg-[#7C3AED]/20 blur-[120px]" />
-        <div className="pointer-events-none absolute right-[-6rem] top-1/3 h-96 w-96 rounded-full bg-[#A855F7]/15 blur-[130px]" />
+        <div className="pointer-events-none absolute -left-24 top-10 h-80 w-80 rounded-full bg-[#0e9a8c]/20 blur-[120px]" />
+        <div className="pointer-events-none absolute right-[-6rem] top-1/3 h-96 w-96 rounded-full bg-[#22c9b8]/15 blur-[130px]" />
 
         <div className="container relative z-10 mx-auto max-w-xl px-4 pb-16 pt-8">
           <div className="mb-7 text-center">
-            <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#A78BFA]">
+            <span className="font-mono text-[11px] uppercase tracking-[0.28em] text-[#22c9b8]">
               Luca · İletişim
             </span>
             <h1 className="mt-3 font-serif text-3xl text-white md:text-4xl">Bize ulaş</h1>
@@ -92,11 +92,11 @@ export default function BasvuruPage() {
                   onClick={() => { setTab(t.type); setErr(""); }}
                   className="relative rounded-xl border p-3 text-center transition-colors"
                   style={{
-                    borderColor: on ? "#8B5CF6" : "#2E2856",
-                    background: on ? "rgba(139,92,246,0.14)" : "rgba(255,255,255,0.02)",
+                    borderColor: on ? "#22c9b8" : "#2E2856",
+                    background: on ? "rgba(34,201,184,0.14)" : "rgba(255,255,255,0.02)",
                   }}
                 >
-                  <Icon className="mx-auto h-5 w-5" style={{ color: on ? "#C4B5FD" : "#6E6796" }} />
+                  <Icon className="mx-auto h-5 w-5" style={{ color: on ? "#7fe6da" : "#6E6796" }} />
                   <span className="mt-1.5 block text-xs" style={{ color: on ? "#E9E5FF" : "#A39DC9" }}>
                     {t.label}
                   </span>
@@ -117,7 +117,7 @@ export default function BasvuruPage() {
                 </p>
                 <Button
                   onClick={() => { setDone(false); setName(""); setEmail(""); setPhone(""); setSubject(""); setMessage(""); setInterests([]); }}
-                  className="mt-6 bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white hover:opacity-90"
+                  className="mt-6 bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] text-white hover:opacity-90"
                 >
                   Yeni başvuru
                 </Button>
@@ -196,8 +196,8 @@ export default function BasvuruPage() {
                                   onClick={() => toggleInterest(c.slug)}
                                   className="rounded-full border px-3 py-1.5 text-xs transition-colors"
                                   style={{
-                                    borderColor: on ? "#8B5CF6" : "#352E6B",
-                                    background: on ? "rgba(139,92,246,0.18)" : "transparent",
+                                    borderColor: on ? "#22c9b8" : "#352E6B",
+                                    background: on ? "rgba(34,201,184,0.18)" : "transparent",
                                     color: on ? "#E9E5FF" : "#A39DC9",
                                   }}
                                 >
@@ -222,12 +222,12 @@ export default function BasvuruPage() {
                     type="checkbox"
                     checked={kvkk}
                     onChange={(e) => setKvkk(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-[#8B5CF6]"
+                    className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-[#22c9b8]"
                   />
                   <span>
-                    <a href="/kvkk" target="_blank" className="text-[#C4B5FD] underline underline-offset-2 hover:text-white">KVKK Aydınlatma Metni</a>
+                    <a href="/kvkk" target="_blank" className="text-[#7fe6da] underline underline-offset-2 hover:text-white">KVKK Aydınlatma Metni</a>
                     {" "}ve{" "}
-                    <a href="/kosullar" target="_blank" className="text-[#C4B5FD] underline underline-offset-2 hover:text-white">Kullanım Koşulları</a>
+                    <a href="/kosullar" target="_blank" className="text-[#7fe6da] underline underline-offset-2 hover:text-white">Kullanım Koşulları</a>
                     {"'nı okudum; kişisel verilerimin bu başvuru kapsamında işlenmesine onay veriyorum."}
                   </span>
                 </label>
@@ -237,7 +237,7 @@ export default function BasvuruPage() {
                 <Button
                   type="submit"
                   disabled={loading || !kvkk}
-                  className="w-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] text-white shadow-lg shadow-[#6366F1]/20 hover:opacity-90"
+                  className="w-full bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] text-white shadow-lg shadow-[#0e9a8c]/20 hover:opacity-90"
                 >
                   {loading ? "Gönderiliyor…" : "Gönder"}
                 </Button>

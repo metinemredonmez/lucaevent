@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const INP =
-  "bg-[#171336] border-[#352E6B] text-white placeholder:text-[#6E6796] focus-visible:ring-[#8B5CF6]";
-const LBL = "block text-sm font-medium text-[#C4B5FD] mb-1.5";
+  "bg-[#171336] border-[#352E6B] text-white placeholder:text-[#6E6796] focus-visible:ring-[#22c9b8]";
+const LBL = "block text-sm font-medium text-[#7fe6da] mb-1.5";
 
 /** Giriş sonrası dönülecek güvenli iç rota (?next=/hesap gibi). */
 function nextUrl(): string {
@@ -92,7 +92,7 @@ export default function Giris() {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] hover:opacity-90 text-white shadow-lg shadow-[#6366F1]/20"
+          className="w-full bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] hover:opacity-90 text-white shadow-lg shadow-[#0e9a8c]/20"
         >
           {loading ? "Giriş yapılıyor…" : "Giriş yap"}
         </Button>
@@ -100,10 +100,10 @@ export default function Giris() {
 
       {/* temiz iki-link satırı (yoga app stili) */}
       <div className="mt-4 flex items-center justify-between text-sm">
-        <Link href="/sifremi-unuttum" className="text-[#A39DC9] hover:text-[#C4B5FD]">
+        <Link href="/sifremi-unuttum" className="text-[#A39DC9] hover:text-[#7fe6da]">
           Şifremi unuttum
         </Link>
-        <Link href="/kayit" className="text-[#A78BFA] underline-offset-4 hover:underline">
+        <Link href="/kayit" className="text-[#22c9b8] underline-offset-4 hover:underline">
           Kayıt ol
         </Link>
       </div>

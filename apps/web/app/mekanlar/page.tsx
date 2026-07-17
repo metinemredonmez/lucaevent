@@ -74,7 +74,7 @@ function isOpenNow(periods?: { open: ClockPart; close?: ClockPart }[]): boolean 
 
 const STATUS: Record<string, { label: string; chip: string; pin: string }> = {
   live: { label: "Canlı", chip: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400", pin: "#10b981" },
-  upcoming: { label: "Yaklaşan", chip: "bg-violet-500/15 text-violet-600 dark:text-violet-400", pin: "#8b5cf6" },
+  upcoming: { label: "Yaklaşan", chip: "bg-violet-500/15 text-violet-600 dark:text-violet-400", pin: "#22c9b8" },
   idle: { label: "Boşta", chip: "bg-muted text-muted-foreground", pin: "#94a3b8" },
 };
 const STATUS_FILTERS = [
@@ -122,7 +122,7 @@ function escapeHtml(s: string): string {
 }
 const STATUS_GRAD: Record<string, string> = {
   live: "linear-gradient(135deg,#047857,#10b981)",
-  upcoming: "linear-gradient(135deg,#6d28d9,#a855f7)",
+  upcoming: "linear-gradient(135deg,#0a6f65,#22c9b8)",
   idle: "linear-gradient(135deg,#374151,#4b5563)",
 };
 function popupHtml(v: Venue): string {
@@ -136,12 +136,12 @@ function popupHtml(v: Venue): string {
   const ev = v.liveEvent
     ? `<div class="ev" style="color:#34d399">● Şu an: ${escapeHtml(v.liveEvent.title)}</div>`
     : v.nextEvent
-      ? `<div class="ev" style="color:#c4b5fd">Sıradaki: ${escapeHtml(v.nextEvent.title)} · ${escapeHtml(formatDateTR(v.nextEvent.startsAt))}</div>`
+      ? `<div class="ev" style="color:#7fe6da">Sıradaki: ${escapeHtml(v.nextEvent.title)} · ${escapeHtml(formatDateTR(v.nextEvent.startsAt))}</div>`
       : `<div class="ev" style="color:#6b7280">Etkinlik yok</div>`;
   const watch = v.liveEvent
     ? `<a class="watch" style="background:#ef4444" href="/canli/${encodeURIComponent(v.liveEvent.slug)}">▶ Canlı İzle</a>`
     : v.nextEvent
-      ? `<a class="watch" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)" href="/etkinlik/${encodeURIComponent(v.nextEvent.slug)}">Detayı gör →</a>`
+      ? `<a class="watch" style="background:linear-gradient(135deg,#0e9a8c,#22c9b8)" href="/etkinlik/${encodeURIComponent(v.nextEvent.slug)}">Detayı gör →</a>`
       : "";
   const dot = v.status === "live" ? `<span style="width:6px;height:6px;border-radius:50%;background:#fff"></span>` : "";
   const g = v.google;
@@ -378,7 +378,7 @@ export default function MekanlarPage() {
                 <div ref={mapEl} className="h-[340px] w-full bg-muted lg:h-[560px]" />
                 <div className="pointer-events-none absolute left-3 top-3 z-[1] flex flex-wrap gap-1.5 rounded-lg bg-card/85 px-2.5 py-1.5 text-[11px] shadow-sm backdrop-blur">
                   <span className="inline-flex items-center gap-1"><i className="h-2 w-2 rounded-full" style={{ background: "#10b981" }} /> Canlı</span>
-                  <span className="inline-flex items-center gap-1"><i className="h-2 w-2 rounded-full" style={{ background: "#8b5cf6" }} /> Yaklaşan</span>
+                  <span className="inline-flex items-center gap-1"><i className="h-2 w-2 rounded-full" style={{ background: "#22c9b8" }} /> Yaklaşan</span>
                   <span className="inline-flex items-center gap-1"><i className="h-2 w-2 rounded-full" style={{ background: "#94a3b8" }} /> Boşta</span>
                 </div>
                 {mapError && (
@@ -415,7 +415,7 @@ export default function MekanlarPage() {
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={cover} alt={v.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
                           ) : (
-                            <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-white/70">
+                            <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#0e9a8c] to-[#22c9b8] text-white/70">
                               <MapPin className="h-6 w-6" />
                             </div>
                           )}

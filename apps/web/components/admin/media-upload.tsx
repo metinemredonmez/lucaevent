@@ -51,7 +51,7 @@ export function MediaUpload({
           type="button"
           onClick={() => ref.current?.click()}
           disabled={busy}
-          className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground transition hover:border-[#8B5CF6]/50 disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground transition hover:border-[#22c9b8]/50 disabled:opacity-60"
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
           {busy ? `Yükleniyor… %${pct}` : buttonLabel || (kind === "video" ? "Video yükle (R2)" : "Görsel yükle (R2)")}
@@ -69,7 +69,7 @@ export function MediaUpload({
 
       {busy && (
         <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-border">
-          <div className="h-full bg-[#8B5CF6] transition-all" style={{ width: `${pct}%` }} />
+          <div className="h-full bg-[#22c9b8] transition-all" style={{ width: `${pct}%` }} />
         </div>
       )}
 

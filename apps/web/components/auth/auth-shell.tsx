@@ -57,12 +57,12 @@ export function AuthShell({
 
         {/* drifting orbs */}
         <motion.div
-          className="pointer-events-none absolute -left-20 top-6 h-72 w-72 rounded-full bg-[#6366F1]/12 blur-3xl"
+          className="pointer-events-none absolute -left-20 top-6 h-72 w-72 rounded-full bg-[#0e9a8c]/12 blur-3xl"
           animate={{ x: [0, 40, 0], y: [0, 30, 0], scale: [1, 1.2, 1] }}
           transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="pointer-events-none absolute right-6 bottom-20 h-80 w-80 rounded-full bg-[#A855F7]/10 blur-3xl"
+          className="pointer-events-none absolute right-6 bottom-20 h-80 w-80 rounded-full bg-[#22c9b8]/10 blur-3xl"
           animate={{ x: [0, -30, 0], y: [0, -40, 0], scale: [1.1, 1, 1.1] }}
           transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -77,12 +77,12 @@ export function AuthShell({
           {[0, 1, 2].map((i) => (
             <motion.span
               key={i}
-              className="absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#A78BFA]/50"
+              className="absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#22c9b8]/50"
               animate={{ scale: [1, 2.6], opacity: [0.5, 0] }}
               transition={{ duration: 4.5, repeat: Infinity, delay: i * 1.4, ease: "easeOut" }}
             />
           ))}
-          <div className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#8B5CF6]/60 blur-sm" />
+          <div className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#22c9b8]/60 blur-sm" />
         </div>
 
         {/* floating event chips */}
@@ -123,7 +123,7 @@ export function AuthShell({
               {features.map((f) => (
                 <motion.li key={f} variants={item} className="flex items-center gap-3 text-sm text-white/80">
                   <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/15">
-                    <Check className="h-3 w-3 text-[#C4B5FD]" />
+                    <Check className="h-3 w-3 text-[#7fe6da]" />
                   </span>
                   {f}
                 </motion.li>
@@ -139,8 +139,8 @@ export function AuthShell({
 
       {/* RIGHT — dark panel (no white) */}
       <div className="relative flex items-center justify-center overflow-hidden px-4 py-10 bg-[#0a0a0b]">
-        <div className="pointer-events-none absolute right-[-6rem] top-[-6rem] h-72 w-72 rounded-full bg-[#7C3AED]/8 blur-3xl" />
-        <div className="pointer-events-none absolute left-[-4rem] bottom-[-4rem] h-64 w-64 rounded-full bg-[#4F46E5]/6 blur-3xl" />
+        <div className="pointer-events-none absolute right-[-6rem] top-[-6rem] h-72 w-72 rounded-full bg-[#0e9a8c]/8 blur-3xl" />
+        <div className="pointer-events-none absolute left-[-4rem] bottom-[-4rem] h-64 w-64 rounded-full bg-[#0e9a8c]/6 blur-3xl" />
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}

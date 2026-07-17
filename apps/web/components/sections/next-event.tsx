@@ -59,7 +59,7 @@ export function NextEvent() {
 
   return (
     <section className="container pt-4">
-      <div className="overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-r from-[#6366F1]/10 via-card to-[#8B5CF6]/10">
+      <div className="overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-r from-[#0e9a8c]/10 via-card to-[#22c9b8]/10">
         <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
           {/* sol: kapak + bilgi */}
           <div className="flex min-w-0 items-center gap-3.5">
@@ -68,7 +68,7 @@ export function NextEvent() {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={cover} alt={ev.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
               ) : (
-                <span className="grid h-full w-full place-items-center bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-white">
+                <span className="grid h-full w-full place-items-center bg-gradient-to-br from-[#0e9a8c] to-[#22c9b8] text-white">
                   <CalendarClock className="size-6" />
                 </span>
               )}
@@ -118,7 +118,7 @@ export function NextEvent() {
               <Radio className="size-4" /> Canlı İzle
             </Link>
           ) : (
-            <Link href={`/etkinlik/${ev.slug}`} className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-3.5 py-2 text-sm font-medium text-white transition hover:opacity-90">
+            <Link href={`/etkinlik/${ev.slug}`} className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-3.5 py-2 text-sm font-medium text-white transition hover:opacity-90">
               Detay / Katıl <ArrowRight className="size-4" />
             </Link>
           )}

@@ -131,11 +131,11 @@ export default function NotificationsAdmin() {
           <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Kanal</label>
           <div className="flex flex-col gap-2">
             <label className="flex items-center gap-2 text-sm text-foreground">
-              <input type="checkbox" checked={inapp} onChange={(e) => setInapp(e.target.checked)} className="h-4 w-4 accent-[#8B5CF6]" />
+              <input type="checkbox" checked={inapp} onChange={(e) => setInapp(e.target.checked)} className="h-4 w-4 accent-[#22c9b8]" />
               <Bell className="h-4 w-4 text-primary" /> Uygulama-içi (çan) <span className="text-xs text-muted-foreground">— anahtar gerekmez</span>
             </label>
             <label className={`flex items-center gap-2 text-sm ${configured ? "text-foreground" : "text-muted-foreground"}`}>
-              <input type="checkbox" checked={push} onChange={(e) => setPush(e.target.checked)} className="h-4 w-4 accent-[#8B5CF6]" />
+              <input type="checkbox" checked={push} onChange={(e) => setPush(e.target.checked)} className="h-4 w-4 accent-[#22c9b8]" />
               <Smartphone className="h-4 w-4 text-primary" /> Push (OneSignal)
               {configured === false && <span className="text-xs text-amber-600 dark:text-amber-400">— anahtar yok</span>}
             </label>
@@ -145,7 +145,7 @@ export default function NotificationsAdmin() {
         <button
           disabled={busy || !title.trim() || !message.trim()}
           onClick={send}
-          className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Send className="h-4 w-4" /> {busy ? "Gönderiliyor…" : target === "event" ? "Katılımcılara gönder" : "Herkese gönder"}
         </button>

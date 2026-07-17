@@ -10,7 +10,7 @@ type Station = { name: string; tag: string; color: string; url: string };
 /** Sabit favoriler — hepsi HTTPS, test edildi. */
 const FAVORITES: Station[] = [
   { name: "I Love Dance", tag: "house · electronic", color: "#22D3EE", url: "https://streams.ilovemusic.de/iloveradio2.mp3" },
-  { name: "Metro FM", tag: "pop · hit", color: "#A855F7", url: "https://playerservices.streamtheworld.com/api/livestream-redirect/METRO_FM.mp3" },
+  { name: "Metro FM", tag: "pop · hit", color: "#22c9b8", url: "https://playerservices.streamtheworld.com/api/livestream-redirect/METRO_FM.mp3" },
   { name: "Joy FM", tag: "lounge · yabancı", color: "#F472B6", url: "https://playerservices.streamtheworld.com/api/livestream-redirect/JOY_FM.mp3" },
   { name: "Virgin Radio", tag: "pop", color: "#FB7185", url: "https://playerservices.streamtheworld.com/api/livestream-redirect/VIRGIN_RADIO.mp3" },
   { name: "Süper FM", tag: "türkçe pop", color: "#34D399", url: "https://playerservices.streamtheworld.com/api/livestream-redirect/SUPER_FM.mp3" },
@@ -85,7 +85,7 @@ async function rbFetch(path: string): Promise<any[]> {
 // (Canlı radyo widget'ı sabit şarkı listesi çalamaz; her mix o vibe'ı çalan istasyona bağlanır.)
 type Mix = { l: string; s: string; q: string; by: "name" | "tag"; hero?: boolean; Icon: LucideIcon; color: string };
 const MIXES: Mix[] = [
-  { l: "BUGÜNE ÖZEL", s: "günün seçkisi · Türkçe rock", q: "eksen", by: "name", hero: true, Icon: Sparkles, color: "#A855F7" },
+  { l: "BUGÜNE ÖZEL", s: "günün seçkisi · Türkçe rock", q: "eksen", by: "name", hero: true, Icon: Sparkles, color: "#22c9b8" },
   { l: "Türkçe Pop", s: "hit & yeni", q: "power türk", by: "name", Icon: Music2, color: "#EC4899" },
   { l: "Rock", s: "yabancı rock klasikleri", q: "rock", by: "tag", Icon: Guitar, color: "#F97316" },
   { l: "Slow · Akşam", s: "sakin, ateş başı", q: "slow türk", by: "name", Icon: Moon, color: "#60A5FA" },
@@ -113,8 +113,8 @@ function eventMix(
   const q = ev.musicQuery?.trim();
   const cat = ev.category?.slug ? CATEGORY_MUSIC[ev.category.slug] : null;
   const label = ev.musicLabel?.trim() || (keepLabel ? "BUGÜNE ÖZEL" : cat?.label || "BU ETKİNLİĞE ÖZEL");
-  if (q) return { l: label.toUpperCase(), s: "etkinlik müziği", q, by: "tag", hero: true, Icon: Sparkles, color: "#A855F7" };
-  if (cat) return { l: label.toUpperCase(), s: "etkinliğe göre", q: cat.q, by: cat.by, hero: true, Icon: Sparkles, color: "#A855F7" };
+  if (q) return { l: label.toUpperCase(), s: "etkinlik müziği", q, by: "tag", hero: true, Icon: Sparkles, color: "#22c9b8" };
+  if (cat) return { l: label.toUpperCase(), s: "etkinliğe göre", q: cat.q, by: cat.by, hero: true, Icon: Sparkles, color: "#22c9b8" };
   return null;
 }
 
@@ -227,7 +227,7 @@ export function RadioPlayer() {
           .map((s) => ({
             name: (s.name || "—").trim().slice(0, 32),
             tag: [s.countrycode, (s.tags || "").split(",")[0]].filter(Boolean).join(" · ").slice(0, 34),
-            color: "#8B5CF6",
+            color: "#22c9b8",
             url: s.url_resolved,
           })),
       );
@@ -366,7 +366,7 @@ export function RadioPlayer() {
       );
       const st = data.find((s) => typeof s.url_resolved === "string" && s.url_resolved.startsWith("https"));
       if (st) {
-        play({ name: (st.name || m.l).trim().slice(0, 32), tag: `mix · ${m.l.toLowerCase()}`, color: "#8B5CF6", url: st.url_resolved });
+        play({ name: (st.name || m.l).trim().slice(0, 32), tag: `mix · ${m.l.toLowerCase()}`, color: "#22c9b8", url: st.url_resolved });
       }
     } finally {
       setMixBusy("");
@@ -607,7 +607,7 @@ export function RadioPlayer() {
   return (
     <div
       ref={wrapRef}
-      className="fixed inset-x-0 top-16 z-40 border-b border-primary/25 bg-gradient-to-r from-[#6366F1]/20 via-background/88 to-[#8B5CF6]/20 backdrop-blur-lg select-none"
+      className="fixed inset-x-0 top-16 z-40 border-b border-primary/25 bg-gradient-to-r from-[#0e9a8c]/20 via-background/88 to-[#22c9b8]/20 backdrop-blur-lg select-none"
     >
       <div className="container relative">
         <div className="flex h-9 items-center gap-2.5">

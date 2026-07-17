@@ -193,7 +193,7 @@ export default function UsersAdmin() {
                   className="flex items-center gap-3 px-3 py-3 transition-colors hover:bg-muted/30 sm:px-4"
                 >
                   {/* avatar / baş harf */}
-                  <div className="grid size-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-[13px] font-semibold text-white">
+                  <div className="grid size-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#0e9a8c] to-[#22c9b8] text-[13px] font-semibold text-white">
                     {initials(u.name, u.email)}
                   </div>
 

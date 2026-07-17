@@ -65,7 +65,7 @@ export function BackgroundMusic() {
             {[0, 1, 2].map((i) => (
               <span
                 key={i}
-                className="w-[2px] rounded-full bg-[#A78BFA]"
+                className="w-[2px] rounded-full bg-[#22c9b8]"
                 style={{ height: 6 + i * 3, animation: `lucaEq 0.9s ${i * 0.15}s ease-in-out infinite alternate` }}
               />
             ))}

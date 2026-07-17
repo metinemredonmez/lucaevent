@@ -32,7 +32,7 @@ const ISTANBUL: [number, number] = [28.9784, 41.0082]; // Mapbox: [lng, lat]
 
 const STATUS: Record<string, { label: string; chip: string; pin: string }> = {
   live: { label: "Canlı", chip: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400", pin: "#10b981" },
-  upcoming: { label: "Yaklaşan", chip: "bg-violet-500/15 text-violet-600 dark:text-violet-400", pin: "#8b5cf6" },
+  upcoming: { label: "Yaklaşan", chip: "bg-violet-500/15 text-violet-600 dark:text-violet-400", pin: "#22c9b8" },
   idle: { label: "Boşta", chip: "bg-muted text-muted-foreground", pin: "#94a3b8" },
 };
 const STATUS_FILTERS = [
@@ -88,7 +88,7 @@ function escapeHtml(s: string): string {
 }
 const STATUS_GRAD: Record<string, string> = {
   live: "linear-gradient(135deg,#047857,#10b981)",
-  upcoming: "linear-gradient(135deg,#6d28d9,#a855f7)",
+  upcoming: "linear-gradient(135deg,#0a6f65,#22c9b8)",
   idle: "linear-gradient(135deg,#374151,#4b5563)",
 };
 function popupHtml(v: Venue): string {
@@ -101,7 +101,7 @@ function popupHtml(v: Venue): string {
   const ev = v.liveEvent
     ? `<div class="ev" style="color:#34d399">● Şu an: ${escapeHtml(v.liveEvent.title)}</div>`
     : v.nextEvent
-      ? `<div class="ev" style="color:#c4b5fd">Sıradaki: ${escapeHtml(v.nextEvent.title)} · ${escapeHtml(formatDateTR(v.nextEvent.startsAt))}</div>`
+      ? `<div class="ev" style="color:#7fe6da">Sıradaki: ${escapeHtml(v.nextEvent.title)} · ${escapeHtml(formatDateTR(v.nextEvent.startsAt))}</div>`
       : `<div class="ev" style="color:#6b7280">Etkinlik yok</div>`;
   const watch = v.liveEvent
     ? `<a class="watch" style="background:#ef4444" href="/canli/${encodeURIComponent(v.liveEvent.slug)}" target="_blank" rel="noopener">▶ Canlı İzle</a>`
@@ -422,7 +422,7 @@ export default function VenuesAdmin() {
             <button
               type="submit"
               disabled={busy === "add"}
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-4 text-[13px] font-medium text-white shadow-sm transition hover:opacity-90 disabled:opacity-60"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-4 text-[13px] font-medium text-white shadow-sm transition hover:opacity-90 disabled:opacity-60"
             >
               <Plus className="h-4 w-4" /> {busy === "add" ? "Ekleniyor…" : "Ekle"}
             </button>
@@ -490,7 +490,7 @@ export default function VenuesAdmin() {
             {/* lejant */}
             <div className="pointer-events-none absolute left-3 top-3 z-[1] flex flex-wrap gap-1.5 rounded-lg bg-card/85 px-2.5 py-1.5 text-[11px] shadow-sm backdrop-blur">
               <span className="inline-flex items-center gap-1"><i className="h-2 w-2 rounded-full" style={{ background: "#10b981" }} /> Canlı</span>
-              <span className="inline-flex items-center gap-1"><i className="h-2 w-2 rounded-full" style={{ background: "#8b5cf6" }} /> Yaklaşan</span>
+              <span className="inline-flex items-center gap-1"><i className="h-2 w-2 rounded-full" style={{ background: "#22c9b8" }} /> Yaklaşan</span>
               <span className="inline-flex items-center gap-1"><i className="h-2 w-2 rounded-full" style={{ background: "#94a3b8" }} /> Boşta</span>
             </div>
             {needsToken && (
@@ -548,7 +548,7 @@ export default function VenuesAdmin() {
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={v.coverUrl} alt={v.name} className="h-full w-full object-cover" />
                         ) : (
-                          <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-white/80">
+                          <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#0e9a8c] to-[#22c9b8] text-white/80">
                             <MapPin className="h-5 w-5" />
                           </div>
                         )}

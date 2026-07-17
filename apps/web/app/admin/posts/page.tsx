@@ -88,7 +88,7 @@ export default function PostsAdmin() {
         actions={
           <Link
             href="/admin/posts/new"
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-3.5 text-[13px] font-medium text-white shadow-sm transition hover:opacity-90"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-3.5 text-[13px] font-medium text-white shadow-sm transition hover:opacity-90"
           >
             <Plus className="h-4 w-4" /> Yeni yazı
           </Link>
@@ -156,7 +156,7 @@ export default function PostsAdmin() {
                   {p.coverUrl ? (
                     <Image src={p.coverUrl} alt={p.title} fill sizes="56px" className="object-cover" />
                   ) : (
-                    <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] text-white/80">
+                    <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#0e9a8c] to-[#22c9b8] text-white/80">
                       <FileText className="h-5 w-5" />
                     </div>
                   )}
