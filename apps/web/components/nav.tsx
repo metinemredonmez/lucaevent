@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { PaletteSwitcher } from "@/components/palette-switcher";
 import { NotificationBell } from "@/components/notification-bell";
 import { Menu, User } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -106,6 +107,7 @@ export function Nav() {
 
         <div className="flex items-center gap-2">
           <NotificationBell />
+          <PaletteSwitcher />
           <ThemeToggle />
           <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
             <a href="/basvuru">Bize Ulaş</a>
