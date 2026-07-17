@@ -2,10 +2,8 @@
 
 import { useState } from "react";
 import { Nav } from "@/components/nav";
-import { Hero } from "@/components/sections/hero";
-import { NextEvent } from "@/components/sections/next-event";
+import { CityPulse } from "@/components/sections/city-pulse";
 import { Categories } from "@/components/sections/categories";
-import { Activities } from "@/components/sections/activities";
 import { Showcase } from "@/components/sections/showcase";
 import { Family } from "@/components/sections/family";
 import { MobileApp } from "@/components/sections/mobile-app";
@@ -20,10 +18,9 @@ export default function HomePage() {
     <>
       <Nav />
       <main className="pt-16">
-        <Hero />
-        <NextEvent />
+        {/* "Şehrin Nabzı" — zaman eksenli canlı etkinlik panosu (yeni kimlik, hero + event listeleri yerine) */}
+        <CityPulse />
         <Categories active={filter} onSelect={setFilter} />
-        <Activities filter={filter} />
         <Showcase />
         <Family />
         <MobileApp />
