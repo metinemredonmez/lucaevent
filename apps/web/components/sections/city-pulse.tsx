@@ -22,6 +22,17 @@ function dayKey(d: Date) {
   return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 }
 
+// WMO hava kodu → durum + etiket (İstanbul'un o anki havası).
+type Weather = { cond: "clear" | "clouds" | "rain" | "snow"; isDay: boolean; temp: number; label: string };
+function mapWeather(code: number): { cond: Weather["cond"]; label: string } {
+  if (code >= 71 && code <= 77) return { cond: "snow", label: "Karlı" };
+  if (code >= 85 && code <= 86) return { cond: "snow", label: "Kar" };
+  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82) || (code >= 95 && code <= 99)) return { cond: "rain", label: "Yağmurlu" };
+  if (code === 45 || code === 48) return { cond: "clouds", label: "Sisli" };
+  if (code === 2 || code === 3) return { cond: "clouds", label: "Bulutlu" };
+  return { cond: "clear", label: "Açık" };
+}
+
 export function CityPulse() {
   const [rows, setRows] = useState<DiscoverEvent[]>([]);
   const [live, setLive] = useState<LiveRow[]>([]);
@@ -29,6 +40,20 @@ export function CityPulse() {
   const [clock, setClock] = useState("--:--:--");
   const [mode, setMode] = useState<"gunduz" | "gece">("gunduz");
   const [loading, setLoading] = useState(true);
+  const [weather, setWeather] = useState<Weather | null>(null);
+
+  // İstanbul'un o anki havası (Open-Meteo, anahtarsız) → arka plan + rozet
+  useEffect(() => {
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=41.0082&longitude=28.9784&current=temperature_2m,weather_code,is_day&timezone=Europe%2FIstanbul")
+      .then((r) => r.json())
+      .then((d) => {
+        const c = d?.current;
+        if (!c) return;
+        const m = mapWeather(c.weather_code);
+        setWeather({ cond: m.cond, label: m.label, isDay: c.is_day === 1, temp: Math.round(c.temperature_2m) });
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     Promise.all([
@@ -83,6 +108,26 @@ export function CityPulse() {
         .cp-bg::after{content:'';position:absolute;inset:0;
           background:linear-gradient(to bottom,rgba(10,11,13,.35) 0%,rgba(10,11,13,.55) 45%,rgba(10,11,13,.9) 80%,#0a0b0d 100%)}
         .cp-in{position:relative;z-index:1;max-width:1020px;margin:0 auto}
+        /* hava efekti katmanı */
+        .cp-fx{position:absolute;inset:0 0 auto 0;height:560px;z-index:0;pointer-events:none}
+        .cp-fx.rain{background-image:linear-gradient(102deg,transparent 46%,rgba(200,225,235,.22) 50%,transparent 54%);
+          background-size:9px 64px;animation:cpRain .62s linear infinite;opacity:.55}
+        @keyframes cpRain{from{background-position:0 0}to{background-position:-14px 64px}}
+        .cp-fx.snow{background-image:radial-gradient(2px 2px at 20% 12%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 68% 38%,rgba(255,255,255,.85) 50%,transparent 51%),radial-gradient(1.6px 1.6px at 44% 66%,#fff 50%,transparent 51%);
+          background-size:200px 320px;animation:cpSnow 7s linear infinite;opacity:.85}
+        @keyframes cpSnow{to{background-position:0 320px,0 320px,0 320px}}
+        .cp-fx.clouds{background-image:radial-gradient(60% 42% at 28% 26%,rgba(255,255,255,.10),transparent 60%),radial-gradient(52% 36% at 76% 44%,rgba(255,255,255,.08),transparent 60%);
+          filter:blur(3px);animation:cpDrift 26s ease-in-out infinite alternate}
+        @keyframes cpDrift{to{transform:translateX(42px)}}
+        .cp-fx.clear.day{background-image:radial-gradient(38% 40% at 84% 10%,rgba(246,167,35,.22),transparent 62%);animation:cpGlow 6.5s ease-in-out infinite}
+        @keyframes cpGlow{0%,100%{opacity:.55}50%{opacity:1}}
+        .cp-fx.clear.night{background-image:radial-gradient(1px 1px at 16% 22%,#fff,transparent),radial-gradient(1px 1px at 58% 14%,#fff,transparent),radial-gradient(1.4px 1.4px at 82% 30%,#fff,transparent),radial-gradient(1px 1px at 38% 40%,#fff,transparent);
+          animation:cpTwinkle 3.4s ease-in-out infinite;opacity:.5}
+        @keyframes cpTwinkle{0%,100%{opacity:.3}50%{opacity:.7}}
+        .cp-wx{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#c9ccce;
+          border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:4px 11px;background:#0c0e11}
+        .cp-wx-dot{width:7px;height:7px;border-radius:50%}
+        @media (prefers-reduced-motion:reduce){.cp-fx{animation:none!important}}
         .cp-mono{font-family:ui-monospace,'SF Mono','Roboto Mono',Menlo,monospace}
         .cp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
         .cp-kick{font-family:ui-monospace,monospace;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:#26cdba}
@@ -124,7 +169,12 @@ export function CityPulse() {
         @media (max-width:640px){.cp-row{grid-template-columns:60px 1fr auto}.cp-tag{display:none}.cp-h1{font-size:40px}}
       `}</style>
 
-      <div className="cp-bg" aria-hidden style={{ backgroundImage: "url(/img/hero/istanbul-dusk.jpg)" }} />
+      <div
+        className="cp-bg"
+        aria-hidden
+        style={{ backgroundImage: `url(${weather && !weather.isDay ? "/img/hero/bosphorus-night.jpg" : "/img/hero/istanbul-dusk.jpg"})` }}
+      />
+      {weather && <div className={`cp-fx ${weather.cond} ${weather.isDay ? "day" : "night"}`} aria-hidden />}
       <div className="cp-in">
         <div className="cp-head">
           <div>
@@ -132,6 +182,12 @@ export function CityPulse() {
             <h1 className="cp-h1">Şu an İstanbul'da <em>ne var?</em></h1>
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10 }}>
+            {weather && (
+              <span className="cp-wx cp-mono">
+                <span className="cp-wx-dot" style={{ background: { clear: "#f6a723", clouds: "#9aa0a3", rain: "#4aa3d8", snow: "#e8f0f4" }[weather.cond] }} />
+                İstanbul · {weather.temp}° · {weather.label}
+              </span>
+            )}
             <span className="cp-clock cp-mono">{clock}</span>
             <div className="cp-toggle">
               <button className={mode === "gunduz" ? "on" : ""} onClick={() => setMode("gunduz")}>GÜNDÜZ</button>
