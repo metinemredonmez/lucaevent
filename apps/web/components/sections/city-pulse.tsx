@@ -34,13 +34,13 @@ function mapWeather(code: number): { cond: Weather["cond"]; label: string } {
 }
 
 // Hava + gündüz/gece → arka plan görseli (public/img/hero).
-function bgFor(w: Weather | null): string {
+// isDay: GÜNDÜZ/GECE toggle'ından gelir (kullanıcı anında değiştirebilir).
+function bgFor(w: Weather | null, isDay: boolean): string {
   const B = "/img/hero/";
-  if (!w) return B + "istanbul-dusk.jpg";
-  if (w.cond === "rain") return B + "istanbul-rain.jpg";
-  if (w.cond === "snow") return B + "istanbul-snow.jpg";
-  if (!w.isDay) return B + "bosphorus-night.jpg"; // gece (açık/bulutlu)
-  if (w.cond === "clouds") return B + "istanbul-cloudy.jpg";
+  if (w?.cond === "rain") return B + "istanbul-rain.jpg";
+  if (w?.cond === "snow") return B + "istanbul-snow.jpg";
+  if (!isDay) return B + "bosphorus-night.jpg"; // gece (açık/bulutlu)
+  if (w?.cond === "clouds") return B + "istanbul-cloudy.jpg";
   return B + "istanbul-dusk.jpg"; // açık · gündüz
 }
 
@@ -61,7 +61,9 @@ export function CityPulse() {
         const c = d?.current;
         if (!c) return;
         const m = mapWeather(c.weather_code);
-        setWeather({ cond: m.cond, label: m.label, isDay: c.is_day === 1, temp: Math.round(c.temperature_2m) });
+        const isDay = c.is_day === 1;
+        setWeather({ cond: m.cond, label: m.label, isDay, temp: Math.round(c.temperature_2m) });
+        setMode(isDay ? "gunduz" : "gece"); // gerçek zamana göre başlat (kullanıcı toggle'la değiştirebilir)
       })
       .catch(() => {});
   }, []);
@@ -109,6 +111,8 @@ export function CityPulse() {
   }, [rows, mode]);
 
   const totalUpcoming = groups.today.length + groups.tomorrow.length + groups.week.length;
+  const isDay = mode === "gunduz"; // arka plan gündüz/gece'yi toggle belirler
+  const bgImg = bgFor(weather, isDay);
 
   return (
     <section className="cp">
@@ -182,12 +186,12 @@ export function CityPulse() {
       `}</style>
 
       <div
-        key={bgFor(weather)}
+        key={bgImg}
         className="cp-bg"
         aria-hidden
-        style={{ backgroundImage: `url(${bgFor(weather)})` }}
+        style={{ backgroundImage: `url(${bgImg})` }}
       />
-      {weather && <div className={`cp-fx ${weather.cond} ${weather.isDay ? "day" : "night"}`} aria-hidden />}
+      {weather && <div className={`cp-fx ${weather.cond} ${isDay ? "day" : "night"}`} aria-hidden />}
       <div className="cp-in">
         <div className="cp-head">
           <div>
