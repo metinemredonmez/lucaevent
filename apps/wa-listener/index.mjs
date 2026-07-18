@@ -18,6 +18,8 @@ import Baileys, {
 } from '@whiskeysockets/baileys';
 const makeWASocket = Baileys.default ?? Baileys;
 import qrcode from 'qrcode-terminal';
+import QRCode from 'qrcode';
+import { join } from 'node:path';
 import pino from 'pino';
 
 const API_URL = (process.env.WA_API_URL || 'http://localhost:3001/api/v1').replace(/\/$/, '');
@@ -115,8 +117,11 @@ async function main() {
   sock.ev.on('connection.update', (u) => {
     const { connection, lastDisconnect, qr } = u;
     if (qr && !PAIR_NUMBER) {
-      log.info('QR kodu — telefondan: Ayarlar → Bağlı Cihazlar → Cihaz Ekle ile okut:');
-      qrcode.generate(qr, { small: true });
+      const png = join(SESSION_DIR, '..', 'luca-wa-qr.png');
+      qrcode.generate(qr, { small: true }); // terminalde ASCII
+      QRCode.toFile(png, qr, { width: 512, margin: 2 })
+        .then(() => log.info(`QR resmi kaydedildi → ${png}  (indir, Anıl'a yolla, 2. ekranda açıp telefonla taratsın)`))
+        .catch((e) => log.warn(`QR resmi yazılamadı: ${e.message}`));
     }
     if (connection === 'open') log.info('✓ WhatsApp bağlandı. Grup mesajları dinleniyor…');
     if (connection === 'close') {
