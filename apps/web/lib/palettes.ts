@@ -20,18 +20,47 @@ export const PALETTES: Palette[] = [
 ];
 
 export const DEFAULT_PALETTE = "teal";
+export const CUSTOM_ID = "custom";
+export const DEFAULT_CUSTOM = "#e0713a";
 const KEY = "luca-palette";
+const CKEY = "luca-palette-custom";
 
 export function savedPaletteId(): string {
   if (typeof localStorage === "undefined") return DEFAULT_PALETTE;
   return localStorage.getItem(KEY) || DEFAULT_PALETTE;
 }
+export function savedCustomHex(): string {
+  if (typeof localStorage === "undefined") return DEFAULT_CUSTOM;
+  return localStorage.getItem(CKEY) || DEFAULT_CUSTOM;
+}
+
+/** #rrggbb → "H S% L%" (globals.css hsl(var(--primary)) formatı). */
+export function hexToHsl(hex: string): string {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return PALETTES[0].primary.dark;
+  const n = parseInt(m[1], 16);
+  const r = ((n >> 16) & 255) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2;
+  let h = 0, s = 0;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    h = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+    h /= 6;
+  }
+  return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+}
 
 /** Paleti köke uygular (mevcut açık/koyu temaya göre). */
 export function applyPalette(id: string, isDark: boolean) {
   if (typeof document === "undefined") return;
-  const p = PALETTES.find((x) => x.id === id) ?? PALETTES[0];
-  const v = isDark ? p.primary.dark : p.primary.light;
+  let v: string;
+  if (id === CUSTOM_ID) {
+    v = hexToHsl(savedCustomHex());
+  } else {
+    const p = PALETTES.find((x) => x.id === id) ?? PALETTES[0];
+    v = isDark ? p.primary.dark : p.primary.light;
+  }
   const root = document.documentElement;
   root.style.setProperty("--primary", v);
   root.style.setProperty("--ring", v);
@@ -40,6 +69,13 @@ export function applyPalette(id: string, isDark: boolean) {
 export function persistPalette(id: string) {
   try {
     localStorage.setItem(KEY, id);
+  } catch {
+    /* yok say */
+  }
+}
+export function persistCustom(hex: string) {
+  try {
+    localStorage.setItem(CKEY, hex);
   } catch {
     /* yok say */
   }
