@@ -53,9 +53,23 @@ export function CityPulse() {
   const [mode, setMode] = useState<"gunduz" | "gece">("gunduz");
   const [loading, setLoading] = useState(true);
   const [weather, setWeather] = useState<Weather | null>(null);
+  const [override, setOverride] = useState<Weather | null>(null); // ?hava= test override
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+    // Test/önizleme: ?hava=acik|bulut|yagmur|kar|gece → arka planı o havaya zorla
+    const h = new URLSearchParams(window.location.search).get("hava")?.toLowerCase();
+    const map: Record<string, Weather> = {
+      acik: { cond: "clear", isDay: true, temp: 26, label: "Açık" },
+      bulut: { cond: "clouds", isDay: true, temp: 18, label: "Bulutlu" },
+      bulutlu: { cond: "clouds", isDay: true, temp: 18, label: "Bulutlu" },
+      yagmur: { cond: "rain", isDay: true, temp: 14, label: "Yağmurlu" },
+      kar: { cond: "snow", isDay: true, temp: 1, label: "Karlı" },
+      gece: { cond: "clear", isDay: false, temp: 20, label: "Açık" },
+    };
+    if (h && map[h]) setOverride(map[h]);
+  }, []);
 
   // İstanbul'un o anki havası (Open-Meteo, anahtarsız) → arka plan + rozet
   useEffect(() => {
@@ -114,9 +128,11 @@ export function CityPulse() {
 
   const totalUpcoming = groups.today.length + groups.tomorrow.length + groups.week.length;
   // Arka plan GERÇEK hava + gerçek gündüz/gece'ye göre (Open-Meteo is_day = güneşin
-  // o anki doğuş/batış durumu). Toggle bg'yi değil, yalnız etkinlik filtresini etkiler.
-  const isDay = weather ? weather.isDay : true;
-  const bgImg = bgFor(weather, isDay);
+  // o anki doğuş/batış durumu). ?hava= override varsa onu kullan (test). Toggle bg'yi
+  // değil, yalnız etkinlik filtresini etkiler.
+  const wx = override ?? weather;
+  const isDay = wx ? wx.isDay : true;
+  const bgImg = bgFor(wx, isDay);
   const light = mounted && resolvedTheme === "light";
 
   return (
@@ -224,7 +240,7 @@ export function CityPulse() {
         aria-hidden
         style={{ backgroundImage: `url(${bgImg})` }}
       />
-      {weather && <div className={`cp-fx ${weather.cond} ${isDay ? "day" : "night"}`} aria-hidden />}
+      {wx && <div className={`cp-fx ${wx.cond} ${isDay ? "day" : "night"}`} aria-hidden />}
       <div className="cp-in">
         <div className="cp-head">
           <div>
@@ -232,10 +248,10 @@ export function CityPulse() {
             <h1 className="cp-h1">Şu an İstanbul'da <em>ne var?</em></h1>
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10 }}>
-            {weather && (
+            {wx && (
               <span className="cp-wx cp-mono">
-                <span className="cp-wx-dot" style={{ background: { clear: "#f6a723", clouds: "#9aa0a3", rain: "#4aa3d8", snow: "#e8f0f4" }[weather.cond] }} />
-                İstanbul · {weather.temp}° · {weather.label}
+                <span className="cp-wx-dot" style={{ background: { clear: "#f6a723", clouds: "#9aa0a3", rain: "#4aa3d8", snow: "#e8f0f4" }[wx.cond] }} />
+                İstanbul · {wx.temp}° · {wx.label}
               </span>
             )}
             <span className="cp-clock cp-mono">{clock}</span>
