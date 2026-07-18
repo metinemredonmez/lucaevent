@@ -93,6 +93,10 @@ async function main() {
     logger: pino({ level: 'silent' }),
     printQRInTerminal: false,
     markOnlineOnConnect: false,
+    browser: ['Luca Radyo', 'Chrome', '121.0'], // tarayıcı imzası — hızlı 408'i azaltır
+    connectTimeoutMs: 60_000, // socket 60 sn açık kalsın (kod girme penceresi)
+    keepAliveIntervalMs: 20_000,
+    qrTimeout: 90_000,
   });
 
   sock.ev.on('creds.update', saveCreds);
