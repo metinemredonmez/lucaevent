@@ -15,7 +15,7 @@ import Baileys, {
   useMultiFileAuthState,
   DisconnectReason,
   fetchLatestBaileysVersion,
-} from '@whiskeysockets/baileys';
+} from 'baileys';
 const makeWASocket = Baileys.default ?? Baileys;
 import qrcode from 'qrcode-terminal';
 import QRCode from 'qrcode';
