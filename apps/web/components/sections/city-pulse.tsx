@@ -33,6 +33,17 @@ function mapWeather(code: number): { cond: Weather["cond"]; label: string } {
   return { cond: "clear", label: "Açık" };
 }
 
+// Hava + gündüz/gece → arka plan görseli (public/img/hero).
+function bgFor(w: Weather | null): string {
+  const B = "/img/hero/";
+  if (!w) return B + "istanbul-dusk.jpg";
+  if (w.cond === "rain") return B + "istanbul-rain.jpg";
+  if (w.cond === "snow") return B + "istanbul-snow.jpg";
+  if (!w.isDay) return B + "bosphorus-night.jpg"; // gece (açık/bulutlu)
+  if (w.cond === "clouds") return B + "istanbul-cloudy.jpg";
+  return B + "istanbul-dusk.jpg"; // açık · gündüz
+}
+
 export function CityPulse() {
   const [rows, setRows] = useState<DiscoverEvent[]>([]);
   const [live, setLive] = useState<LiveRow[]>([]);
@@ -104,7 +115,8 @@ export function CityPulse() {
       <style>{`
         .cp{position:relative;overflow:hidden;background:#0a0b0d;color:#eceae4;padding:26px 20px 44px;
           font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
-        .cp-bg{position:absolute;inset:0 0 auto 0;height:560px;background-position:center top;background-size:cover;background-repeat:no-repeat;opacity:.42}
+        .cp-bg{position:absolute;inset:0 0 auto 0;height:560px;background-position:center top;background-size:cover;background-repeat:no-repeat;opacity:.42;animation:cpBgIn 1s ease both}
+        @keyframes cpBgIn{from{opacity:0;transform:scale(1.04)}to{opacity:.42;transform:none}}
         .cp-bg::after{content:'';position:absolute;inset:0;
           background:linear-gradient(to bottom,rgba(10,11,13,.35) 0%,rgba(10,11,13,.55) 45%,rgba(10,11,13,.9) 80%,#0a0b0d 100%)}
         .cp-in{position:relative;z-index:1;max-width:1020px;margin:0 auto}
@@ -170,9 +182,10 @@ export function CityPulse() {
       `}</style>
 
       <div
+        key={bgFor(weather)}
         className="cp-bg"
         aria-hidden
-        style={{ backgroundImage: `url(${weather && !weather.isDay ? "/img/hero/bosphorus-night.jpg" : "/img/hero/istanbul-dusk.jpg"})` }}
+        style={{ backgroundImage: `url(${bgFor(weather)})` }}
       />
       {weather && <div className={`cp-fx ${weather.cond} ${weather.isDay ? "day" : "night"}`} aria-hidden />}
       <div className="cp-in">
