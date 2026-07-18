@@ -122,15 +122,24 @@ async function main() {
     if (connection === 'close') {
       const code = lastDisconnect?.error?.output?.statusCode;
       const registered = sock.authState.creds.registered;
-      // Eşleştirme tamamlanmadan kapandıysa (kod girilmedi / süre doldu) döngüye girme.
-      if (!registered || code === DisconnectReason.loggedOut) {
-        log.warn(`bağlantı kapandı (code ${code}). Eşleştirme tamamlanmadı.`);
-        log.warn('→ Kodu 2 dk icinde girmediysen: session klasorunu silip komutu TEKRAR calistir (arkadas hazirken).');
-        log.warn('   rm -rf ' + SESSION_DIR);
+      if (!registered) {
+        // Henüz eşleşmedi. 401 (loggedOut) = bozuk/ret session → temizle. Diğer (408 süre
+        // aşımı vb.) → KAPANMA, otomatik yeni kod üretip beklemeye devam et (sınırsız şans).
+        if (code === DisconnectReason.loggedOut) {
+          log.warn('Eşleşme reddedildi / oturum bozuk. Temizle + tekrar: rm -rf ' + SESSION_DIR);
+          process.exit(1);
+        }
+        log.warn(`Eşleşme bekleniyor (code ${code}) — ${PAIR_NUMBER ? 'YENİ KOD üretiliyor…' : 'QR yenileniyor…'}`);
+        setTimeout(() => main().catch((e) => log.error(e)), 3000);
+        return;
+      }
+      // Eşleşmiş: kalıcı çıkışsa dur, değilse yeniden bağlan.
+      if (code === DisconnectReason.loggedOut) {
+        log.warn('Çıkış yapıldı — yeniden eşleşme gerekli. rm -rf ' + SESSION_DIR);
         process.exit(1);
       }
       log.warn(`bağlantı kapandı (code ${code}). Yeniden bağlanılıyor…`);
-      main().catch((e) => log.error(e));
+      setTimeout(() => main().catch((e) => log.error(e)), 1500);
     }
   });
 
