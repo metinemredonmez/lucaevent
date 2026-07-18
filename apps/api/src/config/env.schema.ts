@@ -64,6 +64,9 @@ const schema = z.object({
   // Google Places (New) — mekan detay + koordinat + çalışma saati.
   GOOGLE_PLACES_API_KEY: z.string().optional().default(''),
 
+  // Pexels — havaya göre canlı arka plan görseli (weather-bg proxy). Boşsa yerel görsele düşer.
+  PEXELS_API_KEY: z.string().optional().default(''),
+
   SENTRY_DSN: z.string().optional().default(''),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
   CORS_ORIGINS: z.string().default('http://localhost:3000'),

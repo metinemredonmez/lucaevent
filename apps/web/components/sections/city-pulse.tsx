@@ -34,17 +34,6 @@ function mapWeather(code: number): { cond: Weather["cond"]; label: string } {
   return { cond: "clear", label: "Açık" };
 }
 
-// Hava + gündüz/gece → arka plan görseli (public/img/hero).
-// isDay: GÜNDÜZ/GECE toggle'ından gelir (kullanıcı anında değiştirebilir).
-function bgFor(w: Weather | null, isDay: boolean): string {
-  const B = "/img/hero/";
-  if (w?.cond === "rain") return B + "istanbul-rain.jpg";
-  if (w?.cond === "snow") return B + "istanbul-snow.jpg";
-  if (!isDay) return B + "bosphorus-night.jpg"; // gece (açık/bulutlu)
-  if (w?.cond === "clouds") return B + "istanbul-cloudy.jpg";
-  return B + "istanbul-dusk.jpg"; // açık · gündüz
-}
-
 export function CityPulse() {
   const [rows, setRows] = useState<DiscoverEvent[]>([]);
   const [live, setLive] = useState<LiveRow[]>([]);
@@ -132,7 +121,10 @@ export function CityPulse() {
   // değil, yalnız etkinlik filtresini etkiler.
   const wx = override ?? weather;
   const isDay = wx ? wx.isDay : true;
-  const bgImg = bgFor(wx, isDay);
+  // Arka plan CANLI: API weather-bg proxy'si o havaya uygun İstanbul fotosunu Pexels'ten
+  // çeker (key yoksa yerel görsele redirect). cond/day değişince URL değişir → yeni foto.
+  const API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001") + "/api/v1";
+  const bgImg = `${API}/weather-bg?cond=${wx?.cond ?? "clear"}&day=${isDay ? 1 : 0}`;
   const light = mounted && resolvedTheme === "light";
 
   return (
