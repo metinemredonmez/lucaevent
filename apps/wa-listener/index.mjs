@@ -131,6 +131,13 @@ async function main() {
     if (connection === 'close') {
       const code = lastDisconnect?.error?.output?.statusCode;
       const registered = sock.authState.creds.registered;
+      // Pairing sonrası WhatsApp 515 "restart required" ile kapatır — kod üretmeden
+      // temiz yeniden bağlan; ikinci bağlantıda 'open' gelir (telefondaki "giriş yapılıyor" tamamlanır).
+      if (code === DisconnectReason.restartRequired) {
+        log.info('Eşleşme alındı — yeniden başlatılıyor (giriş tamamlanıyor)…');
+        setTimeout(() => main().catch((e) => log.error(e)), 1000);
+        return;
+      }
       if (!registered) {
         // Henüz eşleşmedi. 401 (loggedOut) = bozuk/ret session → temizle. Diğer (408 süre
         // aşımı vb.) → KAPANMA, otomatik yeni kod üretip beklemeye devam et (sınırsız şans).
