@@ -90,8 +90,6 @@ const MIXES: Mix[] = [
   { l: "Rock", s: "yabancı rock klasikleri", q: "rock", by: "tag", Icon: Guitar, color: "#F97316" },
   { l: "Slow · Akşam", s: "sakin, ateş başı", q: "slow türk", by: "name", Icon: Moon, color: "#60A5FA" },
   { l: "Nostalji", s: "90'lar / 2000'ler", q: "nostalji", by: "name", Icon: Disc3, color: "#F59E0B" },
-  { l: "Türkü · Anadolu", s: "yerel · türkü", q: "türkü", by: "name", Icon: Music2, color: "#EAB308" },
-  { l: "Arabesk", s: "klasik · dram", q: "arabesk", by: "name", Icon: Guitar, color: "#F43F5E" },
 ];
 
 // Kategori → varsayılan müzik (API slug'ları). Etkinliğin kendi musicQuery'si varsa o ezer.

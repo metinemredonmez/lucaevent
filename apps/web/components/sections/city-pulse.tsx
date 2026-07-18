@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useTheme } from "next-themes";
 import Link from "next/link";
 import { discoverEvents, getLiveEvents, getCommunityCount, type DiscoverEvent } from "@/lib/events";
 
@@ -52,6 +53,9 @@ export function CityPulse() {
   const [mode, setMode] = useState<"gunduz" | "gece">("gunduz");
   const [loading, setLoading] = useState(true);
   const [weather, setWeather] = useState<Weather | null>(null);
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   // İstanbul'un o anki havası (Open-Meteo, anahtarsız) → arka plan + rozet
   useEffect(() => {
@@ -113,9 +117,10 @@ export function CityPulse() {
   const totalUpcoming = groups.today.length + groups.tomorrow.length + groups.week.length;
   const isDay = mode === "gunduz"; // arka plan gündüz/gece'yi toggle belirler
   const bgImg = bgFor(weather, isDay);
+  const light = mounted && resolvedTheme === "light";
 
   return (
-    <section className="cp">
+    <section className={`cp${light ? " light" : ""}`}>
       <style>{`
         .cp{position:relative;overflow:hidden;background:#0a0b0d;color:#eceae4;padding:26px 20px 44px;
           font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
@@ -183,6 +188,34 @@ export function CityPulse() {
         .cp-tag.luca{color:#26cdba;border-color:rgba(38,205,186,.35)}
         .cp-empty{padding:34px 18px;text-align:center;color:#8b8f93;font-family:ui-monospace,monospace;font-size:13px}
         @media (max-width:640px){.cp-row{grid-template-columns:60px 1fr auto}.cp-tag{display:none}.cp-h1{font-size:40px}}
+        /* AÇIK TEMA — kağıt zemin, koyu yazı, koyu amber/teal */
+        .cp.light{background:#f4f2ec;color:#1a1c1e}
+        .cp.light .cp-bg::after{background:linear-gradient(to bottom,rgba(244,242,236,.25) 0%,rgba(244,242,236,.5) 45%,rgba(244,242,236,.88) 80%,#f4f2ec 100%)}
+        .cp.light .cp-kick{color:#0e9a8c}
+        .cp.light .cp-h1 em{color:#b9822a}
+        .cp.light .cp-clock{color:#b9822a;background:#fff;border-color:rgba(20,24,26,.12)}
+        .cp.light .cp-wx{color:#444;background:#fff;border-color:rgba(20,24,26,.12)}
+        .cp.light .cp-stats{color:#5f6467}
+        .cp.light .cp-stats b{color:#1a1c1e}
+        .cp.light .cp-cmd{background:#fff;border-color:rgba(20,24,26,.12)}
+        .cp.light .cp-cmd .q{color:#5f6467}
+        .cp.light .cp-cmd .k{color:#8b8f93;border-color:rgba(20,24,26,.12)}
+        .cp.light .cp-toggle{border-color:rgba(20,24,26,.14)}
+        .cp.light .cp-toggle button{color:#5f6467}
+        .cp.light .cp-toggle button.on{background:#b9822a;color:#fff}
+        .cp.light .cp-board{background:#fff;border-color:rgba(20,24,26,.1)}
+        .cp.light .cp-grp{color:#b9822a}
+        .cp.light .cp-grp.now{color:#0e9a8c}
+        .cp.light .cp-grp .rule{background:rgba(20,24,26,.1)}
+        .cp.light .cp-row{border-top-color:rgba(20,24,26,.07)}
+        .cp.light .cp-row:hover{background:#f2f0e8}
+        .cp.light .cp-row.live{background:#e2f5f0}
+        .cp.light .cp-t{color:#b9822a}
+        .cp.light .cp-row.live .cp-t{color:#0e9a8c}
+        .cp.light .cp-v{color:#5f6467}
+        .cp.light .cp-tag{color:#5f6467;border-color:rgba(20,24,26,.12)}
+        .cp.light .cp-tag.luca{color:#0e9a8c;border-color:rgba(14,154,140,.35)}
+        .cp.light .cp-empty{color:#5f6467}
       `}</style>
 
       <div
