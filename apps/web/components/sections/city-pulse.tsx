@@ -65,9 +65,7 @@ export function CityPulse() {
         const c = d?.current;
         if (!c) return;
         const m = mapWeather(c.weather_code);
-        const isDay = c.is_day === 1;
-        setWeather({ cond: m.cond, label: m.label, isDay, temp: Math.round(c.temperature_2m) });
-        setMode(isDay ? "gunduz" : "gece"); // gerçek zamana göre başlat (kullanıcı toggle'la değiştirebilir)
+        setWeather({ cond: m.cond, label: m.label, isDay: c.is_day === 1, temp: Math.round(c.temperature_2m) });
       })
       .catch(() => {});
   }, []);
@@ -115,7 +113,9 @@ export function CityPulse() {
   }, [rows, mode]);
 
   const totalUpcoming = groups.today.length + groups.tomorrow.length + groups.week.length;
-  const isDay = mode === "gunduz"; // arka plan gündüz/gece'yi toggle belirler
+  // Arka plan GERÇEK hava + gerçek gündüz/gece'ye göre (Open-Meteo is_day = güneşin
+  // o anki doğuş/batış durumu). Toggle bg'yi değil, yalnız etkinlik filtresini etkiler.
+  const isDay = weather ? weather.isDay : true;
   const bgImg = bgFor(weather, isDay);
   const light = mounted && resolvedTheme === "light";
 
