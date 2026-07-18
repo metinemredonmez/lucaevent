@@ -59,7 +59,7 @@ export function PaletteSwitcher() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-72 overflow-hidden rounded-xl border border-border bg-popover shadow-2xl">
+        <div className="absolute right-0 top-full z-[60] mt-2 w-72 overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
           <div className="flex items-center gap-2 border-b border-border px-4 py-2.5 text-[11px] font-mono uppercase tracking-[0.14em] text-muted-foreground">
             <PaletteIcon className="h-3.5 w-3.5" /> Renk paleti
           </div>
@@ -73,8 +73,8 @@ export function PaletteSwitcher() {
                   className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${on ? "bg-muted" : "hover:bg-muted/50"}`}
                 >
                   <span className="flex -space-x-1.5">
-                    <span className="size-4 rounded-full ring-2 ring-popover" style={{ background: p.sw[0] }} />
-                    <span className="size-4 rounded-full ring-2 ring-popover" style={{ background: p.sw[1] }} />
+                    <span className="size-4 rounded-full ring-2 ring-card" style={{ background: p.sw[0] }} />
+                    <span className="size-4 rounded-full ring-2 ring-card" style={{ background: p.sw[1] }} />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block text-sm font-medium leading-tight text-foreground">{p.name}</span>
