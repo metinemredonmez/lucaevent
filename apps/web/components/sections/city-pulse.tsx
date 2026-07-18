@@ -77,10 +77,12 @@ export function CityPulse() {
   return (
     <section className="cp">
       <style>{`
-        .cp{background:#0a0b0d;color:#eceae4;padding:26px 20px 44px;
-          background-image:radial-gradient(120% 70% at 50% -8%,rgba(246,167,35,.06),transparent 60%);
+        .cp{position:relative;overflow:hidden;background:#0a0b0d;color:#eceae4;padding:26px 20px 44px;
           font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
-        .cp-in{max-width:1020px;margin:0 auto}
+        .cp-bg{position:absolute;inset:0 0 auto 0;height:560px;background-position:center top;background-size:cover;background-repeat:no-repeat;opacity:.42}
+        .cp-bg::after{content:'';position:absolute;inset:0;
+          background:linear-gradient(to bottom,rgba(10,11,13,.35) 0%,rgba(10,11,13,.55) 45%,rgba(10,11,13,.9) 80%,#0a0b0d 100%)}
+        .cp-in{position:relative;z-index:1;max-width:1020px;margin:0 auto}
         .cp-mono{font-family:ui-monospace,'SF Mono','Roboto Mono',Menlo,monospace}
         .cp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
         .cp-kick{font-family:ui-monospace,monospace;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:#26cdba}
@@ -122,6 +124,7 @@ export function CityPulse() {
         @media (max-width:640px){.cp-row{grid-template-columns:60px 1fr auto}.cp-tag{display:none}.cp-h1{font-size:40px}}
       `}</style>
 
+      <div className="cp-bg" aria-hidden style={{ backgroundImage: "url(/img/hero/istanbul-dusk.jpg)" }} />
       <div className="cp-in">
         <div className="cp-head">
           <div>
