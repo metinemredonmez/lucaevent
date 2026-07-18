@@ -124,7 +124,13 @@ export function CityPulse() {
   // Arka plan CANLI: API weather-bg proxy'si o havaya uygun İstanbul fotosunu Pexels'ten
   // çeker (key yoksa yerel görsele redirect). cond/day değişince URL değişir → yeni foto.
   const API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001") + "/api/v1";
-  const bgImg = `${API}/weather-bg?cond=${wx?.cond ?? "clear"}&day=${isDay ? 1 : 0}`;
+  // Saatlik damga: (1) eski hatalı 302'yi cache'lemiş tarayıcıları anında atlatır,
+  // (2) her saat farklı foto getirir. Saat içinde stabil → gereksiz yeniden çekim yok.
+  const bust = useMemo(() => {
+    const d = new Date();
+    return `${d.getUTCFullYear()}${d.getUTCMonth()}${d.getUTCDate()}${d.getUTCHours()}`;
+  }, []);
+  const bgImg = `${API}/weather-bg?cond=${wx?.cond ?? "clear"}&day=${isDay ? 1 : 0}&v=${bust}`;
   const light = mounted && resolvedTheme === "light";
 
   return (
