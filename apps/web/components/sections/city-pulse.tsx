@@ -138,10 +138,15 @@ export function CityPulse() {
       <style>{`
         .cp{position:relative;overflow:hidden;background:#0a0b0d;color:#eceae4;padding:26px 20px 44px;
           font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
-        .cp-bg{position:absolute;inset:0 0 auto 0;height:560px;background-position:center top;background-size:cover;background-repeat:no-repeat;opacity:.42;animation:cpBgIn 1s ease both}
-        @keyframes cpBgIn{from{opacity:0;transform:scale(1.04)}to{opacity:.42;transform:none}}
+        .cp-bg{--bgop:.6;position:absolute;inset:0 0 auto 0;height:560px;background-position:center top;background-size:cover;background-repeat:no-repeat;opacity:var(--bgop);filter:saturate(.9) contrast(1.05);animation:cpBgIn 1.1s ease both}
+        @keyframes cpBgIn{from{opacity:0;transform:scale(1.05)}to{opacity:var(--bgop);transform:none}}
+        /* teal duotone — hangi foto gelirse gelsin markayla bütünleşsin (gölgeleri teal'e çeker) */
+        .cp-bg::before{content:'';position:absolute;inset:0;background:#063a37;mix-blend-mode:multiply;opacity:.42}
+        /* teal parıltı (sağ üst) + teal-siyah scrim (okunurluk + marka) */
         .cp-bg::after{content:'';position:absolute;inset:0;
-          background:linear-gradient(to bottom,rgba(10,11,13,.35) 0%,rgba(10,11,13,.55) 45%,rgba(10,11,13,.9) 80%,#0a0b0d 100%)}
+          background:
+            radial-gradient(68% 55% at 84% 4%,rgba(38,205,186,.22),transparent 60%),
+            linear-gradient(to bottom,rgba(5,20,19,.42) 0%,rgba(6,19,20,.6) 45%,rgba(8,11,13,.92) 82%,#0a0b0d 100%)}
         .cp-in{position:relative;z-index:1;max-width:1020px;margin:0 auto}
         /* hava efekti katmanı */
         .cp-fx{position:absolute;inset:0 0 auto 0;height:560px;z-index:0;pointer-events:none}
@@ -206,7 +211,8 @@ export function CityPulse() {
            yalnız alttaki pano/kartlar kağıt zemine döner. Açık temada da hava
            fotosu net görünür; soluk peçe altında puslu/ucuz durmaz. */
         .cp.light{background:#f4f2ec;color:#1a1c1e}
-        .cp.light .cp-bg{opacity:.95}
+        .cp.light .cp-bg{--bgop:.95;filter:saturate(1.02)}
+        .cp.light .cp-bg::before{display:none}
         .cp.light .cp-bg::after{background:linear-gradient(to bottom,rgba(10,11,13,.5) 0%,rgba(10,11,13,.6) 45%,rgba(12,14,16,.58) 76%,rgba(244,242,236,.8) 90%,#f4f2ec 100%)}
         .cp.light .cp-h1{color:#f5f3ee}
         .cp.light .cp-board{background:#fff;border-color:rgba(20,24,26,.1)}

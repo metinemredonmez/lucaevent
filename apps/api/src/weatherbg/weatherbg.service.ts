@@ -14,15 +14,15 @@ export class WeatherBgService {
   private plan(cond: string, day: boolean): { q: string; fallback: string } {
     switch (cond) {
       case 'rain':
-        return { q: 'istanbul rainy wet street rain', fallback: 'istanbul-rain.jpg' };
+        return { q: 'istanbul rain reflection wet street moody', fallback: 'istanbul-rain.jpg' };
       case 'snow':
-        return { q: 'istanbul snow snowy winter', fallback: 'istanbul-snow.jpg' };
+        return { q: 'istanbul snow bosphorus winter', fallback: 'istanbul-snow.jpg' };
       case 'clouds':
-        return { q: 'istanbul cloudy overcast grey sky', fallback: 'istanbul-cloudy.jpg' };
+        return { q: 'istanbul moody cloudy skyline aerial', fallback: 'istanbul-cloudy.jpg' };
       default:
         return day
-          ? { q: 'istanbul sunny clear blue sky bosphorus', fallback: 'istanbul-dusk.jpg' }
-          : { q: 'istanbul night bosphorus city lights', fallback: 'bosphorus-night.jpg' };
+          ? { q: 'istanbul bosphorus aerial skyline sunny', fallback: 'istanbul-dusk.jpg' }
+          : { q: 'istanbul night skyline aerial city lights', fallback: 'bosphorus-night.jpg' };
     }
   }
 
