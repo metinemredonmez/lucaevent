@@ -124,6 +124,50 @@ async function main() {
 
   console.log(`✅  Etkinlik ${existing ? 'güncellendi' : 'oluşturuldu'}: /etkinlik/${event.slug}  (id: ${event.id})`);
   if (existing) console.log('ℹ️  Mevcut kayıt — reservation/coverUrl korundu (admin düzenlemesi ezilmedi).');
+
+  // ——— Maltepe Açık Hava Sineması (WhatsApp'tan gelen gerçek etkinlik, 22.07 Çrş) ———
+  const social = await prisma.category.upsert({
+    where: { slug: 'social' },
+    update: {},
+    create: { slug: 'social', name: 'Social', icon: 'users', color: '#9C6B8E', position: 4 },
+  });
+  const maltepe = await prisma.venue.upsert({
+    where: { slug: 'maltepe-sahil' },
+    update: {},
+    create: {
+      slug: 'maltepe-sahil',
+      name: 'Maltepe Sahil',
+      address: 'Maltepe Sahil, İstanbul',
+      city: 'İstanbul',
+      country: 'TR',
+      lat: 40.9224,
+      lng: 29.1309,
+      capacity: 200,
+    },
+  });
+  const sinemaStart = new Date('2026-07-22T21:00:00+03:00');
+  const sinemaEnd = new Date('2026-07-22T23:30:00+03:00');
+  const sinemaExists = await prisma.event.findUnique({ where: { slug: 'maltepe-acik-hava-sinemasi' } });
+  const sinema = await prisma.event.upsert({
+    where: { slug: 'maltepe-acik-hava-sinemasi' },
+    update: { title: 'Maltepe Açık Hava Sineması', status: EventStatus.PUBLISHED, categoryId: social.id, venueId: maltepe.id },
+    create: {
+      slug: 'maltepe-acik-hava-sinemasi',
+      title: 'Maltepe Açık Hava Sineması',
+      tagline: 'Yaz akşamına yıldızların altında sinema',
+      description:
+        'Yaz akşamlarının en keyifli etkinliklerinden biri olan açık hava sinema etkinliğimiz Maltepe sahilde! ' +
+        'Deniz kenarında, yıldızların altında film keyfini kaçırmayın.',
+      kind: EventKind.PARTY,
+      startsAt: sinemaStart,
+      endsAt: sinemaEnd,
+      categoryId: social.id,
+      venueId: maltepe.id,
+      status: EventStatus.PUBLISHED,
+      publishedAt: new Date(),
+    },
+  });
+  console.log(`✅  Etkinlik ${sinemaExists ? 'güncellendi' : 'oluşturuldu'}: /etkinlik/${sinema.slug}`);
 }
 
 main()
