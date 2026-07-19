@@ -121,6 +121,10 @@ export function CityPulse() {
   // değil, yalnız etkinlik filtresini etkiler.
   const wx = override ?? weather;
   const isDay = wx ? wx.isDay : true;
+  const light = mounted && resolvedTheme === "light";
+  // Açık temada arka plan HER ZAMAN aydınlık/gündüz görsel kullanır — gece fotosu beyaz
+  // sayfada koyu blok gibi durmasın. Koyu tema gerçek gündüz/gece'yi yansıtmaya devam eder.
+  const visualDay = light ? true : isDay;
   // Arka plan CANLI: API weather-bg proxy'si o havaya uygun İstanbul fotosunu Pexels'ten
   // çeker (key yoksa yerel görsele redirect). cond/day değişince URL değişir → yeni foto.
   const API = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001") + "/api/v1";
@@ -130,8 +134,7 @@ export function CityPulse() {
     const d = new Date();
     return `${d.getUTCFullYear()}${d.getUTCMonth()}${d.getUTCDate()}${d.getUTCHours()}`;
   }, []);
-  const bgImg = `${API}/weather-bg?cond=${wx?.cond ?? "clear"}&day=${isDay ? 1 : 0}&v=${bust}`;
-  const light = mounted && resolvedTheme === "light";
+  const bgImg = `${API}/weather-bg?cond=${wx?.cond ?? "clear"}&day=${visualDay ? 1 : 0}&v=${bust}`;
 
   return (
     <section className={`cp${light ? " light" : ""}`}>
@@ -233,7 +236,7 @@ export function CityPulse() {
         aria-hidden
         style={{ backgroundImage: `url(${bgImg})` }}
       />
-      {wx && <div className={`cp-fx ${wx.cond} ${isDay ? "day" : "night"}`} aria-hidden />}
+      {wx && <div className={`cp-fx ${wx.cond} ${visualDay ? "day" : "night"}`} aria-hidden />}
       <div className="cp-in">
         <div className="cp-head">
           <div>
