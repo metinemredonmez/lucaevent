@@ -138,15 +138,13 @@ export function CityPulse() {
       <style>{`
         .cp{position:relative;overflow:hidden;background:#0a0b0d;color:#eceae4;padding:26px 20px 44px;
           font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
-        .cp-bg{--bgop:.6;position:absolute;inset:0 0 auto 0;height:560px;background-position:center top;background-size:cover;background-repeat:no-repeat;opacity:var(--bgop);filter:saturate(.9) contrast(1.05);animation:cpBgIn 1.1s ease both}
+        .cp-bg{--bgop:.72;position:absolute;inset:0 0 auto 0;height:560px;background-position:center top;background-size:cover;background-repeat:no-repeat;opacity:var(--bgop);filter:contrast(1.03);animation:cpBgIn 1.1s ease both}
         @keyframes cpBgIn{from{opacity:0;transform:scale(1.05)}to{opacity:var(--bgop);transform:none}}
-        /* teal duotone — hangi foto gelirse gelsin markayla bütünleşsin (gölgeleri teal'e çeker) */
-        .cp-bg::before{content:'';position:absolute;inset:0;background:#063a37;mix-blend-mode:multiply;opacity:.42}
-        /* teal parıltı (sağ üst) + teal-siyah scrim (okunurluk + marka) */
+        /* nötr scrim (okunurluk) + seçili paletin rengiyle hafif parıltı (sağ üst) */
         .cp-bg::after{content:'';position:absolute;inset:0;
           background:
-            radial-gradient(68% 55% at 84% 4%,rgba(38,205,186,.22),transparent 60%),
-            linear-gradient(to bottom,rgba(5,20,19,.42) 0%,rgba(6,19,20,.6) 45%,rgba(8,11,13,.92) 82%,#0a0b0d 100%)}
+            radial-gradient(66% 52% at 84% 4%,hsl(var(--primary) / .20),transparent 60%),
+            linear-gradient(to bottom,rgba(10,11,13,.34) 0%,rgba(10,11,13,.55) 45%,rgba(10,11,13,.9) 82%,#0a0b0d 100%)}
         .cp-in{position:relative;z-index:1;max-width:1020px;margin:0 auto}
         /* hava efekti katmanı */
         .cp-fx{position:absolute;inset:0 0 auto 0;height:560px;z-index:0;pointer-events:none}
@@ -170,7 +168,7 @@ export function CityPulse() {
         @media (prefers-reduced-motion:reduce){.cp-fx{animation:none!important}}
         .cp-mono{font-family:ui-monospace,'SF Mono','Roboto Mono',Menlo,monospace}
         .cp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
-        .cp-kick{font-family:ui-monospace,monospace;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:#4fe3d0;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.5)}
+        .cp-kick{font-family:ui-monospace,monospace;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:hsl(var(--primary));text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.5)}
         .cp-h1{font-weight:800;letter-spacing:-.02em;line-height:.94;text-transform:uppercase;
           font-size:clamp(38px,8vw,84px);margin:12px 0 0;text-shadow:0 2px 18px rgba(0,0,0,.4)}
         .cp-h1 em{font-style:normal;color:#f6a723}
@@ -178,9 +176,9 @@ export function CityPulse() {
           border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 11px;background:#0c0e11;margin-top:6px}
         .cp-stats{margin-top:18px;font-family:ui-monospace,monospace;font-size:13.5px;color:#e6e8ea;display:flex;flex-wrap:wrap;gap:8px 22px;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.55)}
         .cp-stats b{color:#fff;font-weight:600}
-        .cp-ring{display:inline-block;width:8px;height:8px;border-radius:50%;background:#26cdba;vertical-align:1px;
+        .cp-ring{display:inline-block;width:8px;height:8px;border-radius:50%;background:hsl(var(--primary));vertical-align:1px;
           animation:cpRing 1.8s ease-out infinite}
-        @keyframes cpRing{0%{box-shadow:0 0 0 0 rgba(38,205,186,.55)}70%{box-shadow:0 0 0 9px rgba(38,205,186,0)}100%{box-shadow:0 0 0 0 rgba(38,205,186,0)}}
+        @keyframes cpRing{0%{box-shadow:0 0 0 0 hsl(var(--primary) / .55)}70%{box-shadow:0 0 0 9px hsl(var(--primary) / 0)}100%{box-shadow:0 0 0 0 hsl(var(--primary) / 0)}}
         .cp-cmd{display:flex;align-items:center;gap:12px;margin:24px 0 6px;border:1px solid rgba(255,255,255,.1);
           border-radius:12px;background:#0d0f12;padding:15px 18px;text-decoration:none;color:inherit;transition:border-color .15s}
         .cp-cmd:hover{border-color:rgba(246,167,35,.5)}
@@ -192,19 +190,19 @@ export function CityPulse() {
         .cp-board{margin-top:24px;border:1px solid rgba(255,255,255,.09);border-radius:14px;overflow:hidden;background:#0f1114}
         .cp-grp{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;
           padding:15px 18px 8px;color:#f6a723;display:flex;align-items:center;gap:9px}
-        .cp-grp.now{color:#26cdba}
+        .cp-grp.now{color:hsl(var(--primary))}
         .cp-grp .rule{flex:1;height:1px;background:rgba(255,255,255,.08)}
         .cp-row{display:grid;grid-template-columns:76px 1fr 118px;gap:14px;align-items:center;padding:12px 18px;
           border-top:1px solid rgba(255,255,255,.05);text-decoration:none;color:inherit;transition:background .12s}
         .cp-row:hover{background:#161a1f}
         .cp-row.live{background:#122019}
         .cp-t{font-family:ui-monospace,monospace;font-size:17px;color:#f6a723;font-weight:500}
-        .cp-row.live .cp-t{color:#26cdba;font-size:13px}
+        .cp-row.live .cp-t{color:hsl(var(--primary));font-size:13px}
         .cp-n{font-weight:600;font-size:15.5px;letter-spacing:-.01em}
         .cp-v{font-family:ui-monospace,monospace;font-size:12px;color:#8b8f93;margin-top:2px}
         .cp-tag{font-family:ui-monospace,monospace;font-size:10.5px;letter-spacing:.06em;padding:3px 9px;border-radius:5px;
           border:1px solid rgba(255,255,255,.1);color:#8b8f93;justify-self:end;white-space:nowrap}
-        .cp-tag.luca{color:#26cdba;border-color:rgba(38,205,186,.35)}
+        .cp-tag.luca{color:hsl(var(--primary));border-color:hsl(var(--primary) / .35)}
         .cp-empty{padding:34px 18px;text-align:center;color:#8b8f93;font-family:ui-monospace,monospace;font-size:13px}
         @media (max-width:640px){.cp-row{grid-template-columns:60px 1fr auto}.cp-tag{display:none}.cp-h1{font-size:40px}}
         /* AÇIK TEMA — hero FOTOGRAFİK kalır (canlı foto + koyu scrim + açık yazı),
@@ -212,21 +210,20 @@ export function CityPulse() {
            fotosu net görünür; soluk peçe altında puslu/ucuz durmaz. */
         .cp.light{background:#f4f2ec;color:#1a1c1e}
         .cp.light .cp-bg{--bgop:.95;filter:saturate(1.02)}
-        .cp.light .cp-bg::before{display:none}
         .cp.light .cp-bg::after{background:linear-gradient(to bottom,rgba(10,11,13,.5) 0%,rgba(10,11,13,.6) 45%,rgba(12,14,16,.58) 76%,rgba(244,242,236,.8) 90%,#f4f2ec 100%)}
         .cp.light .cp-h1{color:#f5f3ee}
         .cp.light .cp-board{background:#fff;border-color:rgba(20,24,26,.1)}
         .cp.light .cp-grp{color:#b9822a}
-        .cp.light .cp-grp.now{color:#0e9a8c}
+        .cp.light .cp-grp.now{color:hsl(var(--primary))}
         .cp.light .cp-grp .rule{background:rgba(20,24,26,.1)}
         .cp.light .cp-row{border-top-color:rgba(20,24,26,.07)}
         .cp.light .cp-row:hover{background:#f2f0e8}
         .cp.light .cp-row.live{background:#e2f5f0}
         .cp.light .cp-t{color:#b9822a}
-        .cp.light .cp-row.live .cp-t{color:#0e9a8c}
+        .cp.light .cp-row.live .cp-t{color:hsl(var(--primary))}
         .cp.light .cp-v{color:#5f6467}
         .cp.light .cp-tag{color:#5f6467;border-color:rgba(20,24,26,.12)}
-        .cp.light .cp-tag.luca{color:#0e9a8c;border-color:rgba(14,154,140,.35)}
+        .cp.light .cp-tag.luca{color:hsl(var(--primary));border-color:hsl(var(--primary) / .35)}
         .cp.light .cp-empty{color:#5f6467}
       `}</style>
 
