@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/sections/footer";
+import { ReservationForm } from "@/components/reservation-form";
 import { getEvent, eventIcsUrl } from "@/lib/events";
 import { formatDateTR } from "@/lib/utils";
 
@@ -129,10 +130,10 @@ export default async function EventDetailPage({
           <div className="mt-6 flex flex-wrap gap-3">
             {!past && (
               <Link
-                href="/basvuru"
+                href={ev.reservation?.enabled ? "#rezervasyon" : "/basvuru"}
                 className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#0e9a8c] to-[#22c9b8] px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:opacity-90"
               >
-                Katıl / Bilgi al
+                {ev.reservation?.enabled ? "Rezervasyon yap" : "Katıl / Bilgi al"}
               </Link>
             )}
             <a
@@ -221,6 +222,19 @@ export default async function EventDetailPage({
               </div>
             )}
           </div>
+
+          {/* rezervasyon formu */}
+          {ev.reservation?.enabled && !past && (
+            <section id="rezervasyon" className="mt-12 scroll-mt-28">
+              <h2 className="font-serif text-2xl font-semibold tracking-tight">Rezervasyon</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Paketini seç, birkaç soruyu yanıtla — talebini alalım, seni arayıp netleştirelim.
+              </p>
+              <div className="mt-5">
+                <ReservationForm eventId={ev.id} config={ev.reservation} />
+              </div>
+            </section>
+          )}
         </div>
       </main>
       <Footer />

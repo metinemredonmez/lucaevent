@@ -69,6 +69,7 @@ export type ReservationConfig = {
   paddle?: { id: string; name: string; price: number; perPerson?: boolean }[];
   program?: { time: string; desc: string }[];
   note?: string;
+  terms?: string; // etkinlik öncesi koşullar / kurallar (satır satır ya da paragraf)
   menuImageUrl?: string;
 };
 

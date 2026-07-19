@@ -101,6 +101,7 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
       time: p.time ?? "", desc: p.desc ?? "",
     })) as Prg[],
     note: initial?.reservation?.note ?? "",
+    terms: initial?.reservation?.terms ?? "",
     menuImageUrl: initial?.reservation?.menuImageUrl ?? "",
   }));
   function patchResv(p: Partial<typeof resv>) { setResv((s) => ({ ...s, ...p })); }
@@ -116,6 +117,7 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
       paddle: resv.paddle.filter((p) => p.name.trim()).map((p, i) => ({ id: idOf(p.name, "paddle", i), name: p.name.trim(), price: Number(p.price) || 0, perPerson: !!p.perPerson })),
       program: resv.program.filter((p) => p.time.trim() || p.desc.trim()).map((p) => ({ time: p.time.trim(), desc: p.desc.trim() })),
       note: resv.note.trim() || undefined,
+      terms: resv.terms.trim() || undefined,
       menuImageUrl: resv.menuImageUrl.trim() || undefined,
     };
   }
@@ -392,6 +394,11 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
                 <div>
                   <label className={LABEL}>Alt not (ekstra içecek vb.)</label>
                   <textarea className={FIELD} rows={2} value={resv.note} onChange={(e) => patchResv({ note: e.target.value })} placeholder="Ekstra rakı, şarap, bira… mekandan satın alınır." />
+                </div>
+                {/* Koşullar / kurallar */}
+                <div>
+                  <label className={LABEL}>Katılım koşulları / kuralları (form altında görünür, onay şartı)</label>
+                  <textarea className={FIELD} rows={4} value={resv.terms} onChange={(e) => patchResv({ terms: e.target.value })} placeholder={"Rezervasyon en geç 1 gün önce yapılmalı.\nİptal 24 saat kala ücretsiz.\n18 yaş sınırı.\nHava koşuluna göre ertelenebilir."} />
                 </div>
                 {/* Menü görseli */}
                 <div>

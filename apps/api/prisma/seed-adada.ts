@@ -58,6 +58,11 @@ const RESERVATION = {
     { time: '17.00', desc: 'Akşam yemeği başlangıç' },
   ],
   note: 'Ekstra rakı, şarap, bira veya meşrubat isteyenler mekandan satın alarak temin edebilir.',
+  terms:
+    'Rezervasyon en geç 1 gün önceden yapılmalıdır.\n' +
+    'İptal, etkinlikten 24 saat öncesine kadar ücretsizdir.\n' +
+    'Hava koşullarına göre program değişebilir veya ertelenebilir.\n' +
+    'Alkollü içecekler mekandan temin edilir.',
   menuImageUrl: null as string | null,
 };
 
@@ -85,12 +90,9 @@ async function main() {
     },
   });
 
-  // startsAt: yakın gelecekte bir gün (etkinlik "yaklaşan" olarak görünsün)
-  const startsAt = new Date();
-  startsAt.setDate(startsAt.getDate() + 10);
-  startsAt.setHours(9, 0, 0, 0);
-  const endsAt = new Date(startsAt);
-  endsAt.setHours(22, 0, 0, 0);
+  // 25 Temmuz 2026 Cumartesi (İstanbul saati)
+  const startsAt = new Date('2026-07-25T12:00:00+03:00');
+  const endsAt = new Date('2026-07-25T23:00:00+03:00');
 
   const existing = await prisma.event.findUnique({ where: { slug: 'adada' } });
 
@@ -102,8 +104,12 @@ async function main() {
       categoryId: category.id,
       venueId: venue.id,
       status: EventStatus.PUBLISHED,
-      // kapak yalnız boşsa doldurulur; admin'den yüklenmişse korunur. reservation dokunulmaz.
+      startsAt,
+      endsAt,
+      // kapak yalnız boşsa doldurulur (admin yüklemesi korunur). reservation seed'den
+      // yenilenir — admin'den paket düzenledikten SONRA seed'i tekrar çalıştırma.
       coverUrl: existing?.coverUrl || '/img/events/luca-adada.jpg',
+      reservation: RESERVATION as any,
     },
     create: {
       slug: 'adada',
