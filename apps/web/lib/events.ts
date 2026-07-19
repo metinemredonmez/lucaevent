@@ -61,6 +61,17 @@ export type DiscoverParams = {
   take?: number;
 };
 
+// ——— rezervasyon / gün-paketi yapılandırması (Event.reservation JSON) ———
+export type ReservationConfig = {
+  enabled?: boolean;
+  packages?: { id: string; name: string; alt?: string; price: number }[];
+  mezePrice?: number;
+  paddle?: { id: string; name: string; price: number }[];
+  program?: { time: string; desc: string }[];
+  note?: string;
+  menuImageUrl?: string;
+};
+
 // ——— tek etkinlik detayı (public /events/:slug) ———
 export type EventDetail = {
   id: string;
@@ -85,7 +96,35 @@ export type EventDetail = {
   category: { id: string; slug: string; name: string; color: string | null } | null;
   lineup: { id: string; isHeadline: boolean; artist: { id: string; name: string; slug: string } }[];
   tickets: { id: string; name: string; priceMinor: number; capacity: number | null; sold: number }[];
+  reservation: ReservationConfig | null;
 };
+
+// ——— rezervasyon oluştur (public /reservations) ———
+export type ReservationInput = {
+  eventId?: string;
+  venueId?: string;
+  area: string;
+  date: string; // ISO
+  partySize: number;
+  fullName: string;
+  phone: string;
+  email?: string;
+  note?: string;
+  payload?: Record<string, unknown>;
+};
+
+export async function createReservation(body: ReservationInput) {
+  const r = await fetch(`${BASE}/reservations`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) {
+    const msg = await r.text().catch(() => "");
+    throw new Error(msg || "Gönderilemedi, tekrar dene.");
+  }
+  return r.json();
+}
 
 export async function getEvent(slug: string): Promise<EventDetail | null> {
   try {

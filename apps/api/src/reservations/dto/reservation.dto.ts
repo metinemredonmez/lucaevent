@@ -5,6 +5,7 @@ import {
   IsEmail,
   IsEnum,
   IsInt,
+  IsObject,
   IsOptional,
   IsString,
   MaxLength,
@@ -47,15 +48,21 @@ export class ReservationCreateDto {
   @MaxLength(40)
   phone!: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsEmail()
-  email!: string;
+  email?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @MaxLength(1000)
   note?: string;
+
+  @ApiPropertyOptional({ description: 'Tipe özel ekstra alanlar (paket, meze, paddle, tahmini tutar)' })
+  @IsOptional()
+  @IsObject()
+  payload?: Record<string, unknown>;
 }
 
 export class ReservationQueryDto {

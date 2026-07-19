@@ -25,6 +25,7 @@ export class ReservationsService {
         phone: dto.phone,
         email: dto.email,
         note: dto.note,
+        payload: dto.payload as any,
         status: ReservationStatus.PENDING,
       },
     });

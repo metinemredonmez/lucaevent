@@ -1,45 +1,58 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Anchor, Check, Loader2, Sun, Waves, UtensilsCrossed } from "lucide-react";
 import { Nav } from "@/components/nav";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { createSubmission, type SubmissionBody } from "@/lib/session";
+import { getEvent, createReservation, type ReservationConfig } from "@/lib/events";
 
 // Luca Adada — gün-paketi rezervasyon formu.
-// WhatsApp'ta paylaşılan link → bu sayfa → kısa soru-cevap → admin paneline "İletişim"
-// başvurusu olarak düşer (konu: "Adada Rezervasyon"). Fulya panelden görüp onaylar.
+// Paketler/menü "adada" etkinliğinin reservation config'inden gelir (admin-managed);
+// etkinlik/config yoksa yerleşik varsayılanlar kullanılır. Gönderim → Reservation
+// (eventId'li) → admin panelinde /admin/reservations altında görünür.
 
-type PaketId = "plaj-aksam" | "kahvalti";
-const PAKETLER: { id: PaketId; ad: string; alt: string; fiyat: number }[] = [
-  { id: "plaj-aksam", ad: "Plaj kullanımı + akşam yemeği", alt: "1 duble rakı dahil", fiyat: 1750 },
-  { id: "kahvalti", ad: "Açık büfe kahvaltı + sınırsız çay", alt: "09.00 – 11.00", fiyat: 750 },
-];
-const MEZE_FIYAT = 300;
+const SLUG = "adada";
 
-type PaddleId = "yok" | "tek" | "cift";
-const PADDLE: { id: PaddleId; ad: string; fiyat: number }[] = [
-  { id: "yok", ad: "Katılmıyorum", fiyat: 0 },
-  { id: "tek", ad: "Tek kişi binerse", fiyat: 750 },
-  { id: "cift", ad: "İki kişi binerse (kişi başı)", fiyat: 500 },
-];
+type Paket = { id: string; name: string; alt?: string; price: number };
+type Paddle = { id: string; name: string; price: number };
+type Program = { time: string; desc: string };
 
-const PROGRAM = [
-  { t: "09.00 – 11.00", d: "Kahvaltı saati" },
-  { t: "12.00 – 17.00", d: "Paddle ve deniz" },
-  { t: "17.00", d: "Akşam yemeği başlangıç" },
+const DEFAULT_PAKETLER: Paket[] = [
+  { id: "plaj-aksam", name: "Plaj kullanımı + akşam yemeği", alt: "1 duble rakı dahil", price: 1750 },
+  { id: "kahvalti", name: "Açık büfe kahvaltı + sınırsız çay", alt: "09.00 – 11.00", price: 750 },
 ];
+const DEFAULT_MEZE = 300;
+const DEFAULT_PADDLE: Paddle[] = [
+  { id: "yok", name: "Katılmıyorum", price: 0 },
+  { id: "tek", name: "Tek kişi binerse", price: 750 },
+  { id: "cift", name: "İki kişi binerse (kişi başı)", price: 500 },
+];
+const DEFAULT_PROGRAM: Program[] = [
+  { time: "09.00 – 11.00", desc: "Kahvaltı saati" },
+  { time: "12.00 – 17.00", desc: "Paddle ve deniz" },
+  { time: "17.00", desc: "Akşam yemeği başlangıç" },
+];
+const DEFAULT_NOTE = "Ekstra rakı, şarap, bira veya meşrubat isteyenler mekandan satın alarak temin edebilir.";
 
 const tl = (n: number) => new Intl.NumberFormat("tr-TR").format(n) + "₺";
 
+// "yok" (katılmıyorum) seçeneği her zaman ilk sırada olsun
+function withYok(list: Paddle[]): Paddle[] {
+  return list.some((p) => p.id === "yok") ? list : [{ id: "yok", name: "Katılmıyorum", price: 0 }, ...list];
+}
+
 export default function AdadaPage() {
   const bugun = useMemo(() => new Date().toISOString().slice(0, 10), []);
-  const [paket, setPaket] = useState<PaketId | "">("");
+
+  const [cfg, setCfg] = useState<ReservationConfig | null>(null);
+  const [eventId, setEventId] = useState<string | undefined>(undefined);
+
+  const [paket, setPaket] = useState<string>("");
   const [kisi, setKisi] = useState(2);
   const [tarih, setTarih] = useState("");
   const [meze, setMeze] = useState(0);
-  const [paddle, setPaddle] = useState<PaddleId>("yok");
+  const [paddle, setPaddle] = useState<string>("yok");
   const [not, setNot] = useState("");
   const [ad, setAd] = useState("");
   const [tel, setTel] = useState("");
@@ -48,13 +61,30 @@ export default function AdadaPage() {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
 
-  // Yaklaşık tutar (bilgi amaçlı — kesin fiyat Fulya onayında netleşir)
+  // "adada" etkinliğinden config çek (varsa)
+  useEffect(() => {
+    getEvent(SLUG)
+      .then((e) => {
+        if (e?.id) setEventId(e.id);
+        if (e?.reservation && (e.reservation.enabled ?? true)) setCfg(e.reservation);
+      })
+      .catch(() => {});
+  }, []);
+
+  const PAKETLER = cfg?.packages?.length ? cfg.packages : DEFAULT_PAKETLER;
+  const MEZE_FIYAT = cfg?.mezePrice ?? DEFAULT_MEZE;
+  const PADDLE = withYok(cfg?.paddle?.length ? cfg.paddle : DEFAULT_PADDLE);
+  const PROGRAM = cfg?.program?.length ? cfg.program : DEFAULT_PROGRAM;
+  const NOTE = cfg?.note?.trim() || DEFAULT_NOTE;
+  const menuImg = cfg?.menuImageUrl || null;
+
+  // Yaklaşık tutar (bilgi amaçlı — kesin fiyat onayında netleşir)
   const tahmin = useMemo(() => {
     const p = PAKETLER.find((x) => x.id === paket);
-    const pd = PADDLE.find((x) => x.id === paddle)!;
-    const paddleToplam = paddle === "tek" ? 750 : paddle === "cift" ? 500 * kisi : 0;
-    return (p ? p.fiyat * kisi : 0) + meze * MEZE_FIYAT + paddleToplam;
-  }, [paket, kisi, meze, paddle]);
+    const pd = PADDLE.find((x) => x.id === paddle);
+    const paddleToplam = !pd ? 0 : pd.id === "cift" ? pd.price * kisi : pd.price;
+    return (p ? p.price * kisi : 0) + meze * MEZE_FIYAT + paddleToplam;
+  }, [paket, kisi, meze, paddle, PAKETLER, PADDLE, MEZE_FIYAT]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -68,46 +98,30 @@ export default function AdadaPage() {
 
     const p = PAKETLER.find((x) => x.id === paket)!;
     const pd = PADDLE.find((x) => x.id === paddle)!;
-    const tarihStr = new Date(tarih).toLocaleDateString("tr-TR", { day: "2-digit", month: "long", year: "numeric" });
-
-    const ozet = [
-      `🏖️ Luca Adada rezervasyon talebi`,
-      `Tarih: ${tarihStr}`,
-      `Kişi: ${kisi}`,
-      `Paket: ${p.ad} (${tl(p.fiyat)}/kişi)`,
-      meze > 0 ? `Meze: ${meze} porsiyon (${tl(MEZE_FIYAT)}/porsiyon)` : `Meze: —`,
-      `Paddle turu: ${pd.ad}${pd.fiyat ? ` (${tl(pd.fiyat)})` : ""}`,
-      not.trim() ? `Yemek tercihi / not: ${not.trim()}` : null,
-      `Yaklaşık tutar: ${tl(tahmin)}`,
-      `İletişim: ${ad.trim()} · ${tel.trim()}`,
-    ]
-      .filter(Boolean)
-      .join("\n");
-
-    const body: SubmissionBody = {
-      type: "CONTACT",
-      name: ad.trim(),
-      phone: tel.trim(),
-      subject: `Adada Rezervasyon — ${tarihStr} · ${kisi} kişi`,
-      message: ozet,
-      payload: {
-        kind: "adada-rezervasyon",
-        tarih,
-        kisi,
-        paket: p.id,
-        paketAd: p.ad,
-        paketFiyat: p.fiyat,
-        mezePorsiyon: meze,
-        paddle: pd.id,
-        paddleAd: pd.ad,
-        yemekTercihi: not.trim() || null,
-        tahminiTutar: tahmin,
-      },
-    };
 
     setLoading(true);
     try {
-      await createSubmission(body);
+      await createReservation({
+        eventId,
+        area: p.name,
+        date: new Date(tarih).toISOString(),
+        partySize: kisi,
+        fullName: ad.trim(),
+        phone: tel.trim(),
+        note: not.trim() || undefined,
+        payload: {
+          kind: "adada-rezervasyon",
+          paketId: p.id,
+          paketAd: p.name,
+          paketFiyat: p.price,
+          mezePorsiyon: meze,
+          mezeFiyat: MEZE_FIYAT,
+          paddle: pd.id,
+          paddleAd: pd.name,
+          yemekTercihi: not.trim() || null,
+          tahminiTutar: tahmin,
+        },
+      });
       setDone(true);
     } catch (e: any) {
       setErr(e?.message || "Gönderilemedi, tekrar dene.");
@@ -131,6 +145,13 @@ export default function AdadaPage() {
             <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
               Paketini seç, birkaç soruyu yanıtla — talebin bize ulaşsın, onaylayıp seni arayalım.
             </p>
+            {menuImg && (
+              <img
+                src={menuImg}
+                alt="Luca Adada menü"
+                className="mx-auto mt-6 w-full max-w-md rounded-xl border border-border"
+              />
+            )}
           </div>
         </div>
 
@@ -143,7 +164,7 @@ export default function AdadaPage() {
             <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
               En kısa sürede seni arayıp rezervasyonu netleştireceğiz. Teşekkürler!
             </p>
-            <Button variant="outline" className="mt-6" onClick={() => { setDone(false); }}>
+            <Button variant="outline" className="mt-6" onClick={() => setDone(false)}>
               Yeni talep oluştur
             </Button>
           </div>
@@ -166,11 +187,11 @@ export default function AdadaPage() {
                     }`}
                   >
                     <span>
-                      <span className="block font-medium">{p.ad}</span>
-                      <span className="block text-xs text-muted-foreground">{p.alt}</span>
+                      <span className="block font-medium">{p.name}</span>
+                      {p.alt && <span className="block text-xs text-muted-foreground">{p.alt}</span>}
                     </span>
                     <span className="shrink-0 rounded-lg bg-primary px-3 py-1.5 font-mono text-sm font-semibold text-primary-foreground">
-                      {tl(p.fiyat)}
+                      {tl(p.price)}
                     </span>
                   </button>
                 );
@@ -222,8 +243,8 @@ export default function AdadaPage() {
                         on ? "border-primary ring-2 ring-primary/40 bg-primary/5" : "border-border bg-card hover:border-primary/40"
                       }`}
                     >
-                      <span className="block font-medium">{pd.ad}</span>
-                      <span className="mt-1 block font-mono text-xs text-primary">{pd.fiyat ? tl(pd.fiyat) : "—"}</span>
+                      <span className="block font-medium">{pd.name}</span>
+                      <span className="mt-1 block font-mono text-xs text-primary">{pd.price ? tl(pd.price) : "—"}</span>
                     </button>
                   );
                 })}
@@ -259,9 +280,7 @@ export default function AdadaPage() {
               <span className="text-muted-foreground">Yaklaşık tutar</span>
               <span className="font-mono text-lg font-bold text-primary">{tl(tahmin)}</span>
             </div>
-            <p className="mt-2 text-center text-xs text-muted-foreground">
-              Ekstra rakı, şarap, bira veya meşrubat isteyenler mekandan satın alarak temin edebilir.
-            </p>
+            <p className="mt-2 text-center text-xs text-muted-foreground">{NOTE}</p>
 
             {/* KVKK */}
             <label className="mt-5 flex cursor-pointer items-start gap-2 text-xs text-muted-foreground">
@@ -276,16 +295,16 @@ export default function AdadaPage() {
               Rezervasyon talebi gönder
             </Button>
 
-            {/* GÜN BOYU PROGRAM — bilgi */}
+            {/* GÜN BOYU PROGRAM */}
             <div className="mt-10 rounded-xl border border-border bg-card p-5">
               <div className="mb-3 flex items-center gap-2 text-sm font-semibold">
                 <Anchor className="h-4 w-4 text-primary" /> Gün boyu program
               </div>
               <ul className="space-y-2">
-                {PROGRAM.map((x) => (
-                  <li key={x.t} className="flex gap-3 text-sm">
-                    <span className="w-28 shrink-0 font-mono text-primary">{x.t}</span>
-                    <span className="text-muted-foreground">{x.d}</span>
+                {PROGRAM.map((x, i) => (
+                  <li key={i} className="flex gap-3 text-sm">
+                    <span className="w-28 shrink-0 font-mono text-primary">{x.time}</span>
+                    <span className="text-muted-foreground">{x.desc}</span>
                   </li>
                 ))}
               </ul>

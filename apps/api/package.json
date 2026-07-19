@@ -19,6 +19,7 @@
     "prisma:studio": "prisma studio",
     "db:seed": "ts-node prisma/seed.ts",
     "import:events": "ts-node prisma/import-luca-events.ts",
+    "seed:adada": "ts-node prisma/seed-adada.ts",
     "clean:demo": "ts-node prisma/clean-demo.ts"
   },
   "prisma": {

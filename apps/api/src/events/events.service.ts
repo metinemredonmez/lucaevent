@@ -160,6 +160,8 @@ export class EventsService {
     return this.prisma.event.create({
       data: {
         ...dto,
+        // Json alanı: gevşek Record<string,unknown> tipi Prisma Json input'unu bozuyor → cast
+        reservation: dto.reservation as Prisma.InputJsonValue | undefined,
         startsAt: new Date(dto.startsAt),
         endsAt: dto.endsAt ? new Date(dto.endsAt) : undefined,
         doorsAt: dto.doorsAt ? new Date(dto.doorsAt) : undefined,
@@ -174,6 +176,7 @@ export class EventsService {
       where: { id },
       data: {
         ...rest,
+        reservation: rest.reservation as Prisma.InputJsonValue | undefined,
         startsAt: startsAt ? new Date(startsAt) : undefined,
         endsAt: endsAt ? new Date(endsAt) : undefined,
         doorsAt: doorsAt ? new Date(doorsAt) : undefined,

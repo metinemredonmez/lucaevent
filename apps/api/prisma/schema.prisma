@@ -264,6 +264,11 @@ model Event {
   musicQuery String?
   musicLabel String? // radyo çipinde görünecek etiket (örn. "İtalyan Akşamı")
 
+  // rezervasyon / gün-paketi (admin-managed). Boşsa etkinlikte rezervasyon formu yok.
+  // Şekil: { enabled, packages:[{id,name,alt,price}], mezePrice, paddle:[{id,name,price}],
+  //         program:[{time,desc}], note, menuImageUrl }
+  reservation Json?
+
   lineup       Lineup[]
   tickets      TicketTier[]
   media        Media[]      @relation("EventMedia")
@@ -473,8 +478,9 @@ model Reservation {
   partySize Int
   fullName  String
   phone     String
-  email     String
+  email     String?
   note      String?
+  payload   Json?             // paket/meze/paddle gibi tipe özel ekstra alanlar (Adada rezervasyon)
   status    ReservationStatus @default(PENDING)
   userId    String?
   user      User?             @relation(fields: [userId], references: [id])

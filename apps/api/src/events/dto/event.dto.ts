@@ -8,6 +8,7 @@ import {
   IsIn,
   IsInt,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   MaxLength,
@@ -132,6 +133,11 @@ export class EventCreateDto {
   @IsInt()
   @Min(0)
   ageMin?: number;
+
+  @ApiPropertyOptional({ description: 'Rezervasyon / gün-paketi yapılandırması (paketler, meze, paddle, program, menü görseli)' })
+  @IsOptional()
+  @IsObject()
+  reservation?: Record<string, unknown>;
 
   @ApiPropertyOptional()
   @IsOptional()
