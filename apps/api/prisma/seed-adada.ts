@@ -50,7 +50,7 @@ const RESERVATION = {
   paddle: [
     { id: 'yok', name: 'Katılmıyorum', price: 0 },
     { id: 'tek', name: 'Tek kişi binerse', price: 750 },
-    { id: 'cift', name: 'İki kişi binerse (kişi başı)', price: 500 },
+    { id: 'cift', name: 'İki kişi binerse (kişi başı)', price: 500, perPerson: true },
   ],
   program: [
     { time: '09.00 – 11.00', desc: 'Kahvaltı saati' },
@@ -102,7 +102,8 @@ async function main() {
       categoryId: category.id,
       venueId: venue.id,
       status: EventStatus.PUBLISHED,
-      // reservation & coverUrl bilerek dokunulmuyor (admin düzenlemesi korunur)
+      // kapak yalnız boşsa doldurulur; admin'den yüklenmişse korunur. reservation dokunulmaz.
+      coverUrl: existing?.coverUrl || '/img/events/luca-adada.jpg',
     },
     create: {
       slug: 'adada',
@@ -118,6 +119,7 @@ async function main() {
       venueId: venue.id,
       status: EventStatus.PUBLISHED,
       publishedAt: new Date(),
+      coverUrl: '/img/events/luca-adada.jpg',
       reservation: RESERVATION as any,
     },
   });
@@ -150,7 +152,13 @@ async function main() {
   const sinemaExists = await prisma.event.findUnique({ where: { slug: 'maltepe-acik-hava-sinemasi' } });
   const sinema = await prisma.event.upsert({
     where: { slug: 'maltepe-acik-hava-sinemasi' },
-    update: { title: 'Maltepe Açık Hava Sineması', status: EventStatus.PUBLISHED, categoryId: social.id, venueId: maltepe.id },
+    update: {
+      title: 'Maltepe Açık Hava Sineması',
+      status: EventStatus.PUBLISHED,
+      categoryId: social.id,
+      venueId: maltepe.id,
+      coverUrl: sinemaExists?.coverUrl || '/img/events/maltepe-acik-hava-sinemasi.jpg',
+    },
     create: {
       slug: 'maltepe-acik-hava-sinemasi',
       title: 'Maltepe Açık Hava Sineması',
@@ -165,6 +173,7 @@ async function main() {
       venueId: maltepe.id,
       status: EventStatus.PUBLISHED,
       publishedAt: new Date(),
+      coverUrl: '/img/events/maltepe-acik-hava-sinemasi.jpg',
     },
   });
   console.log(`✅  Etkinlik ${sinemaExists ? 'güncellendi' : 'oluşturuldu'}: /etkinlik/${sinema.slug}`);

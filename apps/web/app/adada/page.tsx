@@ -15,7 +15,7 @@ import { getEvent, createReservation, type ReservationConfig } from "@/lib/event
 const SLUG = "adada";
 
 type Paket = { id: string; name: string; alt?: string; price: number };
-type Paddle = { id: string; name: string; price: number };
+type Paddle = { id: string; name: string; price: number; perPerson?: boolean };
 type Program = { time: string; desc: string };
 
 const DEFAULT_PAKETLER: Paket[] = [
@@ -26,7 +26,7 @@ const DEFAULT_MEZE = 300;
 const DEFAULT_PADDLE: Paddle[] = [
   { id: "yok", name: "Katılmıyorum", price: 0 },
   { id: "tek", name: "Tek kişi binerse", price: 750 },
-  { id: "cift", name: "İki kişi binerse (kişi başı)", price: 500 },
+  { id: "cift", name: "İki kişi binerse (kişi başı)", price: 500, perPerson: true },
 ];
 const DEFAULT_PROGRAM: Program[] = [
   { time: "09.00 – 11.00", desc: "Kahvaltı saati" },
@@ -82,7 +82,7 @@ export default function AdadaPage() {
   const tahmin = useMemo(() => {
     const p = PAKETLER.find((x) => x.id === paket);
     const pd = PADDLE.find((x) => x.id === paddle);
-    const paddleToplam = !pd ? 0 : pd.id === "cift" ? pd.price * kisi : pd.price;
+    const paddleToplam = !pd ? 0 : pd.perPerson ? pd.price * kisi : pd.price;
     return (p ? p.price * kisi : 0) + meze * MEZE_FIYAT + paddleToplam;
   }, [paket, kisi, meze, paddle, PAKETLER, PADDLE, MEZE_FIYAT]);
 

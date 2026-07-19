@@ -66,7 +66,7 @@ export type ReservationConfig = {
   enabled?: boolean;
   packages?: { id: string; name: string; alt?: string; price: number }[];
   mezePrice?: number;
-  paddle?: { id: string; name: string; price: number }[];
+  paddle?: { id: string; name: string; price: number; perPerson?: boolean }[];
   program?: { time: string; desc: string }[];
   note?: string;
   menuImageUrl?: string;

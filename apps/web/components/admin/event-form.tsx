@@ -18,6 +18,11 @@ const STATUSES = ["DRAFT", "SCHEDULED", "PUBLISHED", "CANCELED", "ARCHIVED"];
 type Cat = { id: string; name: string; slug: string };
 type Mode = "create" | "edit";
 
+// Rezervasyon / gün-paketi editörü satır tipleri
+type Pkg = { name: string; alt: string; price: number };
+type Pad = { name: string; price: number; perPerson: boolean };
+type Prg = { time: string; desc: string };
+
 const FIELD =
   "w-full rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-[#22c9b8]/40 focus:border-[#22c9b8]/50";
 const LABEL = "block text-xs font-medium text-muted-foreground mb-1";
@@ -79,6 +84,42 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
     streamPrice: initial?.streamPriceMinor != null ? String(initial.streamPriceMinor / 100) : "",
   });
 
+  // ——— Rezervasyon / gün-paketi (Event.reservation JSON) ———
+  const [resvAdv, setResvAdv] = useState(false);
+  const [resvOn, setResvOn] = useState<boolean>(
+    !!initial?.reservation?.enabled || (initial?.reservation?.packages?.length ?? 0) > 0,
+  );
+  const [resv, setResv] = useState(() => ({
+    packages: ((initial?.reservation?.packages ?? []) as any[]).map((p) => ({
+      name: p.name ?? "", alt: p.alt ?? "", price: Number(p.price) || 0,
+    })) as Pkg[],
+    mezePrice: Number(initial?.reservation?.mezePrice ?? 0),
+    paddle: ((initial?.reservation?.paddle ?? []) as any[])
+      .filter((p) => p.id !== "yok")
+      .map((p) => ({ name: p.name ?? "", price: Number(p.price) || 0, perPerson: !!p.perPerson })) as Pad[],
+    program: ((initial?.reservation?.program ?? []) as any[]).map((p) => ({
+      time: p.time ?? "", desc: p.desc ?? "",
+    })) as Prg[],
+    note: initial?.reservation?.note ?? "",
+    menuImageUrl: initial?.reservation?.menuImageUrl ?? "",
+  }));
+  function patchResv(p: Partial<typeof resv>) { setResv((s) => ({ ...s, ...p })); }
+  function editPkg(i: number, p: Partial<Pkg>) { setResv((s) => ({ ...s, packages: s.packages.map((x, j) => (j === i ? { ...x, ...p } : x)) })); }
+  function editPad(i: number, p: Partial<Pad>) { setResv((s) => ({ ...s, paddle: s.paddle.map((x, j) => (j === i ? { ...x, ...p } : x)) })); }
+  function editPrg(i: number, p: Partial<Prg>) { setResv((s) => ({ ...s, program: s.program.map((x, j) => (j === i ? { ...x, ...p } : x)) })); }
+  function buildReservation() {
+    const idOf = (s: string, pre: string, i: number) => slugify(s) || `${pre}-${i + 1}`;
+    return {
+      enabled: true,
+      packages: resv.packages.filter((p) => p.name.trim()).map((p, i) => ({ id: idOf(p.name, "paket", i), name: p.name.trim(), alt: p.alt.trim() || undefined, price: Number(p.price) || 0 })),
+      mezePrice: Number(resv.mezePrice) || 0,
+      paddle: resv.paddle.filter((p) => p.name.trim()).map((p, i) => ({ id: idOf(p.name, "paddle", i), name: p.name.trim(), price: Number(p.price) || 0, perPerson: !!p.perPerson })),
+      program: resv.program.filter((p) => p.time.trim() || p.desc.trim()).map((p) => ({ time: p.time.trim(), desc: p.desc.trim() })),
+      note: resv.note.trim() || undefined,
+      menuImageUrl: resv.menuImageUrl.trim() || undefined,
+    };
+  }
+
   useEffect(() => {
     api<Cat[]>("/categories").then(setCats).catch(() => {});
   }, []);
@@ -125,6 +166,10 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
         body.streamPriceMinor = Math.round(Number(f.streamPrice) * 100);
       }
     }
+
+    // rezervasyon config: açıksa gönder; kapalıysa yalnız daha önce varsa temizle
+    if (resvOn) body.reservation = buildReservation();
+    else if (initial?.reservation) body.reservation = { enabled: false };
 
     setSaving(true);
     try {
@@ -265,6 +310,98 @@ export function EventForm({ mode, id, initial }: { mode: Mode; id?: string; init
               <input type="checkbox" className="h-4 w-4 accent-[#22c9b8]" checked={f.campingAllowed} onChange={(e) => set("campingAllowed", e.target.checked)} />
               Konaklama / kamp var
             </label>
+          </div>
+        )}
+      </div>
+
+      {/* Rezervasyon / Gün-paketi */}
+      <div className="rounded-xl border border-border bg-card">
+        <button type="button" onClick={() => setResvAdv((a) => !a)} className="flex w-full items-center justify-between px-5 py-4 text-sm font-medium text-foreground">
+          <span className="flex items-center gap-2">
+            Rezervasyon / Gün-paketi
+            <span className={`rounded-full px-2 py-0.5 text-[11px] ${resvOn ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>{resvOn ? "açık" : "kapalı"}</span>
+          </span>
+          <span className="text-muted-foreground">{resvAdv ? "−" : "+"}</span>
+        </button>
+        {resvAdv && (
+          <div className="space-y-5 border-t border-border p-5">
+            <label className="flex items-center gap-2 text-sm text-foreground">
+              <input type="checkbox" className="h-4 w-4 accent-[#22c9b8]" checked={resvOn} onChange={(e) => setResvOn(e.target.checked)} />
+              Bu etkinlikte rezervasyon formu olsun (paket seçimli · /adada tipi)
+            </label>
+            {resvOn && (
+              <>
+                {/* Paketler */}
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <label className={LABEL}>Paketler</label>
+                    <button type="button" className="text-xs text-primary hover:underline" onClick={() => setResv((s) => ({ ...s, packages: [...s.packages, { name: "", alt: "", price: 0 }] }))}>+ paket ekle</button>
+                  </div>
+                  <div className="space-y-2">
+                    {resv.packages.map((p, i) => (
+                      <div key={i} className="grid grid-cols-[1fr_1fr_88px_auto] gap-2">
+                        <input className={FIELD} placeholder="Paket adı" value={p.name} onChange={(e) => editPkg(i, { name: e.target.value })} />
+                        <input className={FIELD} placeholder="Alt not (ops.)" value={p.alt} onChange={(e) => editPkg(i, { alt: e.target.value })} />
+                        <input className={FIELD} type="number" placeholder="₺" value={p.price} onChange={(e) => editPkg(i, { price: Number(e.target.value) || 0 })} />
+                        <button type="button" className="px-2 text-muted-foreground hover:text-destructive" onClick={() => setResv((s) => ({ ...s, packages: s.packages.filter((_, j) => j !== i) }))}>×</button>
+                      </div>
+                    ))}
+                    {resv.packages.length === 0 && <p className="text-xs text-muted-foreground/60">Henüz paket yok.</p>}
+                  </div>
+                </div>
+                {/* Meze */}
+                <div className="sm:w-56">
+                  <label className={LABEL}>Meze porsiyon fiyatı (₺)</label>
+                  <input className={FIELD} type="number" value={resv.mezePrice} onChange={(e) => patchResv({ mezePrice: Number(e.target.value) || 0 })} />
+                </div>
+                {/* Paddle / ek seçenekler */}
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <label className={LABEL}>Paddle / ek seçenekler</label>
+                    <button type="button" className="text-xs text-primary hover:underline" onClick={() => setResv((s) => ({ ...s, paddle: [...s.paddle, { name: "", price: 0, perPerson: false }] }))}>+ seçenek ekle</button>
+                  </div>
+                  <div className="space-y-2">
+                    {resv.paddle.map((p, i) => (
+                      <div key={i} className="grid grid-cols-[1fr_88px_auto_auto] items-center gap-2">
+                        <input className={FIELD} placeholder="Seçenek adı" value={p.name} onChange={(e) => editPad(i, { name: e.target.value })} />
+                        <input className={FIELD} type="number" placeholder="₺" value={p.price} onChange={(e) => editPad(i, { price: Number(e.target.value) || 0 })} />
+                        <label className="flex items-center gap-1 whitespace-nowrap text-[11px] text-muted-foreground"><input type="checkbox" className="h-3.5 w-3.5 accent-[#22c9b8]" checked={p.perPerson} onChange={(e) => editPad(i, { perPerson: e.target.checked })} />kişi başı</label>
+                        <button type="button" className="px-2 text-muted-foreground hover:text-destructive" onClick={() => setResv((s) => ({ ...s, paddle: s.paddle.filter((_, j) => j !== i) }))}>×</button>
+                      </div>
+                    ))}
+                    <p className="text-[11px] text-muted-foreground/60">"Katılmıyorum" seçeneği forma otomatik eklenir.</p>
+                  </div>
+                </div>
+                {/* Program */}
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <label className={LABEL}>Gün boyu program</label>
+                    <button type="button" className="text-xs text-primary hover:underline" onClick={() => setResv((s) => ({ ...s, program: [...s.program, { time: "", desc: "" }] }))}>+ satır ekle</button>
+                  </div>
+                  <div className="space-y-2">
+                    {resv.program.map((p, i) => (
+                      <div key={i} className="grid grid-cols-[130px_1fr_auto] gap-2">
+                        <input className={FIELD} placeholder="09.00 – 11.00" value={p.time} onChange={(e) => editPrg(i, { time: e.target.value })} />
+                        <input className={FIELD} placeholder="Kahvaltı saati" value={p.desc} onChange={(e) => editPrg(i, { desc: e.target.value })} />
+                        <button type="button" className="px-2 text-muted-foreground hover:text-destructive" onClick={() => setResv((s) => ({ ...s, program: s.program.filter((_, j) => j !== i) }))}>×</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Not */}
+                <div>
+                  <label className={LABEL}>Alt not (ekstra içecek vb.)</label>
+                  <textarea className={FIELD} rows={2} value={resv.note} onChange={(e) => patchResv({ note: e.target.value })} placeholder="Ekstra rakı, şarap, bira… mekandan satın alınır." />
+                </div>
+                {/* Menü görseli */}
+                <div>
+                  <label className={LABEL}>Menü görseli (formun üstünde görünür)</label>
+                  <input className={FIELD} value={resv.menuImageUrl} onChange={(e) => patchResv({ menuImageUrl: e.target.value })} placeholder="/img/… ya da yükle →" />
+                  <div className="mt-2"><MediaUpload kind="image" folder="events" value={resv.menuImageUrl} onChange={(url) => patchResv({ menuImageUrl: url })} /></div>
+                </div>
+                <a href="/adada" target="_blank" rel="noopener noreferrer" className="inline-flex text-xs text-primary hover:underline">Formu önizle → /adada</a>
+              </>
+            )}
           </div>
         )}
       </div>
