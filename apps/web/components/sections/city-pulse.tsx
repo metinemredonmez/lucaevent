@@ -17,9 +17,9 @@ const IST = { timeZone: "Europe/Istanbul" } as const;
 // Buton ile değiştirilebilir; otomatik de döner.
 const SCENES = [
   { src: "/video/istanbul-bogaz-1.mp4", poster: "/img/hero/istanbul-bogaz-1.jpg", label: "İstanbul · Boğaz" },
+  { src: "/video/istanbul-aerial.mp4", poster: "/img/hero/istanbul-aerial.jpg", label: "İstanbul · Galata" },
   { src: "/video/istanbul-bogaz-2.mp4", poster: "/img/hero/istanbul-bogaz-2.jpg", label: "İstanbul · Gün batımı" },
-  { src: "/video/assos.mp4", poster: "/img/hero/assos.jpg", label: "Ege · Kıyı" },
-  { src: "/video/kamp.mp4", poster: "/img/hero/kamp.jpg", label: "Doğa · Kamp" },
+  { src: "/video/istanbul-gece.mp4", poster: "/img/hero/istanbul-gece.jpg", label: "İstanbul · Gece" },
 ];
 
 function hhmm(iso: string) {
