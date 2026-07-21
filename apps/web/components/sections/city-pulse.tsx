@@ -252,7 +252,7 @@ export function CityPulse() {
            fotosu net görünür; soluk peçe altında puslu/ucuz durmaz. */
         .cp.light{background:#f4f2ec;color:#1a1c1e}
         .cp.light .cp-bg{--bgop:1;filter:saturate(1.06) brightness(1.03)}
-        .cp.light .cp-bg::after{background:linear-gradient(to bottom,rgba(10,11,13,.22) 0%,rgba(10,11,13,.28) 58%,rgba(10,11,13,.34) 80%,rgba(244,242,236,.72) 94%,#f4f2ec 100%)}
+        .cp.light .cp-bg::after{background:linear-gradient(to bottom,rgba(10,11,13,.26) 0%,rgba(10,11,13,.32) 82%,rgba(10,11,13,.34) 94%,rgba(244,242,236,.7) 99%,#f4f2ec 100%)}
         .cp.light .cp-h1{color:#f5f3ee}
         .cp.light .cp-board{background:#fff;border-color:rgba(20,24,26,.1)}
         .cp.light .cp-grp{color:#b9822a}
