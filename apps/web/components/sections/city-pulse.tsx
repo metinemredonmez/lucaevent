@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { discoverEvents, getLiveEvents, getCommunityCount, type DiscoverEvent } from "@/lib/events";
@@ -45,6 +45,11 @@ export function CityPulse() {
   const [override, setOverride] = useState<Weather | null>(null); // ?hava= test override
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  // Bazı tarayıcılar muted autoplay'i JS play() olmadan başlatmaz — nazik dürtü.
+  useEffect(() => {
+    videoRef.current?.play().catch(() => {});
+  }, []);
   useEffect(() => {
     setMounted(true);
     // Test/önizleme: ?hava=acik|bulut|yagmur|kar|gece → arka planı o havaya zorla
@@ -144,10 +149,13 @@ export function CityPulse() {
         .cp-bg{--bgop:.92;position:absolute;inset:0 0 auto 0;height:560px;background-position:center top;background-size:cover;background-repeat:no-repeat;opacity:var(--bgop);filter:contrast(1.06) saturate(1.06);animation:cpBgIn 1.1s ease both}
         @keyframes cpBgIn{from{opacity:0;transform:scale(1.05)}to{opacity:var(--bgop);transform:none}}
         /* foto belirgin: üst yarı açık; alt, panoya geçiş için koyu. + palet parıltısı */
-        .cp-bg::after{content:'';position:absolute;inset:0;
+        .cp-bg::after{content:'';position:absolute;inset:0;z-index:1;
           background:
             radial-gradient(66% 52% at 84% 4%,hsl(var(--primary) / .18),transparent 60%),
             linear-gradient(to bottom,rgba(10,11,13,.12) 0%,rgba(10,11,13,.28) 46%,rgba(10,11,13,.72) 74%,rgba(10,11,13,.95) 90%,#0a0b0d 100%)}
+        /* canlı İstanbul videosu — scrim'in (z-index:1) altında akar */
+        .cp-video{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;object-position:center 42%}
+        @media (prefers-reduced-motion:reduce){.cp-video{display:none}}
         .cp-in{position:relative;z-index:1;max-width:1020px;margin:0 auto}
         /* hava efekti katmanı */
         .cp-fx{position:absolute;inset:0 0 auto 0;height:560px;z-index:0;pointer-events:none}
@@ -230,12 +238,20 @@ export function CityPulse() {
         .cp.light .cp-empty{color:#5f6467}
       `}</style>
 
-      <div
-        key={bgImg}
-        className="cp-bg"
-        aria-hidden
-        style={{ backgroundImage: `url(${bgImg})` }}
-      />
+      <div className="cp-bg" aria-hidden style={{ backgroundImage: `url(${bgImg})` }}>
+        <video
+          ref={videoRef}
+          className="cp-video"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          poster="/img/hero/istanbul-hero-poster.jpg"
+        >
+          <source src="/video/istanbul-hero.mp4" type="video/mp4" />
+        </video>
+      </div>
       {wx && <div className={`cp-fx ${wx.cond} ${visualDay ? "day" : "night"}`} aria-hidden />}
       <div className="cp-in">
         <div className="cp-head">
