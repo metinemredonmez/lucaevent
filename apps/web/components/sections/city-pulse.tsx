@@ -65,6 +65,15 @@ export function CityPulse() {
   useEffect(() => {
     videoRef.current?.play().catch(() => {});
   }, [scene]);
+  // "İzle" — videoyu sesli + tam ekran aç
+  function watchFull() {
+    const v = videoRef.current as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null;
+    if (!v) return;
+    v.muted = false;
+    v.play().catch(() => {});
+    if (v.requestFullscreen) v.requestFullscreen().catch(() => {});
+    else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();
+  }
   useEffect(() => {
     setMounted(true);
     // Test/önizleme: ?hava=acik|bulut|yagmur|kar|gece → arka planı o havaya zorla
@@ -159,9 +168,9 @@ export function CityPulse() {
   return (
     <section className={`cp${light ? " light" : ""}`}>
       <style>{`
-        .cp{position:relative;overflow:hidden;background:#0a0b0d;color:#eceae4;padding:26px 20px 44px;
+        .cp{position:relative;overflow:hidden;background:#0a0b0d;color:#eceae4;padding:clamp(72px,15vh,170px) 20px 44px;
           font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
-        .cp-bg{--bgop:.92;position:absolute;inset:0 0 auto 0;height:560px;background-position:center top;background-size:cover;background-repeat:no-repeat;opacity:var(--bgop);filter:contrast(1.06) saturate(1.06);animation:cpBgIn 1.1s ease both}
+        .cp-bg{--bgop:.92;position:absolute;inset:0 0 auto 0;height:min(78vh,760px);background-position:center top;background-size:cover;background-repeat:no-repeat;opacity:var(--bgop);filter:contrast(1.06) saturate(1.06);animation:cpBgIn 1.1s ease both}
         @keyframes cpBgIn{from{opacity:0;transform:scale(1.05)}to{opacity:var(--bgop);transform:none}}
         /* foto belirgin: üst yarı açık; alt, panoya geçiş için koyu. + palet parıltısı */
         .cp-bg::after{content:'';position:absolute;inset:0;z-index:1;
@@ -173,7 +182,7 @@ export function CityPulse() {
         @media (prefers-reduced-motion:reduce){.cp-video{display:none}}
         .cp-in{position:relative;z-index:1;max-width:1020px;margin:0 auto}
         /* hava efekti katmanı */
-        .cp-fx{position:absolute;inset:0 0 auto 0;height:560px;z-index:0;pointer-events:none}
+        .cp-fx{position:absolute;inset:0 0 auto 0;height:min(78vh,760px);z-index:0;pointer-events:none}
         .cp-fx.rain{background-image:linear-gradient(102deg,transparent 46%,rgba(200,225,235,.22) 50%,transparent 54%);
           background-size:9px 64px;animation:cpRain .62s linear infinite;opacity:.55}
         @keyframes cpRain{from{background-position:0 0}to{background-position:-14px 64px}}
@@ -303,6 +312,9 @@ export function CityPulse() {
             >
               <span className="cp-scene-dot" /> {SCENES[scene].label}
               <span className="cp-scene-arrow">›</span>
+            </button>
+            <button type="button" className="cp-scene-btn cp-mono" onClick={watchFull} aria-label="Videoyu tam ekran izle" title="Tam ekran izle">
+              ⤢ İzle
             </button>
           </div>
         </div>
