@@ -192,7 +192,7 @@ export function CityPulse() {
         .cp-fx.clouds{background-image:radial-gradient(60% 42% at 28% 26%,rgba(255,255,255,.10),transparent 60%),radial-gradient(52% 36% at 76% 44%,rgba(255,255,255,.08),transparent 60%);
           filter:blur(3px);animation:cpDrift 26s ease-in-out infinite alternate}
         @keyframes cpDrift{to{transform:translateX(42px)}}
-        .cp-fx.clear.day{background-image:radial-gradient(38% 40% at 84% 10%,rgba(246,167,35,.22),transparent 62%);animation:cpGlow 6.5s ease-in-out infinite}
+        .cp-fx.clear.day{background-image:radial-gradient(38% 40% at 84% 10%,hsl(var(--primary) / .22),transparent 62%);animation:cpGlow 6.5s ease-in-out infinite}
         @keyframes cpGlow{0%,100%{opacity:.55}50%{opacity:1}}
         .cp-fx.clear.night{background-image:radial-gradient(1px 1px at 16% 22%,#fff,transparent),radial-gradient(1px 1px at 58% 14%,#fff,transparent),radial-gradient(1.4px 1.4px at 82% 30%,#fff,transparent),radial-gradient(1px 1px at 38% 40%,#fff,transparent);
           animation:cpTwinkle 3.4s ease-in-out infinite;opacity:.5}
@@ -206,8 +206,8 @@ export function CityPulse() {
         .cp-kick{font-family:ui-monospace,monospace;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:hsl(var(--primary));text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.5)}
         .cp-h1{font-weight:800;letter-spacing:-.02em;line-height:.94;text-transform:uppercase;
           font-size:clamp(38px,8vw,84px);margin:12px 0 0;text-shadow:0 2px 8px rgba(0,0,0,.65),0 1px 2px rgba(0,0,0,.75)}
-        .cp-h1 em{font-style:normal;color:#f6a723}
-        .cp-clock{font-family:ui-monospace,monospace;font-size:14px;color:#f6a723;letter-spacing:.08em;
+        .cp-h1 em{font-style:normal;color:hsl(var(--primary))}
+        .cp-clock{font-family:ui-monospace,monospace;font-size:14px;color:hsl(var(--primary));letter-spacing:.08em;
           border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 11px;background:#0c0e11;margin-top:6px}
         .cp-stats{margin-top:18px;font-family:ui-monospace,monospace;font-size:13.5px;color:#e6e8ea;display:flex;flex-wrap:wrap;gap:8px 22px;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.55)}
         .cp-stats b{color:#fff;font-weight:600}
@@ -216,12 +216,12 @@ export function CityPulse() {
         @keyframes cpRing{0%{box-shadow:0 0 0 0 hsl(var(--primary) / .55)}70%{box-shadow:0 0 0 9px hsl(var(--primary) / 0)}100%{box-shadow:0 0 0 0 hsl(var(--primary) / 0)}}
         .cp-cmd{display:flex;align-items:center;gap:12px;margin:24px 0 6px;border:1px solid rgba(255,255,255,.1);
           border-radius:12px;background:#0d0f12;padding:15px 18px;text-decoration:none;color:inherit;transition:border-color .15s}
-        .cp-cmd:hover{border-color:rgba(246,167,35,.5)}
+        .cp-cmd:hover{border-color:hsl(var(--primary) / .5)}
         .cp-cmd .q{flex:1;font-size:16px;color:#8b8f93}
         .cp-cmd .k{font-family:ui-monospace,monospace;font-size:11px;color:#5c6165;border:1px solid rgba(255,255,255,.1);border-radius:5px;padding:3px 7px}
         .cp-toggle{display:flex;font-family:ui-monospace,monospace;font-size:11px;border:1px solid rgba(255,255,255,.1);border-radius:999px;overflow:hidden}
         .cp-toggle button{padding:6px 13px;letter-spacing:.14em;color:#8b8f93;background:transparent;border:none;cursor:pointer;font-family:inherit;font-size:inherit}
-        .cp-toggle button.on{background:#f6a723;color:#1a1206;font-weight:700}
+        .cp-toggle button.on{background:hsl(var(--primary));color:#fff;font-weight:700}
         .cp-scene-btn{display:inline-flex;align-items:center;gap:7px;font-size:11px;letter-spacing:.04em;color:#c9ccce;
           border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:5px 11px;background:rgba(12,14,17,.72);
           backdrop-filter:blur(6px);cursor:pointer;transition:border-color .15s,color .15s}
@@ -231,14 +231,14 @@ export function CityPulse() {
         .cp.light .cp-scene-btn{color:#fff;background:rgba(12,14,17,.55);border-color:rgba(255,255,255,.18)}
         .cp-board{margin-top:24px;border:1px solid rgba(255,255,255,.09);border-radius:14px;overflow:hidden;background:#0f1114}
         .cp-grp{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;
-          padding:15px 18px 8px;color:#f6a723;display:flex;align-items:center;gap:9px}
+          padding:15px 18px 8px;color:hsl(var(--primary));display:flex;align-items:center;gap:9px}
         .cp-grp.now{color:hsl(var(--primary))}
         .cp-grp .rule{flex:1;height:1px;background:rgba(255,255,255,.08)}
         .cp-row{display:grid;grid-template-columns:76px 1fr 118px;gap:14px;align-items:center;padding:12px 18px;
           border-top:1px solid rgba(255,255,255,.05);text-decoration:none;color:inherit;transition:background .12s}
         .cp-row:hover{background:#161a1f}
         .cp-row.live{background:#122019}
-        .cp-t{font-family:ui-monospace,monospace;font-size:17px;color:#f6a723;font-weight:500}
+        .cp-t{font-family:ui-monospace,monospace;font-size:17px;color:hsl(var(--primary));font-weight:500}
         .cp-row.live .cp-t{color:hsl(var(--primary));font-size:13px}
         .cp-n{font-weight:600;font-size:15.5px;letter-spacing:-.01em}
         .cp-v{font-family:ui-monospace,monospace;font-size:12px;color:#8b8f93;margin-top:2px}
@@ -250,18 +250,18 @@ export function CityPulse() {
         /* AÇIK TEMA — hero FOTOGRAFİK kalır (canlı foto + koyu scrim + açık yazı),
            yalnız alttaki pano/kartlar kağıt zemine döner. Açık temada da hava
            fotosu net görünür; soluk peçe altında puslu/ucuz durmaz. */
-        .cp.light{background:#f4f2ec;color:#1a1c1e}
-        .cp.light .cp-bg{--bgop:1;filter:saturate(1.06) brightness(1.03)}
-        .cp.light .cp-bg::after{background:linear-gradient(to bottom,rgba(10,11,13,.26) 0%,rgba(10,11,13,.32) 82%,rgba(10,11,13,.34) 94%,rgba(244,242,236,.7) 99%,#f4f2ec 100%)}
+        /* Açık temada da hero fotografik/koyu kalır (video + koyu scrim, dark ile aynı);
+           böylece beyaz bant/yıkama olmaz. Yalnız pano beyaz KART olarak öne çıkar. */
+        .cp.light{background:#0a0b0d;color:#1a1c1e}
         .cp.light .cp-h1{color:#f5f3ee}
         .cp.light .cp-board{background:#fff;border-color:rgba(20,24,26,.1)}
-        .cp.light .cp-grp{color:#b9822a}
+        .cp.light .cp-grp{color:hsl(var(--primary))}
         .cp.light .cp-grp.now{color:hsl(var(--primary))}
         .cp.light .cp-grp .rule{background:rgba(20,24,26,.1)}
         .cp.light .cp-row{border-top-color:rgba(20,24,26,.07)}
         .cp.light .cp-row:hover{background:#f2f0e8}
         .cp.light .cp-row.live{background:#e2f5f0}
-        .cp.light .cp-t{color:#b9822a}
+        .cp.light .cp-t{color:hsl(var(--primary))}
         .cp.light .cp-row.live .cp-t{color:hsl(var(--primary))}
         .cp.light .cp-v{color:#5f6467}
         .cp.light .cp-tag{color:#5f6467;border-color:rgba(20,24,26,.12)}
@@ -294,7 +294,7 @@ export function CityPulse() {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10 }}>
             {wx && (
               <span className="cp-wx cp-mono">
-                <span className="cp-wx-dot" style={{ background: { clear: "#f6a723", clouds: "#9aa0a3", rain: "#4aa3d8", snow: "#e8f0f4" }[wx.cond] }} />
+                <span className="cp-wx-dot" style={{ background: { clear: "hsl(var(--primary))", clouds: "#9aa0a3", rain: "#4aa3d8", snow: "#e8f0f4" }[wx.cond] }} />
                 İstanbul · {wx.temp}° · {wx.label}
               </span>
             )}
@@ -326,7 +326,7 @@ export function CityPulse() {
         </div>
 
         <Link href="/kesfet" className="cp-cmd">
-          <span className="cp-mono" style={{ color: "#f6a723" }}>⌕</span>
+          <span className="cp-mono" style={{ color: "hsl(var(--primary))" }}>⌕</span>
           <span className="q">Bu gece ne yapsam? · Kadıköy'de atölye · hafta sonu tekne…</span>
           <span className="k">keşfet</span>
         </Link>
