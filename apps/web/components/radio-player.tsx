@@ -608,7 +608,8 @@ export function RadioPlayer() {
   return (
     <div
       ref={wrapRef}
-      className="fixed inset-x-0 top-16 z-40 border-b border-primary/25 bg-gradient-to-r from-[#0e9a8c]/20 via-background/88 to-[#22c9b8]/20 backdrop-blur-lg select-none"
+      className="fixed inset-x-0 top-16 z-40 border-b border-primary/25 backdrop-blur-lg select-none"
+      style={{ background: "linear-gradient(to right, hsl(var(--primary) / 0.16), hsl(var(--background) / 0.9) 50%, hsl(var(--primary) / 0.16))" }}
     >
       <div className="container relative">
         <div className="flex h-9 items-center gap-2.5">
