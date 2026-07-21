@@ -13,6 +13,15 @@ type LiveRow = { slug: string; title: string };
 const TR = "tr-TR";
 const IST = { timeZone: "Europe/Istanbul" } as const;
 
+// Arka planda dönen canlı sahneler (Pexels + kullanıcı klipleri, web'e uygun 720p).
+// Buton ile değiştirilebilir; otomatik de döner.
+const SCENES = [
+  { src: "/video/istanbul-bogaz-1.mp4", poster: "/img/hero/istanbul-bogaz-1.jpg", label: "İstanbul · Boğaz" },
+  { src: "/video/istanbul-bogaz-2.mp4", poster: "/img/hero/istanbul-bogaz-2.jpg", label: "İstanbul · Gün batımı" },
+  { src: "/video/assos.mp4", poster: "/img/hero/assos.jpg", label: "Ege · Kıyı" },
+  { src: "/video/kamp.mp4", poster: "/img/hero/kamp.jpg", label: "Doğa · Kamp" },
+];
+
 function hhmm(iso: string) {
   return new Date(iso).toLocaleTimeString(TR, { hour: "2-digit", minute: "2-digit", hour12: false, ...IST });
 }
@@ -46,10 +55,16 @@ export function CityPulse() {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  // Bazı tarayıcılar muted autoplay'i JS play() olmadan başlatmaz — nazik dürtü.
+  const [scene, setScene] = useState(0);
+  // otomatik slayt geçişi (14 sn); buton da değiştirir
+  useEffect(() => {
+    const t = setInterval(() => setScene((s) => (s + 1) % SCENES.length), 14000);
+    return () => clearInterval(t);
+  }, []);
+  // sahne değişince (ve mount'ta) videoyu oynat — muted autoplay dürtüsü
   useEffect(() => {
     videoRef.current?.play().catch(() => {});
-  }, []);
+  }, [scene]);
   useEffect(() => {
     setMounted(true);
     // Test/önizleme: ?hava=acik|bulut|yagmur|kar|gece → arka planı o havaya zorla
@@ -198,6 +213,13 @@ export function CityPulse() {
         .cp-toggle{display:flex;font-family:ui-monospace,monospace;font-size:11px;border:1px solid rgba(255,255,255,.1);border-radius:999px;overflow:hidden}
         .cp-toggle button{padding:6px 13px;letter-spacing:.14em;color:#8b8f93;background:transparent;border:none;cursor:pointer;font-family:inherit;font-size:inherit}
         .cp-toggle button.on{background:#f6a723;color:#1a1206;font-weight:700}
+        .cp-scene-btn{display:inline-flex;align-items:center;gap:7px;font-size:11px;letter-spacing:.04em;color:#c9ccce;
+          border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:5px 11px;background:rgba(12,14,17,.72);
+          backdrop-filter:blur(6px);cursor:pointer;transition:border-color .15s,color .15s}
+        .cp-scene-btn:hover{border-color:hsl(var(--primary) / .6);color:#fff}
+        .cp-scene-dot{width:6px;height:6px;border-radius:50%;background:hsl(var(--primary));box-shadow:0 0 0 3px hsl(var(--primary) / .18)}
+        .cp-scene-arrow{opacity:.6;font-size:14px;line-height:1}
+        .cp.light .cp-scene-btn{color:#fff;background:rgba(12,14,17,.55);border-color:rgba(255,255,255,.18)}
         .cp-board{margin-top:24px;border:1px solid rgba(255,255,255,.09);border-radius:14px;overflow:hidden;background:#0f1114}
         .cp-grp{font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;
           padding:15px 18px 8px;color:#f6a723;display:flex;align-items:center;gap:9px}
@@ -238,8 +260,9 @@ export function CityPulse() {
         .cp.light .cp-empty{color:#5f6467}
       `}</style>
 
-      <div className="cp-bg" aria-hidden style={{ backgroundImage: `url(${bgImg})` }}>
+      <div className="cp-bg" aria-hidden style={{ backgroundImage: `url(${SCENES[scene].poster}), url(${bgImg})` }}>
         <video
+          key={scene}
           ref={videoRef}
           className="cp-video"
           autoPlay
@@ -247,9 +270,9 @@ export function CityPulse() {
           loop
           playsInline
           preload="auto"
-          poster="/img/hero/istanbul-hero-poster.jpg"
+          poster={SCENES[scene].poster}
         >
-          <source src="/video/istanbul-hero.mp4" type="video/mp4" />
+          <source src={SCENES[scene].src} type="video/mp4" />
         </video>
       </div>
       {wx && <div className={`cp-fx ${wx.cond} ${visualDay ? "day" : "night"}`} aria-hidden />}
@@ -271,6 +294,16 @@ export function CityPulse() {
               <button className={mode === "gunduz" ? "on" : ""} onClick={() => setMode("gunduz")}>GÜNDÜZ</button>
               <button className={mode === "gece" ? "on" : ""} onClick={() => setMode("gece")}>GECE</button>
             </div>
+            <button
+              type="button"
+              className="cp-scene-btn cp-mono"
+              onClick={() => setScene((s) => (s + 1) % SCENES.length)}
+              aria-label="Arka plan sahnesini değiştir"
+              title="Arka planı değiştir"
+            >
+              <span className="cp-scene-dot" /> {SCENES[scene].label}
+              <span className="cp-scene-arrow">›</span>
+            </button>
           </div>
         </div>
 
