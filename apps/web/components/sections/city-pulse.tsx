@@ -170,13 +170,13 @@ export function CityPulse() {
       <style>{`
         .cp{position:relative;overflow:hidden;background:#0a0b0d;color:#eceae4;padding:clamp(72px,15vh,170px) 20px 44px;
           font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
-        .cp-bg{--bgop:.92;position:absolute;inset:0 0 auto 0;height:min(78vh,760px);background-position:center top;background-size:cover;background-repeat:no-repeat;opacity:var(--bgop);filter:contrast(1.06) saturate(1.06);animation:cpBgIn 1.1s ease both}
+        .cp-bg{--bgop:1;position:absolute;inset:0 0 auto 0;height:min(78vh,760px);background-position:center top;background-size:cover;background-repeat:no-repeat;opacity:var(--bgop);filter:saturate(1.06) brightness(1.06);animation:cpBgIn 1.1s ease both}
         @keyframes cpBgIn{from{opacity:0;transform:scale(1.05)}to{opacity:var(--bgop);transform:none}}
         /* foto belirgin: üst yarı açık; alt, panoya geçiş için koyu. + palet parıltısı */
         .cp-bg::after{content:'';position:absolute;inset:0;z-index:1;
           background:
-            radial-gradient(66% 52% at 84% 4%,hsl(var(--primary) / .18),transparent 60%),
-            linear-gradient(to bottom,rgba(10,11,13,.12) 0%,rgba(10,11,13,.28) 46%,rgba(10,11,13,.72) 74%,rgba(10,11,13,.95) 90%,#0a0b0d 100%)}
+            radial-gradient(66% 52% at 84% 4%,hsl(var(--primary) / .12),transparent 60%),
+            linear-gradient(to bottom,rgba(10,11,13,.03) 0%,rgba(10,11,13,.1) 44%,rgba(10,11,13,.4) 70%,rgba(10,11,13,.86) 88%,#0a0b0d 100%)}
         /* canlı İstanbul videosu — scrim'in (z-index:1) altında akar */
         .cp-video{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;object-position:center 42%}
         @media (prefers-reduced-motion:reduce){.cp-video{display:none}}
@@ -205,7 +205,7 @@ export function CityPulse() {
         .cp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
         .cp-kick{font-family:ui-monospace,monospace;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:hsl(var(--primary));text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.5)}
         .cp-h1{font-weight:800;letter-spacing:-.02em;line-height:.94;text-transform:uppercase;
-          font-size:clamp(38px,8vw,84px);margin:12px 0 0;text-shadow:0 2px 10px rgba(0,0,0,.55),0 1px 3px rgba(0,0,0,.6)}
+          font-size:clamp(38px,8vw,84px);margin:12px 0 0;text-shadow:0 2px 8px rgba(0,0,0,.65),0 1px 2px rgba(0,0,0,.75)}
         .cp-h1 em{font-style:normal;color:#f6a723}
         .cp-clock{font-family:ui-monospace,monospace;font-size:14px;color:#f6a723;letter-spacing:.08em;
           border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:6px 11px;background:#0c0e11;margin-top:6px}
