@@ -36,6 +36,7 @@ import { ContentModule } from './content/content.module';
 import { SmsModule } from './sms/sms.module';
 import { WhatsappModule } from './whatsapp/whatsapp.module';
 import { WeatherBgModule } from './weatherbg/weatherbg.module';
+import { RadioModule } from './radio/radio.module';
 
 @Module({
   imports: [
@@ -83,6 +84,7 @@ import { WeatherBgModule } from './weatherbg/weatherbg.module';
     SmsModule,
     WhatsappModule,
     WeatherBgModule,
+    RadioModule,
   ],
   controllers: [HealthController],
   providers: [

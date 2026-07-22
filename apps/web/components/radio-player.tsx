@@ -133,6 +133,7 @@ export function RadioPlayer() {
   const isAuth = !!pathname && /^\/(giris|kayit|sifremi-unuttum|sifre-sifirla|dogrula)(\/|$)/.test(pathname);
   const hidden = isAdmin || isAuth;
   const [current, setCurrent] = useState<Station>(FAVORITES[0]);
+  const [track, setTrack] = useState<string | null>(null); // "şu an çalan" (ICY metadata)
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -178,7 +179,26 @@ export function RadioPlayer() {
   const [searching, setSearching] = useState(false);
   const [openCat, setOpenCat] = useState<"genre" | "world" | null>("genre"); // açılır kategori
   const [mixBusy, setMixBusy] = useState(""); // yükleniyor olan mix etiketi
-  const [heroMix, setHeroMix] = useState<Mix | null>(null); // etkinliğe/güne göre dinamik hero mix
+  const [heroMix, setHeroMix] = useState<Mix | null>(null); // etkinliğe/güre göre dinamik hero mix
+
+  // "Şu an çalan" — çalarken ICY metadata proxy'sinden periyodik çek (yoksa null)
+  useEffect(() => {
+    setTrack(null);
+    if (!playing || !current.url) return;
+    const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001") + "/api/v1";
+    let alive = true;
+    const poll = async () => {
+      try {
+        const r = await fetch(`${API_BASE}/radio/now-playing?url=${encodeURIComponent(current.url)}`);
+        if (!r.ok) return;
+        const d = await r.json();
+        if (alive) setTrack(typeof d?.title === "string" && d.title.trim() ? d.title.trim() : null);
+      } catch { /* yoksay */ }
+    };
+    poll();
+    const t = setInterval(poll, 15000);
+    return () => { alive = false; clearInterval(t); };
+  }, [playing, current.url]);
 
   // Etkinlik sayfasında o etkinliğin müziği; ana sayfada bugünün öne çıkan etkinliği.
   useEffect(() => {
@@ -627,7 +647,9 @@ export function RadioPlayer() {
         <div className="flex min-w-0 items-center gap-2">
           <Radio className="hidden h-3.5 w-3.5 shrink-0 text-muted-foreground sm:block" />
           <span className="truncate text-xs font-medium text-foreground">{current.name}</span>
-          <span className="hidden truncate text-[11px] text-muted-foreground sm:inline">{current.tag}</span>
+          <span className="hidden truncate text-[11px] text-muted-foreground sm:inline">
+            {track ? <span className="text-foreground/90">♪ {track}</span> : current.tag}
+          </span>
           {playing ? <Eq /> : null}
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{playing ? "● canlı" : "radyo"}</span>
         </div>
