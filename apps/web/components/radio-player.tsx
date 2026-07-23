@@ -87,6 +87,7 @@ type Mix = { l: string; s: string; q: string; by: "name" | "tag"; hero?: boolean
 const MIXES: Mix[] = [
   { l: "BUGÜNE ÖZEL", s: "günün seçkisi · Türkçe rock", q: "eksen", by: "name", hero: true, Icon: Sparkles, color: "#22c9b8" },
   { l: "AI IRIE FM", s: "reggae · chill vibe", q: "reggae", by: "tag", Icon: Music2, color: "#22C55E" },
+  { l: "GREEK", s: "laiko · pop · en iyiler", q: "greek music", by: "tag", Icon: Music2, color: "#2F6FED" },
   { l: "Türkçe Pop", s: "hit & yeni", q: "power türk", by: "name", Icon: Music2, color: "#EC4899" },
   { l: "Rock", s: "yabancı rock klasikleri", q: "rock", by: "tag", Icon: Guitar, color: "#F97316" },
   { l: "Slow · Akşam", s: "sakin, ateş başı", q: "slow türk", by: "name", Icon: Moon, color: "#60A5FA" },
