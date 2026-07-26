@@ -666,3 +666,37 @@ model Notification {
   createdAt DateTime @default(now())
   @@index([userId, read, createdAt])
 }
+
+enum CollectionStatus {
+  DRAFT
+  PUBLISHED
+}
+
+// Ana sayfadaki video koleksiyonları ("Pazar collection'ları" gibi) — admin'den yönetilir.
+model Collection {
+  id        String           @id @default(cuid())
+  slug      String           @unique
+  title     String
+  subtitle  String?
+  status    CollectionStatus @default(DRAFT)
+  sort      Int              @default(0)
+  items     CollectionItem[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  @@index([status, sort])
+}
+
+// Koleksiyondaki tek video. URL yapıştırılır; başlık/kanal/kapak oEmbed ile doldurulur.
+model CollectionItem {
+  id           String     @id @default(cuid())
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  url          String
+  videoId      String
+  title        String
+  author       String?
+  thumbUrl     String?
+  sort         Int        @default(0)
+  createdAt    DateTime   @default(now())
+  @@index([collectionId, sort])
+}

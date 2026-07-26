@@ -289,6 +289,33 @@ export function RadioPlayer() {
     return () => document.removeEventListener("visibilitychange", onVis);
   }, []);
 
+  // Sitede video açılınca (koleksiyon oynatıcısı) radyo sussun; video kapanınca
+  // yalnızca zaten çalıyorsa kaldığı istasyondan devam etsin.
+  useEffect(() => {
+    let wasPlaying = false;
+    const onPause = () => {
+      wasPlaying = wantRef.current;
+      if (!wantRef.current) return;
+      wantRef.current = false;
+      if (reconnectRef.current) { clearTimeout(reconnectRef.current); reconnectRef.current = null; }
+      clearStall();
+      audioRef.current?.pause();
+      setPlaying(false);
+      setLoading(false);
+    };
+    const onResume = () => {
+      if (!wasPlaying) return;
+      wasPlaying = false;
+      startPlaying(curRef.current);
+    };
+    window.addEventListener("luca:radio-pause", onPause);
+    window.addEventListener("luca:radio-resume", onResume);
+    return () => {
+      window.removeEventListener("luca:radio-pause", onPause);
+      window.removeEventListener("luca:radio-resume", onResume);
+    };
+  }, []);
+
   function clearStall() {
     if (stallRef.current) { clearTimeout(stallRef.current); stallRef.current = null; }
   }

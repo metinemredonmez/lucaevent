@@ -20,6 +20,7 @@
     "db:seed": "ts-node prisma/seed.ts",
     "import:events": "ts-node prisma/import-luca-events.ts",
     "seed:adada": "ts-node prisma/seed-adada.ts",
+    "seed:collections": "ts-node prisma/seed-collections.ts",
     "clean:demo": "ts-node prisma/clean-demo.ts"
   },
   "prisma": {

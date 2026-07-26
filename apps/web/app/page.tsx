@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Nav } from "@/components/nav";
 import { CityPulse } from "@/components/sections/city-pulse";
+import { Collections } from "@/components/sections/collections";
 import { Categories } from "@/components/sections/categories";
 import { Showcase } from "@/components/sections/showcase";
 import { Family } from "@/components/sections/family";
@@ -20,6 +21,8 @@ export default function HomePage() {
       <main className="pt-16">
         {/* "Şehrin Nabzı" — zaman eksenli canlı etkinlik panosu (yeni kimlik, hero + event listeleri yerine) */}
         <CityPulse />
+        {/* Admin'den yönetilen video koleksiyonları — panonun hemen altında */}
+        <Collections />
         <Categories active={filter} onSelect={setFilter} />
         <Showcase />
         <Family />
