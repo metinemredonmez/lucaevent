@@ -308,11 +308,19 @@ export function RadioPlayer() {
       wasPlaying = false;
       startPlaying(curRef.current);
     };
+    // Dışarıdan (ör. koleksiyon bandı "Radyoyu aç") radyoyu başlat: şeridi göster + çal.
+    const onOpen = () => {
+      setCollapsed(false);
+      setOpen(true);
+      startPlaying(curRef.current);
+    };
     window.addEventListener("luca:radio-pause", onPause);
     window.addEventListener("luca:radio-resume", onResume);
+    window.addEventListener("luca:radio-open", onOpen);
     return () => {
       window.removeEventListener("luca:radio-pause", onPause);
       window.removeEventListener("luca:radio-resume", onResume);
+      window.removeEventListener("luca:radio-open", onOpen);
     };
   }, []);
 

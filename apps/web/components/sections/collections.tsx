@@ -52,6 +52,9 @@ export function Collections() {
               return <CinemaRail key={c.id} collection={c} onOpen={onOpen} />;
           }
         })}
+        <div className="container">
+          <SonicBanner />
+        </div>
       </section>
 
       {playing && (
@@ -153,18 +156,87 @@ function useRail(itemCount: number) {
   return { edge, scrollBy, handlers, wasDrag };
 }
 
-// Başlık sağındaki müzik equalizer'ı — Luca'ya özel, primary rengiyle ritimle zıplar.
+// Koleksiyonların altındaki tam genişlik sinematik radyo bandı — dönen aurora + akan ses
+// dalgaları + dev equalizer. "Radyoyu aç" sayfadaki radyo çalarını başlatır (luca:radio-open).
+function SonicBanner() {
+  const bars = ["-.9s", "-.3s", "-.6s", "-.1s", "-.7s", "-.4s", "-.8s"];
+  return (
+    <div
+      className="relative flex min-h-[280px] items-center overflow-hidden rounded-2xl md:min-h-[320px] md:rounded-3xl"
+      style={{
+        background:
+          "radial-gradient(120% 140% at 15% 20%, hsl(var(--primary) / 0.20), #0a0f14 55%, #08090c 100%)",
+      }}
+    >
+      <div
+        className="luca-aurora pointer-events-none absolute -inset-x-[10%] -inset-y-[45%] opacity-30 blur-[70px]"
+        style={{
+          background:
+            "conic-gradient(from 180deg at 50% 50%, hsl(var(--primary)), #22c9b8, #185FA5, hsl(var(--primary)))",
+        }}
+      />
+      <svg
+        className="pointer-events-none absolute bottom-0 left-0 h-[70%] w-[200%]"
+        viewBox="0 0 800 140"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path className="luca-wave-1" fill="none" strokeWidth="2" stroke="hsl(var(--primary))" style={{ opacity: 0.5 }} d="M0 90 Q 50 40 100 90 T 200 90 T 300 90 T 400 90 T 500 90 T 600 90 T 700 90 T 800 90" />
+        <path className="luca-wave-2" fill="none" strokeWidth="2" stroke="#185FA5" style={{ opacity: 0.35 }} d="M0 100 Q 60 55 120 100 T 240 100 T 360 100 T 480 100 T 600 100 T 720 100 T 840 100" />
+        <path className="luca-wave-3" fill="none" strokeWidth="1.5" stroke="#5DCAA5" style={{ opacity: 0.3 }} d="M0 80 Q 40 110 80 80 T 160 80 T 240 80 T 320 80 T 400 80 T 480 80 T 560 80 T 640 80 T 720 80 T 800 80" />
+      </svg>
+
+      <div className="relative z-10 max-w-xl px-6 py-10 sm:px-10">
+        <div className="inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.24em] text-primary">
+          <span className="luca-live-dot size-[7px] rounded-full bg-[#22c9b8]" /> CANLI FREKANS · LUCA RADYO
+        </div>
+        <h3 className="mt-3 font-serif text-3xl font-semibold text-white sm:text-4xl">
+          Şehrin frekansı, tek akışta.
+        </h3>
+        <p className="mt-2 max-w-md text-sm text-white/70">
+          Koleksiyonlar bitmez — house, chill, new age ve daha fazlası Luca radyoda kesintisiz çalar.
+        </p>
+        <button
+          onClick={() => window.dispatchEvent(new Event("luca:radio-open"))}
+          className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
+        >
+          <Play className="size-4 fill-current" /> Radyoyu aç
+        </button>
+      </div>
+
+      <div className="pointer-events-none absolute right-[6%] top-1/2 hidden h-20 -translate-y-1/2 items-end gap-1.5 md:flex">
+        {bars.map((d, i) => (
+          <span
+            key={i}
+            className="luca-eq-bar h-full w-2 rounded-full bg-gradient-to-t from-primary to-[#22c9b8]"
+            style={{ animationDelay: d }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Başlık sağındaki "canlı radyo" rozeti — zıplayan çubuklar + LUCA RADYO yazısı, çerçeveli.
 function Equalizer() {
   const delays = ["-0.9s", "-0.5s", "-0.2s", "-0.7s", "-0.4s"];
   return (
-    <span aria-hidden className="hidden h-6 shrink-0 items-end gap-[3px] sm:flex">
-      {delays.map((d, i) => (
-        <span
-          key={i}
-          className="luca-eq-bar h-full w-[3px] rounded-full bg-primary/80"
-          style={{ animationDelay: d }}
-        />
-      ))}
+    <span
+      aria-hidden
+      className="hidden shrink-0 items-center gap-2.5 rounded-full border border-primary/25 bg-primary/5 px-3.5 py-2 sm:inline-flex"
+    >
+      <span className="flex h-4 items-end gap-[3px]">
+        {delays.map((d, i) => (
+          <span
+            key={i}
+            className="luca-eq-bar h-full w-[3px] rounded-full bg-primary"
+            style={{ animationDelay: d }}
+          />
+        ))}
+      </span>
+      <span className="font-mono text-[10px] font-medium tracking-[0.2em] text-primary/90">
+        LUCA RADYO
+      </span>
     </span>
   );
 }

@@ -122,4 +122,24 @@
       transform: scaleY(0.6);
     }
   }
+  /* Sinematik radyo bandı — dönen aurora + akan ses dalgaları */
+  @keyframes luca-aurora {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes luca-wave {
+    to { transform: translateX(-25%); }
+  }
+  @keyframes luca-live-ping {
+    to { box-shadow: 0 0 0 10px rgba(34, 201, 184, 0); }
+  }
+  .luca-aurora { animation: luca-aurora 16s linear infinite; }
+  .luca-wave-1 { animation: luca-wave 7s linear infinite; }
+  .luca-wave-2 { animation: luca-wave 11s linear infinite reverse; }
+  .luca-wave-3 { animation: luca-wave 9s linear infinite; }
+  .luca-live-dot { animation: luca-live-ping 1.6s ease-out infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    .luca-aurora, .luca-wave-1, .luca-wave-2, .luca-wave-3, .luca-live-dot {
+      animation: none;
+    }
+  }
 }
