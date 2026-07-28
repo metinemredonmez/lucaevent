@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
+import Image from "next/image";
 import { discoverEvents, getLiveEvents, getCommunityCount, type DiscoverEvent } from "@/lib/events";
 
 // "Şehrin Nabzı" — İstanbul etkinliklerinin canlı kalkış-panosu (departures board).
@@ -246,7 +247,25 @@ export function CityPulse() {
           border:1px solid rgba(255,255,255,.1);color:#8b8f93;justify-self:end;white-space:nowrap}
         .cp-tag.luca{color:hsl(var(--primary));border-color:hsl(var(--primary) / .35)}
         .cp-empty{padding:34px 18px;text-align:center;color:#8b8f93;font-family:ui-monospace,monospace;font-size:13px}
-        @media (max-width:640px){.cp-row{grid-template-columns:60px 1fr auto}.cp-tag{display:none}.cp-h1{font-size:40px}}
+        /* zengin etkinlik satırı — kapak + kategori + açıklama + saat/mekan + detay */
+        .cp-erow{display:grid;grid-template-columns:104px 1fr auto;gap:14px;align-items:center;padding:13px 18px;
+          border-top:1px solid rgba(255,255,255,.05);text-decoration:none;color:inherit;transition:background .12s}
+        .cp-erow:hover{background:#161a1f}
+        .cp-cov{position:relative;width:104px;height:66px;border-radius:9px;overflow:hidden;background:#161a1f}
+        .cp-cov-ph{position:absolute;inset:0;z-index:0}
+        .cp-cat{position:absolute;left:6px;bottom:6px;z-index:2;font-family:ui-monospace,monospace;font-size:9px;
+          letter-spacing:.05em;text-transform:uppercase;background:rgba(0,0,0,.6);color:#fff;padding:2px 7px;border-radius:20px}
+        .cp-day{position:absolute;top:6px;right:6px;z-index:2;font-family:ui-monospace,monospace;font-size:10px;
+          color:#fff;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:5px}
+        .cp-e-body{min-width:0}
+        .cp-tl{font-size:12.5px;color:#9aa0a3;margin-top:3px;line-height:1.35;overflow:hidden;
+          display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}
+        .cp-meta{font-family:ui-monospace,monospace;font-size:11px;color:#7f8587;margin-top:5px;display:flex;gap:14px;flex-wrap:wrap}
+        .cp-go{font-size:12px;color:hsl(var(--primary));border:1px solid hsl(var(--primary) / .35);
+          border-radius:20px;padding:6px 13px;white-space:nowrap;transition:background .12s}
+        .cp-erow:hover .cp-go{background:hsl(var(--primary) / .12)}
+        @media (max-width:640px){.cp-row{grid-template-columns:60px 1fr auto}.cp-tag{display:none}.cp-h1{font-size:40px}
+          .cp-erow{grid-template-columns:76px 1fr;gap:12px}.cp-go{display:none}.cp-cov{width:76px;height:50px}.cp-tl{display:none}}
         /* AÇIK TEMA — hero FOTOGRAFİK kalır (canlı foto + koyu scrim + açık yazı),
            yalnız alttaki pano/kartlar kağıt zemine döner. Açık temada da hava
            fotosu net görünür; soluk peçe altında puslu/ucuz durmaz. */
@@ -272,6 +291,11 @@ export function CityPulse() {
         .cp.light .cp-tag{color:#5f6467;border-color:rgba(20,24,26,.12)}
         .cp.light .cp-tag.luca{color:hsl(var(--primary));border-color:hsl(var(--primary) / .35)}
         .cp.light .cp-empty{color:#5f6467}
+        .cp.light .cp-erow{border-top-color:rgba(20,24,26,.07)}
+        .cp.light .cp-erow:hover{background:#f2f0e8}
+        .cp.light .cp-cov{background:#e6e3da}
+        .cp.light .cp-tl{color:#5f6467}
+        .cp.light .cp-meta{color:#8a8f92}
       `}</style>
 
       <div className="cp-bg" aria-hidden style={{ backgroundImage: `url(${SCENES[scene].poster}), url(${bgImg})` }}>
@@ -371,19 +395,32 @@ function BoardGroup({ label, events, showDay }: { label: string; events: Discove
   return (
     <>
       <div className="cp-grp">{label} <span className="rule" /></div>
-      {events.map((e) => (
-        <Link key={e.slug} href={`/etkinlik/${e.slug}`} className="cp-row">
-          <span className="cp-t">{showDay ? wd(e.startsAt) : hhmm(e.startsAt)}</span>
-          <div>
-            <div className="cp-n">{e.title}</div>
-            <div className="cp-v">
-              {showDay ? `${hhmm(e.startsAt)} · ` : ""}
-              {e.venue?.name ?? e.category?.name ?? "İstanbul"}
+      {events.map((e) => {
+        // kapak yoksa kategori rengine dayalı gradyan placeholder
+        const c = e.category?.color || "#0e9a8c";
+        return (
+          <Link key={e.slug} href={`/etkinlik/${e.slug}`} className="cp-erow">
+            <span className="cp-cov">
+              {e.coverUrl ? (
+                <Image src={e.coverUrl} alt={e.title} fill sizes="104px" className="object-cover" />
+              ) : (
+                <span className="cp-cov-ph" style={{ background: `linear-gradient(135deg, ${c}, ${c}66)` }} />
+              )}
+              {e.category?.name && <span className="cp-cat">{e.category.name}</span>}
+              {showDay && <span className="cp-day">{wd(e.startsAt)}</span>}
+            </span>
+            <div className="cp-e-body">
+              <div className="cp-n">{e.title}</div>
+              {e.tagline && <div className="cp-tl">{e.tagline}</div>}
+              <div className="cp-meta">
+                <span>{hhmm(e.startsAt)}</span>
+                <span>{e.venue?.name ?? e.category?.name ?? "İstanbul"}</span>
+              </div>
             </div>
-          </div>
-          <span className="cp-tag luca">Luca</span>
-        </Link>
-      ))}
+            <span className="cp-go">Detay →</span>
+          </Link>
+        );
+      })}
     </>
   );
 }
