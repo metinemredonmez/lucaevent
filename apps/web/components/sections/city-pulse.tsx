@@ -252,7 +252,12 @@ export function CityPulse() {
            fotosu net görünür; soluk peçe altında puslu/ucuz durmaz. */
         /* Açık temada da hero fotografik/koyu kalır (video + koyu scrim, dark ile aynı);
            böylece beyaz bant/yıkama olmaz. Yalnız pano beyaz KART olarak öne çıkar. */
-        .cp.light{background:#0a0b0d;color:#1a1c1e}
+        .cp.light{background:#f8f6f0;color:#1a1c1e}
+        /* Açık temada foto üstte net/koyu kalır ama alt, koyu yerine kağıt zemine geçer —
+           böylece pano/kartın altında siyah bant kalmaz. */
+        .cp.light .cp-bg::after{background:
+          radial-gradient(66% 52% at 84% 4%,hsl(var(--primary) / .12),transparent 60%),
+          linear-gradient(to bottom,rgba(10,11,13,.02) 0%,rgba(10,11,13,.06) 40%,rgba(248,246,240,.35) 70%,rgba(248,246,240,.86) 88%,#f8f6f0 100%)}
         .cp.light .cp-h1{color:#f5f3ee}
         .cp.light .cp-board{background:#fff;border-color:rgba(20,24,26,.1)}
         .cp.light .cp-grp{color:hsl(var(--primary))}
