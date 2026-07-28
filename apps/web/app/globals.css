@@ -107,4 +107,19 @@
       0 0 16px rgba(168, 85, 247, 0.32),
       0 0 40px rgba(168, 85, 247, 0.16);
   }
+  /* Koleksiyon başlıklarının sağındaki müzik equalizer'ı — ritimle zıplayan çubuklar */
+  @keyframes luca-eq {
+    0%, 100% { transform: scaleY(0.22); }
+    50% { transform: scaleY(1); }
+  }
+  .luca-eq-bar {
+    transform-origin: bottom;
+    animation: luca-eq 1s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .luca-eq-bar {
+      animation: none;
+      transform: scaleY(0.6);
+    }
+  }
 }

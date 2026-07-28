@@ -153,6 +153,22 @@ function useRail(itemCount: number) {
   return { edge, scrollBy, handlers, wasDrag };
 }
 
+// Başlık sağındaki müzik equalizer'ı — Luca'ya özel, primary rengiyle ritimle zıplar.
+function Equalizer() {
+  const delays = ["-0.9s", "-0.5s", "-0.2s", "-0.7s", "-0.4s"];
+  return (
+    <span aria-hidden className="hidden h-6 shrink-0 items-end gap-[3px] sm:flex">
+      {delays.map((d, i) => (
+        <span
+          key={i}
+          className="luca-eq-bar h-full w-[3px] rounded-full bg-primary/80"
+          style={{ animationDelay: d }}
+        />
+      ))}
+    </span>
+  );
+}
+
 function Arrows({ edge, scrollBy }: { edge: { start: boolean; end: boolean }; scrollBy: (d: number) => void }) {
   return (
     <div className="hidden shrink-0 items-center gap-1.5 sm:flex">
@@ -195,7 +211,10 @@ function CinemaRail({ collection, onOpen }: { collection: Collection; onOpen: Op
             <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{collection.subtitle}</p>
           )}
         </div>
-        <Arrows edge={edge} scrollBy={scrollBy} />
+        <div className="flex shrink-0 items-center gap-4">
+          <Equalizer />
+          <Arrows edge={edge} scrollBy={scrollBy} />
+        </div>
       </div>
       <div {...handlers} className={`${railClass} gap-4`}>
         {collection.items.map((item, i) => (
@@ -234,7 +253,10 @@ function NumberedRail({ collection, onOpen }: { collection: Collection; onOpen: 
             <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{collection.subtitle}</p>
           )}
         </div>
-        <Arrows edge={edge} scrollBy={scrollBy} />
+        <div className="flex shrink-0 items-center gap-4">
+          <Equalizer />
+          <Arrows edge={edge} scrollBy={scrollBy} />
+        </div>
       </div>
       <div {...handlers} className={`${railClass} items-center gap-5`}>
         {collection.items.map((item, i) => (
@@ -269,14 +291,17 @@ function PosterRail({ collection, onOpen }: { collection: Collection; onOpen: Op
   const { handlers, wasDrag } = useRail(collection.items.length);
   return (
     <div className="container">
-      <div className="mb-5 text-center">
-        <div className="text-[11px] font-mono tracking-[0.22em] text-primary/70">COLLECTION</div>
-        <h2 className="mt-1 font-serif text-2xl font-semibold tracking-tight md:text-3xl">
-          {collection.title}
-        </h2>
-        {collection.subtitle && (
-          <p className="mx-auto mt-1 max-w-xl text-sm text-muted-foreground">{collection.subtitle}</p>
-        )}
+      <div className="mb-5 flex items-end justify-between gap-4">
+        <div className="min-w-0">
+          <div className="text-[11px] font-mono tracking-[0.22em] text-primary/70">COLLECTION</div>
+          <h2 className="mt-1 font-serif text-2xl font-semibold tracking-tight md:text-3xl">
+            {collection.title}
+          </h2>
+          {collection.subtitle && (
+            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{collection.subtitle}</p>
+          )}
+        </div>
+        <Equalizer />
       </div>
       <div {...handlers} className={`${railClass} gap-3`}>
         {collection.items.map((item, i) => (
@@ -305,16 +330,19 @@ function FeaturedGrid({ collection, onOpen }: { collection: Collection; onOpen: 
   const noDrag = () => false;
   return (
     <div className="container">
-      <div className="mb-5">
-        <div className="inline-flex items-center gap-2 text-[11px] font-mono tracking-[0.22em] text-primary/70">
-          <span className="size-1.5 rounded-full bg-primary" /> BUGÜN · COLLECTION
+      <div className="mb-5 flex items-end justify-between gap-4">
+        <div className="min-w-0">
+          <div className="inline-flex items-center gap-2 text-[11px] font-mono tracking-[0.22em] text-primary/70">
+            <span className="size-1.5 rounded-full bg-primary" /> BUGÜN · COLLECTION
+          </div>
+          <h2 className="mt-1 font-serif text-2xl font-semibold tracking-tight md:text-3xl">
+            {collection.title}
+          </h2>
+          {collection.subtitle && (
+            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{collection.subtitle}</p>
+          )}
         </div>
-        <h2 className="mt-1 font-serif text-2xl font-semibold tracking-tight md:text-3xl">
-          {collection.title}
-        </h2>
-        {collection.subtitle && (
-          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{collection.subtitle}</p>
-        )}
+        <Equalizer />
       </div>
       <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
         <PlayCard
