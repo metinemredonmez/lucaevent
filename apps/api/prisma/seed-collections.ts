@@ -96,6 +96,45 @@ const COLLECTIONS: Seed[] = [
       'https://www.youtube.com/watch?v=kJQP7kiw5Fk',
     ],
   },
+  {
+    slug: 'deep-house',
+    title: 'Deep House',
+    subtitle: 'Rooftop sunset setleri — deep, melodic',
+    layout: 'cinema',
+    urls: [
+      'https://www.youtube.com/watch?v=6tJ3jin46SI',
+      'https://www.youtube.com/watch?v=UQE72BnsD9I',
+      'https://www.youtube.com/watch?v=hVybBCmbWIQ',
+      'https://www.youtube.com/watch?v=M3y5BRFdOa8',
+      'https://www.youtube.com/watch?v=yWLM2gXA1iY',
+    ],
+  },
+  {
+    slug: 'chill',
+    title: 'Chill',
+    subtitle: 'Chillout lounge — sakin yaz akşamı',
+    layout: 'featured',
+    urls: [
+      'https://www.youtube.com/watch?v=l8pvzTacz4E',
+      'https://www.youtube.com/watch?v=cq2Ef6rvL6g',
+      'https://www.youtube.com/watch?v=dHPePtU0g-c',
+      'https://www.youtube.com/watch?v=E4xZhOMkNTQ',
+      'https://www.youtube.com/watch?v=RadEGtZ5R6Q',
+    ],
+  },
+  {
+    slug: 'new-age',
+    title: 'New Age',
+    subtitle: 'Ambient ve meditasyon — huzur',
+    layout: 'poster',
+    urls: [
+      'https://www.youtube.com/watch?v=iCund1HH0TY',
+      'https://www.youtube.com/watch?v=BXbsO8exZns',
+      'https://www.youtube.com/watch?v=aR-7IdBmtVo',
+      'https://www.youtube.com/watch?v=78w8bIMohBo',
+      'https://www.youtube.com/watch?v=r405RtlPNK8',
+    ],
+  },
 ];
 
 /** oEmbed — anahtarsız; ulaşılamazsa başlık video id'ye düşer. */
