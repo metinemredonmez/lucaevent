@@ -510,6 +510,7 @@ function GeniePlayer({
   onClose: () => void;
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [index, setIndex] = useState(startIndex);
   const [phase, setPhase] = useState<"opening" | "open" | "closing">("opening");
   const [scrim, setScrim] = useState(0);
@@ -596,6 +597,33 @@ function GeniePlayer({
     return () => window.removeEventListener("keydown", onKey);
   }, [close, step]);
 
+  // YouTube iframe API (postMessage): video bitince (onStateChange info=0) otomatik
+  // sıradaki videoya geç — koleksiyon playlist gibi sırayla çalar.
+  useEffect(() => {
+    const onMsg = (e: MessageEvent) => {
+      if (typeof e.data !== "string" || !e.origin.includes("youtube")) return;
+      try {
+        const d = JSON.parse(e.data);
+        if (d.event === "onStateChange" && d.info === 0) step(1);
+      } catch {
+        /* youtube dışı mesaj — yoksay */
+      }
+    };
+    window.addEventListener("message", onMsg);
+    return () => window.removeEventListener("message", onMsg);
+  }, [step]);
+
+  // iframe yüklenince YouTube'a durum olaylarını dinlemek istediğimizi bildir.
+  function onIframeLoad() {
+    const w = iframeRef.current?.contentWindow;
+    if (!w) return;
+    w.postMessage(JSON.stringify({ event: "listening" }), "*");
+    w.postMessage(
+      JSON.stringify({ event: "command", func: "addEventListener", args: ["onStateChange"] }),
+      "*",
+    );
+  }
+
   if (!item) return null;
 
   return (
@@ -638,7 +666,9 @@ function GeniePlayer({
           {phase === "open" && (
             <iframe
               key={item.videoId}
-              src={`https://www.youtube-nocookie.com/embed/${item.videoId}?autoplay=1&rel=0&modestbranding=1`}
+              ref={iframeRef}
+              onLoad={onIframeLoad}
+              src={`https://www.youtube-nocookie.com/embed/${item.videoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1&origin=${typeof window !== "undefined" ? encodeURIComponent(window.location.origin) : ""}`}
               title={item.title}
               allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
