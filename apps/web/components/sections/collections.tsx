@@ -1,14 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Play, X } from "lucide-react";
 import { getCollections, type Collection, type CollectionItem } from "@/lib/collections";
 
-// Ana sayfa video koleksiyonları — yatay şerit (sürükle/kaydır), tıklayınca modal oynatıcı.
-// İçerik tamamen admin panelinden yönetilir (/admin/collections); veri yoksa hiç render etmez.
+// Ana sayfa video koleksiyonları — yatay şerit (sürükle/kaydır), tıklayınca genie geçişiyle
+// büyük oynatıcı. İçerik tamamen admin panelinden yönetilir (/admin/collections);
+// veri yoksa hiç render etmez.
 
-type Playing = { collection: Collection; index: number };
+type Playing = { collection: Collection; index: number; origin: DOMRect };
 
 export function Collections() {
   const [rows, setRows] = useState<Collection[]>([]);
@@ -18,41 +19,7 @@ export function Collections() {
     getCollections().then(setRows);
   }, []);
 
-  // Modal açıkken sayfa kaymasın; radyo çalıyorsa sussun (kapanınca kaldığı yerden devam eder).
-  useEffect(() => {
-    if (!playing) return;
-    window.dispatchEvent(new Event("luca:radio-pause"));
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-      window.dispatchEvent(new Event("luca:radio-resume"));
-    };
-  }, [playing]);
-
-  const close = useCallback(() => setPlaying(null), []);
-  const step = useCallback((d: number) => {
-    setPlaying((p) => {
-      if (!p) return p;
-      const n = p.collection.items.length;
-      return { ...p, index: (p.index + d + n) % n };
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!playing) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
-      else if (e.key === "ArrowRight") step(1);
-      else if (e.key === "ArrowLeft") step(-1);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [playing, close, step]);
-
   if (rows.length === 0) return null;
-
-  const current = playing?.collection.items[playing.index];
 
   return (
     <>
@@ -61,71 +28,226 @@ export function Collections() {
           <CollectionRail
             key={c.id}
             collection={c}
-            onPlay={(i) => setPlaying({ collection: c, index: i })}
+            onPlay={(i, origin) => setPlaying({ collection: c, index: i, origin })}
           />
         ))}
       </section>
 
-      {playing && current && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={current.title}
-          onClick={close}
-          className="fixed inset-0 z-[120] flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
-        >
-          <div onClick={(e) => e.stopPropagation()} className="w-full max-w-4xl">
-            <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/10 bg-black">
-              <iframe
-                key={current.videoId}
-                src={`https://www.youtube-nocookie.com/embed/${current.videoId}?autoplay=1&rel=0&modestbranding=1`}
-                title={current.title}
-                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="absolute inset-0 size-full"
-              />
-            </div>
-
-            <div className="mt-3 flex items-start gap-3">
-              <div className="min-w-0 flex-1">
-                <div className="truncate font-serif text-base font-semibold text-white sm:text-lg">
-                  {current.title}
-                </div>
-                <div className="mt-0.5 truncate text-xs text-white/60">
-                  {playing.collection.title} · {playing.index + 1} / {playing.collection.items.length}
-                  {current.author ? ` · ${current.author}` : ""}
-                </div>
-              </div>
-              {playing.collection.items.length > 1 && (
-                <div className="flex shrink-0 items-center gap-1.5">
-                  <button
-                    onClick={() => step(-1)}
-                    aria-label="Önceki video"
-                    className="grid size-9 place-items-center rounded-full border border-white/20 text-white/80 transition hover:bg-white/10"
-                  >
-                    <ChevronLeft className="size-4" />
-                  </button>
-                  <button
-                    onClick={() => step(1)}
-                    aria-label="Sonraki video"
-                    className="grid size-9 place-items-center rounded-full border border-white/20 text-white/80 transition hover:bg-white/10"
-                  >
-                    <ChevronRight className="size-4" />
-                  </button>
-                </div>
-              )}
-              <button
-                onClick={close}
-                aria-label="Kapat"
-                className="grid size-9 shrink-0 place-items-center rounded-full border border-white/20 text-white/80 transition hover:bg-white/10"
-              >
-                <X className="size-4" />
-              </button>
-            </div>
-          </div>
-        </div>
+      {playing && (
+        <GeniePlayer
+          collection={playing.collection}
+          startIndex={playing.index}
+          origin={playing.origin}
+          onClose={() => setPlaying(null)}
+        />
       )}
     </>
+  );
+}
+
+// Kartın konumundan büyüyerek açılan, kapanınca aynı konuma inen (mac genie) oynatıcı.
+// FLIP: modal içindeki büyük kutunun son konumu ölçülür, kartın rect'inden oraya
+// scale+translate ile geçilir. Büyüme/küçülme sırasında iframe yerine kapak gösterilir
+// (iframe scale altında bozulur); animasyon bitince iframe yüklenir.
+function GeniePlayer({
+  collection,
+  startIndex,
+  origin,
+  onClose,
+}: {
+  collection: Collection;
+  startIndex: number;
+  origin: DOMRect;
+  onClose: () => void;
+}) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [index, setIndex] = useState(startIndex);
+  const [phase, setPhase] = useState<"opening" | "open" | "closing">("opening");
+  const [scrim, setScrim] = useState(0);
+  const item = collection.items[index];
+
+  // Radyo çalıyorsa sustur; sayfa kaymasın. Kapanışta geri aç.
+  useEffect(() => {
+    window.dispatchEvent(new Event("luca:radio-pause"));
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+      window.dispatchEvent(new Event("luca:radio-resume"));
+    };
+  }, []);
+
+  // Açılış genie'si — kart rect'inden büyük kutunun son konumuna FLIP.
+  useLayoutEffect(() => {
+    const box = boxRef.current;
+    if (!box) return;
+    const target = box.getBoundingClientRect();
+    const sx = origin.width / target.width;
+    const sy = origin.height / target.height;
+    const tx = origin.left - target.left;
+    const ty = origin.top - target.top;
+    box.style.transformOrigin = "top left";
+    box.style.transition = "none";
+    box.style.transform = `translate(${tx}px, ${ty}px) scale(${sx}, ${sy})`;
+    box.style.opacity = "1";
+    // iki rAF: başlangıç transform'u boyansın, sonra hedefe geçiş kurulsun
+    const id = requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        box.style.transition =
+          "transform 0.42s cubic-bezier(0.34, 1.2, 0.5, 1), opacity 0.2s ease";
+        box.style.transform = "translate(0, 0) scale(1, 1)";
+        setScrim(0.82);
+        const onEnd = (e: TransitionEvent) => {
+          if (e.propertyName !== "transform") return;
+          box.removeEventListener("transitionend", onEnd);
+          setPhase("open"); // artık iframe yüklenebilir
+        };
+        box.addEventListener("transitionend", onEnd);
+      }),
+    );
+    return () => cancelAnimationFrame(id);
+    // yalnız mount'ta; index değişimi iframe src'yi günceller, genie tekrarlamaz
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const close = useCallback(() => {
+    const box = boxRef.current;
+    if (!box || phase === "closing") {
+      onClose();
+      return;
+    }
+    setPhase("closing"); // iframe'i kaldır, kapağı göster
+    const target = box.getBoundingClientRect();
+    const sx = origin.width / target.width;
+    const sy = origin.height / target.height;
+    const tx = origin.left - target.left;
+    const ty = origin.top - target.top;
+    requestAnimationFrame(() => {
+      box.style.transition =
+        "transform 0.36s cubic-bezier(0.5, 0, 0.75, 0), opacity 0.32s ease 0.05s";
+      box.style.transform = `translate(${tx}px, ${ty}px) scale(${sx}, ${sy})`;
+      box.style.opacity = "0";
+      setScrim(0);
+    });
+    const t = setTimeout(onClose, 380);
+    return () => clearTimeout(t);
+  }, [origin, phase, onClose]);
+
+  const step = useCallback(
+    (d: number) => {
+      const n = collection.items.length;
+      setIndex((i) => (i + d + n) % n);
+    },
+    [collection.items.length],
+  );
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowRight") step(1);
+      else if (e.key === "ArrowLeft") step(-1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [close, step]);
+
+  if (!item) return null;
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={item.title}
+      className="fixed inset-0 z-[120] flex items-center justify-center p-4"
+    >
+      {/* dark perde — genie ile birlikte koyulaşır */}
+      <div
+        onClick={close}
+        className="absolute inset-0 bg-black transition-opacity duration-300"
+        style={{ opacity: scrim }}
+      />
+
+      <div className="relative z-10 w-full max-w-4xl">
+        <div
+          ref={boxRef}
+          style={{ opacity: 0, willChange: "transform" }}
+          className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/10 bg-black"
+        >
+          {/* kapak — genie sırasında (opening/closing) gösterilir, iframe scale altında bozulmasın */}
+          {phase !== "open" && (
+            <>
+              {item.thumbUrl && (
+                <Image
+                  src={item.thumbUrl}
+                  alt={item.title}
+                  fill
+                  sizes="(max-width: 900px) 100vw, 896px"
+                  className="object-cover"
+                  priority
+                />
+              )}
+              <div className="absolute inset-0 grid place-items-center bg-black/25">
+                <span className="grid size-14 place-items-center rounded-full bg-black/50 text-white backdrop-blur-sm">
+                  <Play className="size-6 translate-x-[1px] fill-current" />
+                </span>
+              </div>
+            </>
+          )}
+
+          {phase === "open" && (
+            <iframe
+              key={item.videoId}
+              src={`https://www.youtube-nocookie.com/embed/${item.videoId}?autoplay=1&rel=0&modestbranding=1`}
+              title={item.title}
+              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute inset-0 size-full"
+            />
+          )}
+        </div>
+
+        {/* alt bilgi + gezinme — genie bittiğinde belirir */}
+        <div
+          className="mt-3 flex items-start gap-3 transition-opacity duration-300"
+          style={{ opacity: phase === "open" ? 1 : 0 }}
+        >
+          <div className="min-w-0 flex-1">
+            <div className="truncate font-serif text-base font-semibold text-white sm:text-lg">
+              {item.title}
+            </div>
+            <div className="mt-0.5 truncate text-xs text-white/60">
+              {collection.title} · {index + 1} / {collection.items.length}
+              {item.author ? ` · ${item.author}` : ""}
+            </div>
+          </div>
+          {collection.items.length > 1 && (
+            <div className="flex shrink-0 items-center gap-1.5">
+              <button
+                onClick={() => step(-1)}
+                aria-label="Önceki video"
+                className="grid size-9 place-items-center rounded-full border border-white/20 text-white/80 transition hover:bg-white/10"
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+              <button
+                onClick={() => step(1)}
+                aria-label="Sonraki video"
+                className="grid size-9 place-items-center rounded-full border border-white/20 text-white/80 transition hover:bg-white/10"
+              >
+                <ChevronRight className="size-4" />
+              </button>
+            </div>
+          )}
+          <button
+            onClick={close}
+            aria-label="Kapat"
+            className="grid size-9 shrink-0 place-items-center rounded-full border border-white/20 text-white/80 transition hover:bg-white/10"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -134,7 +256,7 @@ function CollectionRail({
   onPlay,
 }: {
   collection: Collection;
-  onPlay: (index: number) => void;
+  onPlay: (index: number, origin: DOMRect) => void;
 }) {
   const railRef = useRef<HTMLDivElement>(null);
   const [edge, setEdge] = useState({ start: true, end: false });
@@ -224,9 +346,9 @@ function CollectionRail({
           <VideoCard
             key={item.id}
             item={item}
-            onClick={() => {
+            onOpen={(rect) => {
               if (drag.current.moved > 6) return; // sürükleme bitişi tıklama sayılmasın
-              onPlay(i);
+              onPlay(i, rect);
             }}
           />
         ))}
@@ -235,13 +357,26 @@ function CollectionRail({
   );
 }
 
-function VideoCard({ item, onClick }: { item: CollectionItem; onClick: () => void }) {
+function VideoCard({
+  item,
+  onOpen,
+}: {
+  item: CollectionItem;
+  onOpen: (rect: DOMRect) => void;
+}) {
+  const thumbRef = useRef<HTMLDivElement>(null);
   return (
     <button
-      onClick={onClick}
+      onClick={() => {
+        const r = thumbRef.current?.getBoundingClientRect();
+        if (r) onOpen(r);
+      }}
       className="group w-[78vw] shrink-0 snap-start text-left sm:w-[300px]"
     >
-      <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border bg-muted">
+      <div
+        ref={thumbRef}
+        className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border bg-muted"
+      >
         {item.thumbUrl && (
           <Image
             src={item.thumbUrl}
