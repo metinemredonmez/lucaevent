@@ -17,15 +17,24 @@ type Item = {
   thumbUrl: string | null;
   sort: number;
 };
+type Layout = "cinema" | "numbered" | "poster" | "featured";
 type Collection = {
   id: string;
   slug: string;
   title: string;
   subtitle: string | null;
   status: "DRAFT" | "PUBLISHED";
+  layout: Layout;
   sort: number;
   items: Item[];
 };
+
+const LAYOUTS: { v: Layout; l: string }[] = [
+  { v: "cinema", l: "Sinema — geniş 16:9 şerit" },
+  { v: "numbered", l: "Numaralı liste — top" },
+  { v: "poster", l: "Poster duvarı — dikey" },
+  { v: "featured", l: "Öne çıkan + ızgara" },
+];
 
 export default function CollectionEdit() {
   const { id } = useParams<{ id: string }>();
@@ -63,6 +72,7 @@ export default function CollectionEdit() {
           slug: c.slug,
           subtitle: c.subtitle ?? "",
           status: c.status,
+          layout: c.layout,
           sort: c.sort,
         }),
       });
@@ -229,6 +239,23 @@ export default function CollectionEdit() {
               <option value="DRAFT">Taslak (sitede görünmez)</option>
               <option value="PUBLISHED">Yayında</option>
             </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs text-muted-foreground">Şerit tasarımı</label>
+            <select
+              value={c.layout}
+              onChange={(e) => patch({ layout: e.target.value as Layout })}
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary/50"
+            >
+              {LAYOUTS.map((l) => (
+                <option key={l.v} value={l.v}>
+                  {l.l}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Her koleksiyon ana sayfada bu tasarımla, ayrı bir şerit olarak görünür.
+            </p>
           </div>
           <p className="text-xs text-muted-foreground">
             Yayındaki koleksiyonlar ana sayfada etkinlik panosunun altında, sıra değerine göre listelenir.

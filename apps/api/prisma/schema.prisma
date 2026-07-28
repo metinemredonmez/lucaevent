@@ -679,6 +679,8 @@ model Collection {
   title     String
   subtitle  String?
   status    CollectionStatus @default(DRAFT)
+  // Şerit tasarımı: cinema | numbered | poster | featured (web'de farklı render)
+  layout    String           @default("cinema")
   sort      Int              @default(0)
   items     CollectionItem[]
   createdAt DateTime         @default(now())

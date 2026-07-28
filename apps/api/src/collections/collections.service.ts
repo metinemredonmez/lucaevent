@@ -25,16 +25,20 @@ export class CollectionsService {
   constructor(private readonly prisma: PrismaService) {}
 
   // ---- public ----
-  /** Yayınlanan koleksiyonlar + videoları (ana sayfa şeridi). Boş koleksiyon gösterilmez. */
+  /**
+   * Yayınlanan koleksiyonlar + videoları (ana sayfa şeridi). Boş koleksiyon gösterilmez.
+   * LIFO: sort eşitse (varsayılan) en son oluşturulan en üstte; sort ile manuel override.
+   */
   async listPublished() {
     const rows = await this.prisma.collection.findMany({
       where: { status: CollectionStatus.PUBLISHED },
-      orderBy: [{ sort: 'asc' }, { createdAt: 'asc' }],
+      orderBy: [{ sort: 'asc' }, { createdAt: 'desc' }],
       select: {
         id: true,
         slug: true,
         title: true,
         subtitle: true,
+        layout: true,
         items: { orderBy: { sort: 'asc' }, select: ITEM_SELECT },
       },
     });
@@ -44,7 +48,7 @@ export class CollectionsService {
   // ---- admin ----
   adminList() {
     return this.prisma.collection.findMany({
-      orderBy: [{ sort: 'asc' }, { createdAt: 'asc' }],
+      orderBy: [{ sort: 'asc' }, { createdAt: 'desc' }],
       include: {
         items: { orderBy: { sort: 'asc' }, select: ITEM_SELECT },
       },
@@ -69,6 +73,7 @@ export class CollectionsService {
           title: dto.title.trim(),
           subtitle: dto.subtitle?.trim() || null,
           status: dto.status ?? CollectionStatus.DRAFT,
+          layout: dto.layout ?? 'cinema',
           sort: dto.sort ?? 0,
         },
         include: { items: true },
@@ -86,6 +91,7 @@ export class CollectionsService {
       data.slug = dto.slug.trim() || slugify(dto.title ?? existing.title);
     if (dto.subtitle !== undefined) data.subtitle = dto.subtitle?.trim() || null;
     if (dto.status !== undefined) data.status = dto.status;
+    if (dto.layout !== undefined) data.layout = dto.layout;
     if (dto.sort !== undefined) data.sort = dto.sort;
     try {
       return await this.prisma.collection.update({

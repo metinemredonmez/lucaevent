@@ -5,6 +5,7 @@ import {
   ArrayMinSize,
   IsArray,
   IsEnum,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -12,6 +13,14 @@ import {
   Min,
   MinLength,
 } from 'class-validator';
+
+export const COLLECTION_LAYOUTS = [
+  'cinema',
+  'numbered',
+  'poster',
+  'featured',
+] as const;
+export type CollectionLayout = (typeof COLLECTION_LAYOUTS)[number];
 
 export class CreateCollectionDto {
   @ApiProperty()
@@ -35,6 +44,11 @@ export class CreateCollectionDto {
   @IsOptional()
   @IsEnum(CollectionStatus)
   status?: CollectionStatus;
+
+  @ApiPropertyOptional({ enum: COLLECTION_LAYOUTS })
+  @IsOptional()
+  @IsIn(COLLECTION_LAYOUTS as unknown as string[])
+  layout?: CollectionLayout;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -65,6 +79,11 @@ export class UpdateCollectionDto {
   @IsOptional()
   @IsEnum(CollectionStatus)
   status?: CollectionStatus;
+
+  @ApiPropertyOptional({ enum: COLLECTION_LAYOUTS })
+  @IsOptional()
+  @IsIn(COLLECTION_LAYOUTS as unknown as string[])
+  layout?: CollectionLayout;
 
   @ApiPropertyOptional()
   @IsOptional()

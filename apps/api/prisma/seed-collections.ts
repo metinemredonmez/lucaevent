@@ -40,12 +40,44 @@ import { join } from 'path';
 
 const prisma = new PrismaClient();
 
-const SLUG = 'pazar-collectionlari';
-const URLS = [
-  'https://www.youtube.com/watch?v=4kphqkoQthQ',
-  'https://www.youtube.com/watch?v=lLwyqwJbMvw',
-  'https://www.youtube.com/watch?v=3Eoi765lSsA',
-  'https://www.youtube.com/watch?v=Yf3UpljAe4I',
+// Koleksiyonlar — her biri farklı bir şerit tasarımı (layout) ile.
+// LIFO: dizide SONRAKİ = daha yeni = ana sayfada daha ÜSTTE görünür.
+// Boş (urls:[]) olanlar videosu eklenene dek sitede görünmez; admin'den doldurulur.
+type Seed = { slug: string; title: string; subtitle: string; layout: string; urls: string[] };
+const COLLECTIONS: Seed[] = [
+  {
+    slug: 'pazar-collectionlari',
+    title: "Pazar collection'ları",
+    subtitle: 'Pazar için seçilmiş setler — house, nu disco, açık hava',
+    layout: 'cinema',
+    urls: [
+      'https://www.youtube.com/watch?v=4kphqkoQthQ',
+      'https://www.youtube.com/watch?v=lLwyqwJbMvw',
+      'https://www.youtube.com/watch?v=3Eoi765lSsA',
+      'https://www.youtube.com/watch?v=Yf3UpljAe4I',
+    ],
+  },
+  {
+    slug: 'gunluk-collectionlari',
+    title: "Günlük collection'ları",
+    subtitle: 'Bugünün seçkisi — güne eşlik eden mixler',
+    layout: 'featured',
+    urls: [],
+  },
+  {
+    slug: 'turkce-collectionlari',
+    title: "Türkçe collection'ları",
+    subtitle: 'Türkçe seçkiler — pop, rap, alternatif',
+    layout: 'poster',
+    urls: [],
+  },
+  {
+    slug: 'yabanci-pop',
+    title: 'Yabancı pop',
+    subtitle: 'Dünya listelerinden — en çok dinlenenler',
+    layout: 'numbered',
+    urls: [],
+  },
 ];
 
 /** oEmbed — anahtarsız; ulaşılamazsa başlık video id'ye düşer. */
@@ -80,38 +112,45 @@ async function meta(videoId: string) {
 }
 
 async function main() {
-  console.log("🎧  \"Pazar collection'ları\" hazırlanıyor…");
-  const collection = await prisma.collection.upsert({
-    where: { slug: SLUG },
-    update: {},
-    create: {
-      slug: SLUG,
-      title: "Pazar collection'ları",
-      subtitle: 'Pazar için seçilmiş setler — house, nu disco, açık hava',
-      status: CollectionStatus.PUBLISHED,
-      sort: 0,
-    },
-    include: { items: true },
-  });
+  console.log('🎧  Koleksiyonlar hazırlanıyor…');
 
-  const existing = new Set(collection.items.map((i) => i.videoId));
-  let sort = collection.items.reduce((m, i) => Math.max(m, i.sort), -1) + 1;
-  let added = 0;
-
-  for (const raw of URLS) {
-    const videoId = new URL(raw).searchParams.get('v')!;
-    if (existing.has(videoId)) continue;
-    const m = await meta(videoId);
-    await prisma.collectionItem.create({
-      data: { collectionId: collection.id, ...m, sort: sort++ },
+  for (const seed of COLLECTIONS) {
+    // Koleksiyonu oluştur (varsa dokunma — layout/başlık admin'den yönetiliyor olabilir).
+    const collection = await prisma.collection.upsert({
+      where: { slug: seed.slug },
+      update: {},
+      create: {
+        slug: seed.slug,
+        title: seed.title,
+        subtitle: seed.subtitle,
+        status: CollectionStatus.PUBLISHED,
+        layout: seed.layout,
+        sort: 0,
+      },
+      include: { items: true },
     });
-    added++;
-    console.log(`   + ${m.title}`);
-  }
 
-  console.log(
-    `✅  Koleksiyon hazır (${SLUG}) — ${added} yeni video eklendi, toplam ${existing.size + added}.`,
-  );
+    const existing = new Set(collection.items.map((i) => i.videoId));
+    let sort = collection.items.reduce((m, i) => Math.max(m, i.sort), -1) + 1;
+    let added = 0;
+
+    for (const raw of seed.urls) {
+      const videoId = new URL(raw).searchParams.get('v')!;
+      if (existing.has(videoId)) continue;
+      const m = await meta(videoId);
+      await prisma.collectionItem.create({
+        data: { collectionId: collection.id, ...m, sort: sort++ },
+      });
+      added++;
+      console.log(`   + [${seed.slug}] ${m.title}`);
+    }
+
+    const total = existing.size + added;
+    console.log(
+      `✅  ${seed.title} (${seed.layout}) — +${added} video, toplam ${total}` +
+        (total === 0 ? ' (boş; admin\'den video eklenince görünür)' : ''),
+    );
+  }
 }
 
 main()

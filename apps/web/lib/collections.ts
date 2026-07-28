@@ -11,11 +11,14 @@ export type CollectionItem = {
   thumbUrl: string | null;
 };
 
+export type CollectionLayout = "cinema" | "numbered" | "poster" | "featured";
+
 export type Collection = {
   id: string;
   slug: string;
   title: string;
   subtitle: string | null;
+  layout: CollectionLayout;
   items: CollectionItem[];
 };
 
