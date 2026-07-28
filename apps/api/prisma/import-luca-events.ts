@@ -136,6 +136,7 @@ async function main() {
     {
       slug: 'sahilde-sarap-maltepe',
       title: 'Sahilde Şarap Buluşması · Maltepe',
+      cover: '/img/events/sahilde-sarap-maltepe.jpg',
       tagline: 'Sahilde, kendi şarabınla, keyifli bir akşam.',
       description:
         '31 Temmuz Cuma akşamı Maltepe sahilinde buluşuyoruz. Kendi masamızı kurup kendi şarabımızı ' +
@@ -152,6 +153,7 @@ async function main() {
     {
       slug: 'istanbul-gizli-hazineleri',
       title: "İstanbul'un Gizli Hazineleri",
+      cover: '/img/events/istanbul-gizli-hazineleri.jpg',
       tagline: 'Şehrin bilinmeyen köşelerini keşfet.',
       description:
         "1 Ağustos'ta İstanbul'un pek bilinmeyen, gizli kalmış yerlerini geziyoruz. 'Çok iyi biliyorum' " +
@@ -165,6 +167,7 @@ async function main() {
     {
       slug: 'adalarda-dalis-deneyimi',
       title: "Adalar'da Dalış Deneyimi",
+      cover: '/img/events/adalarda-dalis-deneyimi.jpg',
       tagline: 'Tekne, dalış ve yüzme — her şey dahil.',
       description:
         '2 Ağustos Pazar günü Adalar sularında tekne, dalış ve yüzme keyfi. Küçükyalı Marina\'dan kalkıp ' +
