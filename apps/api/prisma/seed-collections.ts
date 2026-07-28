@@ -62,21 +62,39 @@ const COLLECTIONS: Seed[] = [
     title: "Günlük collection'ları",
     subtitle: 'Bugünün seçkisi — güne eşlik eden mixler',
     layout: 'featured',
-    urls: [],
+    urls: [
+      'https://www.youtube.com/watch?v=4skb09tixM0',
+      'https://www.youtube.com/watch?v=vN4Vc9T8QQc',
+      'https://www.youtube.com/watch?v=3NQPYsqSemY',
+      'https://www.youtube.com/watch?v=1rnAROkbrUk',
+      'https://www.youtube.com/watch?v=uVGEN8lU-oI',
+    ],
   },
   {
     slug: 'turkce-collectionlari',
     title: "Türkçe collection'ları",
     subtitle: 'Türkçe seçkiler — pop, rap, alternatif',
     layout: 'poster',
-    urls: [],
+    urls: [
+      'https://www.youtube.com/watch?v=_GOZDXq7I-I',
+      'https://www.youtube.com/watch?v=6ywcf07KQZA',
+      'https://www.youtube.com/watch?v=weVh_KolH1E',
+      'https://www.youtube.com/watch?v=qlib3dFzaZk',
+      'https://www.youtube.com/watch?v=C2tQrIHSXho',
+    ],
   },
   {
     slug: 'yabanci-pop',
     title: 'Yabancı pop',
     subtitle: 'Dünya listelerinden — en çok dinlenenler',
     layout: 'numbered',
-    urls: [],
+    urls: [
+      'https://www.youtube.com/watch?v=4NRXx6U8ABQ',
+      'https://www.youtube.com/watch?v=H5v3kku4y6Q',
+      'https://www.youtube.com/watch?v=JGwWNGJdvx8',
+      'https://www.youtube.com/watch?v=DyDfgMOUjCI',
+      'https://www.youtube.com/watch?v=kJQP7kiw5Fk',
+    ],
   },
 ];
 
