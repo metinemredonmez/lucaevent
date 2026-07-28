@@ -101,6 +101,8 @@ async function main() {
     { slug: 'mardin', name: 'Mardin · Midyat', address: 'Mardin (uçaklı tur)', city: 'Mardin', lat: 37.3124, lng: 40.735, capacity: 40 },
     { slug: 'macka-demokrasi-parki', name: 'Maçka Demokrasi Parkı', address: 'Maçka, Şişli, İstanbul', city: 'İstanbul', lat: 41.0446, lng: 28.9946, capacity: 200 },
     { slug: 'belgrad-ormani', name: 'Belgrad Ormanı', address: 'Belgrad Ormanı, Sarıyer, İstanbul', city: 'İstanbul', lat: 41.1855, lng: 28.9836, capacity: 100 },
+    { slug: 'kucukyali-marina', name: 'Küçükyalı Marina', address: 'Küçükyalı Marina, Maltepe, İstanbul', city: 'İstanbul', lat: 40.9557, lng: 29.1189, capacity: 40 },
+    { slug: 'maltepe-sahil', name: 'Maltepe Sahili', address: 'Maltepe Sahil, İstanbul', city: 'İstanbul', lat: 40.9223, lng: 29.1307, capacity: 20 },
   ];
   const ven: Record<string, { id: string }> = {};
   for (const v of venueData) {
@@ -130,6 +132,61 @@ async function main() {
   };
 
   const events: Ev[] = [
+    // ——— Yaklaşan (WhatsApp toplulukları) ———
+    {
+      slug: 'sahilde-sarap-maltepe',
+      title: 'Sahilde Şarap Buluşması · Maltepe',
+      tagline: 'Sahilde, kendi şarabınla, keyifli bir akşam.',
+      description:
+        '31 Temmuz Cuma akşamı Maltepe sahilinde buluşuyoruz. Kendi masamızı kurup kendi şarabımızı ' +
+        'getiriyor, komşularımızla keyifli bir akşam geçiriyoruz. Herkes kendi içeceğini getiriyor. Kontenjan 20 kişi.',
+      kind: EventKind.TRIP,
+      categorySlug: 'social',
+      venueSlug: 'maltepe-sahil',
+      startsAt: '2026-07-31T19:00:00+03:00',
+      endsAt: '2026-07-31T22:30:00+03:00',
+      status: EventStatus.PUBLISHED,
+      included: ['Sahilde masa kurulumu', 'Keyifli sohbet ortamı'],
+      bringList: ['Kendi içeceğin', 'Atıştırmalık (paylaşmak istersen)'],
+    },
+    {
+      slug: 'istanbul-gizli-hazineleri',
+      title: "İstanbul'un Gizli Hazineleri",
+      tagline: 'Şehrin bilinmeyen köşelerini keşfet.',
+      description:
+        "1 Ağustos'ta İstanbul'un pek bilinmeyen, gizli kalmış yerlerini geziyoruz. 'Çok iyi biliyorum' " +
+        'diyenler bile bu turda yeni yerler keşfedebilir. Şehri farklı bir gözle görmek isteyenlerle birlikte yola çıkıyoruz.',
+      kind: EventKind.TRIP,
+      categorySlug: 'gezi-seyahat',
+      startsAt: '2026-08-01T11:00:00+03:00',
+      endsAt: '2026-08-01T16:00:00+03:00',
+      status: EventStatus.PUBLISHED,
+    },
+    {
+      slug: 'adalarda-dalis-deneyimi',
+      title: "Adalar'da Dalış Deneyimi",
+      tagline: 'Tekne, dalış ve yüzme — her şey dahil.',
+      description:
+        '2 Ağustos Pazar günü Adalar sularında tekne, dalış ve yüzme keyfi. Küçükyalı Marina\'dan kalkıp ' +
+        'gün boyu denizin tadını çıkarıyoruz. 30 dakikalık rehberli dalış, tüm ekipmanlar, ücretsiz su altı ' +
+        'fotoğraf ve video, öğle yemeği ve serbest yüzme dahil. Dalış için deneyim gerekmez.',
+      kind: EventKind.TRIP,
+      categorySlug: 'outdoor-spor',
+      venueSlug: 'kucukyali-marina',
+      startsAt: '2026-08-02T10:00:00+03:00',
+      endsAt: '2026-08-02T17:00:00+03:00',
+      status: EventStatus.PUBLISHED,
+      agenda: [
+        { time: '10:00', title: "Küçükyalı Marina'dan kalkış" },
+        { time: '12:00', title: 'Rehberli dalış (30 dk)' },
+        { time: '13:30', title: 'Öğle yemeği' },
+        { time: '15:00', title: 'Serbest yüzme' },
+        { time: '17:00', title: 'Marinaya dönüş' },
+      ],
+      included: ['30 dakikalık rehberli dalış', 'Tüm dalış ekipmanları', 'Ücretsiz su altı fotoğraf & video', 'Öğle yemeği', 'Serbest yüzme'],
+      bringList: ['Mayo & havlu', 'Güneş kremi', 'Yedek kıyafet'],
+    },
+
     // ——— Yaklaşan ———
     {
       slug: 'sile-kampi',
