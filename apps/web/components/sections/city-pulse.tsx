@@ -274,12 +274,12 @@ export function CityPulse() {
         .cp.light{background:#f8f6f0;color:#1a1c1e}
         /* Açık temada foto üstte net/koyu kalır ama alt, koyu yerine kağıt zemine geçer —
            böylece pano/kartın altında siyah bant kalmaz. */
-        /* açık deniz sahnesi yıkanmasın: foto'yu hafif koyult, dramatik scrim ekle (dark benzeri),
-           beyaz yalnız en dipte panoya geçişte */
-        .cp.light .cp-bg{filter:saturate(1.1) brightness(0.9)}
+        /* NET FOTO + TEMİZ AÇIK ZEMİN: foto geniş alanda tam net (bulanık beyaz pus yok);
+           üstte yazı için koyu scrim, en dipte KISA/keskin geçişle düz açık zemine iner. */
+        .cp.light .cp-bg{filter:saturate(1.08) brightness(0.95)}
         .cp.light .cp-bg::after{background:
-          radial-gradient(66% 52% at 84% 4%,hsl(var(--primary) / .12),transparent 60%),
-          linear-gradient(to bottom,rgba(10,11,13,.30) 0%,rgba(10,11,13,.14) 34%,transparent 68%,rgba(248,246,240,.5) 90%,#f8f6f0 100%)}
+          radial-gradient(66% 52% at 84% 4%,hsl(var(--primary) / .10),transparent 55%),
+          linear-gradient(to bottom,rgba(10,11,13,.34) 0%,rgba(10,11,13,.10) 30%,transparent 52%,transparent 92%,#f8f6f0 99%)}
         .cp.light .cp-h1{color:#f5f3ee}
         .cp.light .cp-board{background:#fff;border-color:rgba(20,24,26,.1)}
         .cp.light .cp-grp{color:hsl(var(--primary))}
