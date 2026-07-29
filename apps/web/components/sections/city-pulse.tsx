@@ -173,7 +173,7 @@ export function CityPulse() {
           font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
         /* içerik zemini (#0e1014) foto'dan bir ton açık; foto alt kenarı koyu shelf gölgesiyle
            biter → slider ile etkinlik listesi arası net ama yumuşak ayrım. */
-        .cp-bg{--bgop:1;position:absolute;inset:0 0 auto 0;height:min(78vh,760px);background-position:center top;background-size:cover;background-repeat:no-repeat;opacity:var(--bgop);filter:saturate(1.06) brightness(1.06);box-shadow:0 24px 44px -18px rgba(0,0,0,.75);animation:cpBgIn 1.1s ease both}
+        .cp-bg{--bgop:1;position:absolute;inset:0 0 auto 0;height:min(78vh,760px);background-position:center top;background-size:cover;background-repeat:no-repeat;opacity:var(--bgop);filter:saturate(1.06) brightness(1.06);animation:cpBgIn 1.1s ease both}
         @keyframes cpBgIn{from{opacity:0;transform:scale(1.05)}to{opacity:var(--bgop);transform:none}}
         /* foto belirgin: üst yarı açık; alt, panoya geçiş için koyu. + palet parıltısı */
         .cp-bg::after{content:'';position:absolute;inset:0;z-index:1;
